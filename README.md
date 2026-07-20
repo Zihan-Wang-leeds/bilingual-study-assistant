@@ -24,7 +24,7 @@ python3 -m pip install -r requirements.txt
 Create a local `.env` file:
 
 ```bash
-DEEPSEEK_API_KEY=your_api_key_here
+DEEPSEEK_API_KEY=your-deepseek-api-key-here
 ```
 
 `.env` is intentionally ignored by Git.
