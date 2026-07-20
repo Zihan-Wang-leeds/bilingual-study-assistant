@@ -5,20 +5,16 @@ import os
 import sys
 import re
 import time
-import json
 from datetime import datetime
-from openai import OpenAI
-from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import (
-    API_KEY, BASE_URL, MODEL_NAME, COURSES_DIR,
+    COURSES_DIR,
     GENERATION_TEMPERATURE, GENERATION_MAX_TOKENS, GENERATION_SLEEP,
 )
-from pdf_loader import extract_text_from_pdf, extract_course_info
-
-load_dotenv()
+from pdf_loader import extract_text_from_pdf
+from llm_client import call_llm_with_prompts
 
 OUTPUT_DIR = "guides"
 
@@ -30,11 +26,6 @@ class ProblemSolver:
         self.course_code = course_code
         self.pdf_path = pdf_path
         self.output_dir = os.path.join(os.path.dirname(pdf_path), OUTPUT_DIR)
-
-        self.client = OpenAI(
-            api_key=os.getenv("DEEPSEEK_API_KEY", API_KEY),
-            base_url=BASE_URL
-        )
 
         print(f"Loading PDF: {pdf_path}")
         self.pages = extract_text_from_pdf(pdf_path)
@@ -237,17 +228,14 @@ RULES:
 5. For proof questions, explain the logical structure
 6. Double-check all calculations"""
 
-        response = self.client.chat.completions.create(
-            model=MODEL_NAME,
-            messages=[
-                {"role": "system", "content": "You are a university mathematics tutor specializing in stochastic processes. You create detailed, step-by-step solutions with bilingual (Chinese/English) explanations. You never skip steps and always explain the reasoning."},
-                {"role": "user", "content": prompt}
-            ],
+        response = call_llm_with_prompts(
+            "You are a university mathematics tutor specializing in stochastic processes. You create detailed, step-by-step solutions with bilingual (Chinese/English) explanations. You never skip steps and always explain the reasoning.",
+            prompt,
             temperature=GENERATION_TEMPERATURE,
-            max_tokens=GENERATION_MAX_TOKENS
+            max_tokens=GENERATION_MAX_TOKENS,
         )
 
-        content = response.choices[0].message.content
+        content = response
 
         header = f"""# Problem Sheet {ps['number']} - 详细解答 / Detailed Solutions
 

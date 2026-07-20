@@ -25,6 +25,10 @@ try:
 except ModuleNotFoundError:
     Flask = None
 
+from config import COURSES_DIR
+from pdf_loader import extract_text_from_pdf
+from chunker import chunk_pdf
+
 app = Flask(__name__) if Flask else None
 
 # 全局 RAG 实例（启动时加载索引）
@@ -36,6 +40,7 @@ MODE_NAMES = {
     "homework": "✏️ 作业辅导 Homework Help",
     "review": "📝 考前复习 Exam Review",
     "coursework": "📋 课程作业 Coursework Help",
+    "quiz": "📝 模拟测验 Quiz Mode",
 }
 
 MODE_DESCRIPTIONS = {
@@ -44,6 +49,7 @@ MODE_DESCRIPTIONS = {
     "homework": "引导思考，分步提示，不直接给答案",
     "review": "知识框架梳理 + 重要公式 + 自测题",
     "coursework": "需求拆解 + 方法建议 + 代码框架 + 报告结构",
+    "quiz": "生成练习题 + 自动批改 + 薄弱点分析",
 }
 
 
@@ -115,13 +121,14 @@ def api_modes():
 
 
 def build_chat_response(data):
-    """聊天接口 — 返回 JSON"""
+    """聊天接口 — 返回 JSON（支持对话历史）"""
     if not data:
         return {"error": "Request body required"}, 400
 
     question = data.get('question', '').strip()
     course_code = data.get('course_code') or None
     mode = data.get('mode', 'teach')
+    history = data.get('history') or None
 
     if not question:
         return {"error": "Question is empty"}, 400
@@ -129,7 +136,7 @@ def build_chat_response(data):
     if mode not in MODE_NAMES:
         mode = 'teach'
 
-    result = rag.ask(question, course_code=course_code, mode=mode)
+    result = rag.ask(question, course_code=course_code, mode=mode, history=history)
 
     return {
         "answer": result['answer'],
@@ -139,10 +146,64 @@ def build_chat_response(data):
     }, 200
 
 
+def api_upload():
+    """上传 PDF 课件 — 自动提取 → 分块 → 索引"""
+    if 'file' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files['file']
+    course_code = request.form.get('course_code', '').strip().upper()
+
+    if not file.filename.lower().endswith('.pdf'):
+        return jsonify({"error": "Only PDF files supported"}), 400
+    if not course_code:
+        return jsonify({"error": "course_code is required (e.g. MATH2702)"}), 400
+
+    # 创建课程目录
+    course_dir = os.path.join(COURSES_DIR, course_code)
+    os.makedirs(course_dir, exist_ok=True)
+
+    # 保存文件
+    pdf_filename = file.filename
+    pdf_path = os.path.join(course_dir, pdf_filename)
+    file.save(pdf_path)
+
+    # 处理: 提取 → 分块 → 索引
+    try:
+        pages = extract_text_from_pdf(pdf_path)
+        chunks = chunk_pdf(pages)
+        course_name = course_code
+        rag.add_chunks(course_code, course_name, chunks)
+
+        # 尝试语义索引
+        try:
+            from semantic_search import SemanticSearch
+            sem = SemanticSearch()
+            if sem.is_ready:
+                sem.add_chunks(course_code, chunks)
+        except Exception:
+            pass
+
+        return jsonify({
+            "success": True,
+            "course_code": course_code,
+            "filename": pdf_filename,
+            "pages": len(pages),
+            "chunks": len(chunks),
+            "message": f"✅ {course_code} indexed: {len(pages)} pages, {len(chunks)} chunks"
+        }), 200
+    except Exception as e:
+        return jsonify({"error": f"Processing failed: {str(e)}"}), 500
+
+
 if app:
     app.add_url_rule('/api/stats', 'api_stats', lambda: jsonify(api_stats()))
     app.add_url_rule('/api/courses', 'api_courses', lambda: jsonify(api_courses()))
     app.add_url_rule('/api/modes', 'api_modes', lambda: jsonify(api_modes()))
+    @app.route('/api/upload', methods=['POST'])
+    def upload_route():
+        payload, status = api_upload()
+        return jsonify(payload), status
 
     @app.route('/api/chat', methods=['POST'])
     def api_chat():
@@ -151,7 +212,7 @@ if app:
 
     @app.route('/api/chat/stream', methods=['POST'])
     def api_chat_stream():
-        """聊天接口 — SSE 流式返回（给未来扩展用，目前回退到非流式）"""
+        """聊天接口 — 真正的 SSE 流式返回"""
         data = request.get_json()
         if not data:
             return jsonify({"error": "Request body required"}), 400
@@ -159,6 +220,7 @@ if app:
         question = data.get('question', '').strip()
         course_code = data.get('course_code') or None
         mode = data.get('mode', 'teach')
+        history = data.get('history') or None
 
         if not question:
             return jsonify({"error": "Question is empty"}), 400
@@ -167,8 +229,8 @@ if app:
             mode = 'teach'
 
         def generate():
-            result = rag.ask(question, course_code=course_code, mode=mode)
-            yield f"data: {json.dumps({'answer': result['answer'], 'sources': result['sources'], 'mode': mode, 'course_code': course_code}, ensure_ascii=False)}\n\n"
+            for token in rag.ask_stream(question, course_code=course_code, mode=mode, history=history):
+                yield f"data: {json.dumps({'token': token}, ensure_ascii=False)}\n\n"
             yield "data: [DONE]\n\n"
 
         return Response(

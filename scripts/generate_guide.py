@@ -9,18 +9,15 @@ import sys
 import re
 import time
 from datetime import datetime
-from openai import OpenAI
-from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import (
-    API_KEY, BASE_URL, MODEL_NAME, COURSES_DIR,
+    COURSES_DIR,
     GENERATION_TEMPERATURE, GENERATION_MAX_TOKENS, GENERATION_SLEEP,
 )
 from pdf_loader import extract_text_from_pdf, extract_with_structure
-
-load_dotenv()
+from llm_client import call_llm_with_prompts
 
 # 输出目录
 OUTPUT_DIR = "guides"
@@ -46,11 +43,6 @@ class GuideGenerator:
         self.pdf_path = pdf_path
         self.output_dir = os.path.join(
             os.path.dirname(pdf_path), OUTPUT_DIR
-        )
-
-        self.client = OpenAI(
-            api_key=os.getenv("DEEPSEEK_API_KEY", API_KEY),
-            base_url=BASE_URL
         )
 
         # 提取所有页面文本
@@ -363,17 +355,14 @@ IMPORTANT RULES:
 5. For proofs, explain the logic step by step, don't just copy
 6. The guide should be usable WITHOUT referring back to the original PDF"""
 
-        response = self.client.chat.completions.create(
-            model=MODEL_NAME,
-            messages=[
-                {"role": "system", "content": "You are an expert university professor creating bilingual (Chinese/English) self-study textbooks. You are thorough, patient, and include EVERY detail from the source material."},
-                {"role": "user", "content": prompt}
-            ],
+        response = call_llm_with_prompts(
+            "You are an expert university professor creating bilingual (Chinese/English) self-study textbooks. You are thorough, patient, and include EVERY detail from the source material.",
+            prompt,
             temperature=GENERATION_TEMPERATURE,
-            max_tokens=GENERATION_MAX_TOKENS
+            max_tokens=GENERATION_MAX_TOKENS,
         )
 
-        content = response.choices[0].message.content
+        content = response
 
         # 添加文件头
         header = f"""# Section {boundary['number']}: {boundary['title']}

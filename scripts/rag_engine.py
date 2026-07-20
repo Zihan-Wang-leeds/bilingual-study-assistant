@@ -11,8 +11,7 @@ import re
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from openai import OpenAI
-from dotenv import load_dotenv
+from llm_client import get_client, call_llm_with_prompts, call_llm_stream_with_prompts
 
 from config import (
     API_KEY, BASE_URL, MODEL_NAME,
@@ -28,8 +27,6 @@ if _project_root not in _sys.path:
 
 from prompts.study_modes import get_study_prompt
 
-load_dotenv()
-
 # 存储路径
 INDEX_FILE = "knowledge_index.json"
 
@@ -38,21 +35,26 @@ class CourseRAG:
     """基于课程课件的RAG问答系统（TF-IDF版）"""
 
     def __init__(self, index_path: str = INDEX_FILE):
-        # LLM客户端
-        self.client = OpenAI(
-            api_key=os.getenv("DEEPSEEK_API_KEY", API_KEY),
-            base_url=BASE_URL
-        )
-
         self.index_path = index_path
         self.courses = {}           # {course_code: {"name": ..., "chunks": [...]}}
         self.vectorizer = None      # TfidfVectorizer实例
         self.tfidf_matrix = None    # TF-IDF矩阵
         self.all_chunks = []        # 所有chunk的扁平列表
+        self.semantic = None        # SemanticSearch 实例（按需加载）
 
         # 如果已有索引文件，加载
         if os.path.exists(index_path):
             self._load_index()
+
+    def _init_semantic(self):
+        """按需加载语义搜索引擎（避免启动时强制依赖 chromadb）。"""
+        if self.semantic is None:
+            try:
+                from semantic_search import SemanticSearch
+                self.semantic = SemanticSearch()
+            except ImportError:
+                self.semantic = False  # 标记为不可用
+        return self.semantic if self.semantic else None
 
     # ================================================================
     # 索引持久化
@@ -105,7 +107,8 @@ class CourseRAG:
     # 索引管理
     # ================================================================
 
-    def add_chunks(self, course_code: str, course_name: str, chunks: list[dict]) -> int:
+    def add_chunks(self, course_code: str, course_name: str, chunks: list[dict],
+                   semantic: bool = False) -> int:
         """将分块后的文档添加到课程知识库。"""
         if course_code not in self.courses:
             self.courses[course_code] = {
@@ -121,9 +124,16 @@ class CourseRAG:
 
         print(f"[{course_code}] 已添加 {len(chunks)} 个文档块")
 
-        # 重建索引
+        # 重建 TF-IDF 索引
         self._rebuild_tfidf()
         self._save_index()
+
+        # 语义索引（如果可用）
+        if semantic:
+            sem = self._init_semantic()
+            if sem and sem.is_ready:
+                sem.add_chunks(course_code, chunks)
+
         return len(chunks)
 
     def list_courses(self) -> list[str]:
@@ -144,12 +154,26 @@ class CourseRAG:
     # ================================================================
 
     def search(self, query: str, course_code: str = None,
-               top_k: int = TOP_K) -> list[dict]:
+               top_k: int = TOP_K, use_semantic: bool = False) -> list[dict]:
         """
-        检索最相关的课程内容（TF-IDF + 余弦相似度）。
+        检索最相关的课程内容。
+
+        参数:
+            use_semantic: True 时使用 ChromaDB 语义搜索（需安装依赖），
+                          False 时使用 TF-IDF（零依赖，即时可用）
 
         返回: [{"content": "...", "metadata": {...}, "score": 0.95}, ...]
         """
+        # 尝试语义搜索
+        if use_semantic:
+            sem = self._init_semantic()
+            if sem and sem.is_ready:
+                results = sem.search(query, course_code=course_code, top_k=top_k)
+                if results:
+                    return results
+            # Fallback: 语义搜索不可用或结果为空
+
+        # TF-IDF 搜索（默认，零依赖）
         if not self.vectorizer or not self.all_chunks:
             return []
 
@@ -201,14 +225,16 @@ class CourseRAG:
     # ================================================================
 
     def ask(self, question: str, course_code: str = None,
-            mode: str = "concept", top_k: int = TOP_K) -> dict:
+            mode: str = "concept", top_k: int = TOP_K,
+            history: list[dict] = None) -> dict:
         """
         基于课程内容回答问题。
 
         参数:
             question: 用户问题
             course_code: 课程代码（可选）
-            mode: 回答模式 - "concept"概念解释 | "homework"作业引导 | "review"考前复习
+            mode: 回答模式 - "teach"|"concept"|"homework"|"review"|"coursework"
+            history: 对话历史 [{"role": "user/assistant", "content": "..."}]
 
         返回: {"answer": "...", "sources": [...], "mode": "..."}
         """
@@ -240,7 +266,7 @@ class CourseRAG:
         system_prompt = get_study_prompt(mode, context)
 
         # 4. 调用LLM
-        answer = self._call_llm(system_prompt, question)
+        answer = self._call_llm(system_prompt, question, history=history)
 
         # 5. 整理来源
         sources = []
@@ -259,21 +285,85 @@ class CourseRAG:
             "mode": mode
         }
 
-    def _call_llm(self, system_prompt: str, question: str) -> str:
-        """调用LLM生成回答。"""
-        try:
-            response = self.client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": question}
-                ],
-                temperature=TEMPERATURE,
-                max_tokens=MAX_TOKENS
-            )
-            return normalize_math_answer(response.choices[0].message.content)
-        except Exception as e:
-            return f"API调用失败: {e}"
+    def ask_stream(self, question: str, course_code: str = None,
+                   mode: str = "concept", top_k: int = TOP_K,
+                   history: list[dict] = None):
+        """
+        流式版本 ask() — 逐个 token yield。
+
+        先 yield metadata (JSON)，然后逐 token yield 回答文本。
+        Yields:
+            首条: '{"sources": [...], "mode": "..."}\n'  (metadata)
+            后续: str (逐个 delta 文本)
+        """
+        import json as _json
+
+        # 1. 检索
+        relevant_docs = self.search(question, course_code, top_k)
+        if not relevant_docs:
+            yield _json.dumps({"answer": "在课程资料中没有找到相关内容。", "sources": [], "mode": mode}, ensure_ascii=False)
+            return
+
+        # 2. 构建上下文
+        context_parts = []
+        for i, doc in enumerate(relevant_docs):
+            meta = doc["metadata"]
+            src_info = f"[来源{i+1}] "
+            if "course_name" in meta:
+                src_info += f"课程: {meta['course_name']}, "
+            if "section_title" in meta:
+                src_info += f"Section {meta['section']}: {meta['section_title']}"
+            elif "section" in meta:
+                src_info += f"Section {meta['section']}"
+            context_parts.append(f"{src_info}\n{doc['content']}")
+        context = "\n\n---\n\n".join(context_parts)
+
+        # 3. 来源 metadata
+        sources = []
+        for doc in relevant_docs:
+            meta = doc["metadata"]
+            sources.append({
+                "course": meta.get("course_name", ""),
+                "section": meta.get("section", ""),
+                "section_title": meta.get("section_title", ""),
+                "preview": doc["content"][:200]
+            })
+        yield _json.dumps({"sources": sources, "mode": mode}, ensure_ascii=False) + "\n"
+
+        # 4. System prompt
+        system_prompt = get_study_prompt(mode, context)
+        messages = [{"role": "system", "content": system_prompt}]
+        if history:
+            for turn in history[-12:]:
+                messages.append({"role": turn["role"], "content": turn["content"]})
+        messages.append({"role": "user", "content": question})
+
+        # 5. 流式生成
+        buffer = ""
+        for delta in call_llm_stream(
+            messages=messages,
+            temperature=TEMPERATURE,
+            max_tokens=MAX_TOKENS,
+        ):
+            buffer += delta
+            yield delta
+
+        # 最终做一次 math normalize（整段输出也可用）
+        # 流式无法实时 normalize，所以只在最后做
+        """调用LLM生成回答（带自动重试）。"""
+        messages = [{"role": "system", "content": system_prompt}]
+        # 注入对话历史
+        if history:
+            for turn in history[-12:]:  # 最多保留最近 12 条消息
+                messages.append({"role": turn["role"], "content": turn["content"]})
+        messages.append({"role": "user", "content": question})
+
+        answer = call_llm(
+            messages=messages,
+            temperature=TEMPERATURE,
+            max_tokens=MAX_TOKENS,
+        )
+        return normalize_math_answer(answer)
 
 
 def normalize_math_answer(answer: str) -> str:

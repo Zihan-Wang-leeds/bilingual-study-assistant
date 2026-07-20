@@ -420,6 +420,16 @@
             40% { transform: scale(1); }
         }
 
+        /* Streaming cursor blink */
+        .streaming-cursor {
+            animation: blink 0.7s infinite;
+            color: var(--primary);
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
         /* ============================================================
            Input Area
            ============================================================ */
@@ -589,7 +599,7 @@ const state = {
     mode: 'teach',
     courseCode: null,
     courses: [],
-    messages: [],
+    messages: [],   // [{role: 'user'|'assistant', content: '...'}]
     loading: false
 };
 
@@ -653,6 +663,8 @@ function loadModes() {
           desc: '知识框架梳理 + 重要公式 + 自测题' },
         { key: 'coursework', icon: '📋', label: '课程作业', enLabel: 'Coursework Help',
           desc: '需求拆解 + 方法建议 + 代码框架 + 报告结构' },
+        { key: 'quiz', icon: '📝', label: '模拟测验', enLabel: 'Quiz Mode',
+          desc: '生成练习题 + 自动批改 + 薄弱点分析' },
     ];
 
     const list = document.getElementById('modeList');
@@ -685,6 +697,7 @@ function switchMode(mode) {
         homework: '✏️ 作业辅导 Homework Help',
         review: '📝 考前复习 Exam Review',
         coursework: '📋 课程作业 Coursework Help',
+        quiz: '📝 模拟测验 Quiz Mode',
     };
     document.getElementById('currentModeLabel').textContent = labels[mode] || labels.teach;
     updateSuggestions();
@@ -746,6 +759,11 @@ function updateSuggestions() {
             'How should I structure my data analysis report?',
             'What statistical methods are appropriate here?',
         ],
+        quiz: [
+            'Generate a quiz on Markov chains with 5 questions',
+            'Test me on Poisson processes - medium difficulty',
+            'Create a mixed quiz covering sections 1-5',
+        ],
     };
 
     const items = suggestions[state.mode] || suggestions.teach;
@@ -785,7 +803,10 @@ async function sendMessage() {
     const welcome = document.getElementById('welcomeScreen');
     if (welcome) welcome.remove();
 
-    // Add user message
+    // Track user message in state
+    state.messages.push({role: 'user', content: question});
+
+    // Add user message to UI
     addMessage('user', question);
     input.value = '';
     input.style.height = 'auto';
@@ -796,29 +817,74 @@ async function sendMessage() {
     const typingMsg = addTypingIndicator();
 
     try {
-        const res = await fetch('/api/chat', {
+        // Build conversation history for the server
+        const history = state.messages.slice(0, -1);  // exclude current question
+
+        const res = await fetch('/api/chat/stream', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 question: question,
                 course_code: state.courseCode,
-                mode: state.mode
+                mode: state.mode,
+                history: history.length > 0 ? history : null
             })
         });
 
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
-        const data = await res.json();
-
         // Remove typing indicator
         typingMsg.remove();
 
-        // Add assistant message
-        addMessage('assistant', data.answer, data.sources);
+        // Create assistant bubble for streaming
+        const assistantDiv = addMessage('assistant', '', null, true);
+
+        // Read SSE stream
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let accumulated = '';
+        let sources = null;
+
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, {stream: true});
+            const lines = buffer.split('\n');
+            buffer = lines.pop();  // keep incomplete line in buffer
+
+            for (const line of lines) {
+                if (!line.startsWith('data: ')) continue;
+                const payload = line.slice(6);
+                if (payload === '[DONE]') break;
+
+                try {
+                    const data = JSON.parse(payload);
+                    if (data.sources) {
+                        // First message: metadata with sources
+                        sources = data.sources;
+                    } else if (data.token) {
+                        accumulated += data.token;
+                        // Update the bubble with accumulated text
+                        updateAssistantBubble(assistantDiv, accumulated, sources);
+                    }
+                } catch (e) {
+                    // Skip malformed JSON
+                }
+            }
+        }
+
+        // Final render
+        updateAssistantBubble(assistantDiv, accumulated, sources);
+        // Save to state history
+        state.messages.push({role: 'assistant', content: accumulated});
 
     } catch (e) {
         typingMsg.remove();
-        addMessage('assistant', `❌ **错误 / Error**: ${e.message}\n\n请确认服务器正在运行。Please make sure the server is running.`, []);
+        const errMsg = `❌ **错误 / Error**: ${e.message}\n\n请确认服务器正在运行。Please make sure the server is running.`;
+        addMessage('assistant', errMsg, []);
+        state.messages.push({role: 'assistant', content: errMsg});
     } finally {
         state.loading = false;
         document.getElementById('sendBtn').disabled = false;
@@ -826,7 +892,7 @@ async function sendMessage() {
     }
 }
 
-function addMessage(role, content, sources) {
+function addMessage(role, content, sources, isStreaming) {
     const container = document.getElementById('messages');
     const div = document.createElement('div');
     div.className = `msg ${role}`;
@@ -836,42 +902,67 @@ function addMessage(role, content, sources) {
             <div class="avatar">👤</div>
             <div class="bubble">${escapeHtml(content)}</div>`;
     } else {
-        // Protect LaTeX before Markdown parsing, then typeset it with MathJax.
-        let html = renderAssistantMarkdown(content);
+        // If streaming, create a placeholder bubble that will be updated
+        const bubbleId = 'bubble-' + Date.now();
+        let html = isStreaming ? '<span class="streaming-cursor">▊</span>' : renderAssistantMarkdown(content);
 
-        // Render sources if present
+        // Render sources if present (only when not streaming)
         let sourcesHtml = '';
-        if (sources && sources.length > 0) {
-            sourcesHtml = `
-            <div class="sources">
-                <details>
-                    <summary>📎 参考来源 / References (${sources.length})</summary>
-                    <ul>
-                        ${sources.map((s, i) => `
-                            <li>
-                                <strong>[${i + 1}]</strong>
-                                ${s.course ? s.course + ' · ' : ''}
-                                ${s.section ? 'Section ' + s.section : ''}
-                                ${s.section_title ? ': ' + s.section_title : ''}
-                            </li>
-                        `).join('')}
-                    </ul>
-                </details>
-            </div>`;
+        if (sources && sources.length > 0 && !isStreaming) {
+            sourcesHtml = renderSourcesHtml(sources);
         }
 
         div.innerHTML = `
             <div class="avatar">🤖</div>
             <div>
-                <div class="bubble">${html}</div>
+                <div class="bubble" id="${bubbleId}">${html}</div>
                 ${sourcesHtml}
             </div>`;
+        div.dataset.bubbleId = bubbleId;
     }
 
     container.appendChild(div);
-    typesetMath(div);
+    if (!isStreaming) {
+        typesetMath(div);
+    }
     scrollToBottom();
     return div;
+}
+
+function renderSourcesHtml(sources) {
+    return `
+    <div class="sources">
+        <details>
+            <summary>📎 参考来源 / References (${sources.length})</summary>
+            <ul>
+                ${sources.map((s, i) => `
+                    <li>
+                        <strong>[${i + 1}]</strong>
+                        ${s.course ? s.course + ' · ' : ''}
+                        ${s.section ? 'Section ' + s.section : ''}
+                        ${s.section_title ? ': ' + s.section_title : ''}
+                    </li>
+                `).join('')}
+            </ul>
+        </details>
+    </div>`;
+}
+
+function updateAssistantBubble(div, content, sources) {
+    const bubble = div.querySelector('.bubble');
+    if (!bubble) return;
+    bubble.innerHTML = renderAssistantMarkdown(content) + '<span class="streaming-cursor" style="display:none">▊</span>';
+    // Update sources
+    const existingSources = div.querySelector('.sources');
+    if (existingSources) existingSources.remove();
+    if (sources && sources.length > 0) {
+        const sourcesContainer = document.createElement('div');
+        sourcesContainer.innerHTML = renderSourcesHtml(sources);
+        div.querySelector('div:last-child')?.appendChild?.(sourcesContainer.firstElementChild) ||
+            div.appendChild(sourcesContainer.firstElementChild);
+    }
+    typesetMath(div);
+    scrollToBottom();
 }
 
 function normalizeMathContent(content) {
