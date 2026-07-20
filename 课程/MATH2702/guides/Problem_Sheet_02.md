@@ -1,257 +1,246 @@
 # Problem Sheet 2 - 详细解答 / Detailed Solutions
 
 > MATH2702 Stochastic Processes
-> 生成时间 / Generated: 2026-07-17 15:10
+> 生成时间 / Generated: 2026-07-20 16:01
 > 来源页 / Source Pages: 27-29
 
 ---
 
-好的，作为大学随机过程课程的导师，我将为您提供MATH2702课程习题集2的完整、详细的逐步解答。
-
----
+好的，作为您的大学随机过程数学导师，我将为您提供这份习题集的完整、详细的双语解答。
 
 ### Question 1 / 第1题
 
 **Problem / 题目原文:**
-Consider the gambler’s ruin problem with draws: at each step, Alice wins £1 with probability 𝑝, loses £1 with probability 𝑞, and neither wins nor loses any money with probability 𝑠, where 𝑝 + 𝑞 + 𝑠 = 1, and 0 < 𝑝,𝑞,𝑠 < 1. We assume that 𝑝 ≠ 𝑞. Alice starts with £𝑎 and Bob with £(𝑚−𝑎).
+Consider the gambler’s ruin problem with draws: at each step, Alice wins £1 with probability $p$, loses £1 with probability $q$, and neither wins nor loses any money with probability $s$, where $p+q+s=1$, and $0 < p, q, s < 1$. We assume that $p \neq q$. Alice starts with £$a$ and Bob with £$(m-a)$.
 (a) .
-(i) For the case 𝑝 ≠ 𝑞, show that 𝑀𝑛= (𝑞/𝑝)^(𝑋𝑛) is a martingale with respect to the increments of the random walk (so adding draws does not affect 𝑀𝑛 from lectures).
-(ii) Use the optional stopping theorem to conclude that 𝑟𝑎 does not depend on 𝑠 in this case.
-(b) Let 𝑑𝑖 be the expected duration of the game from the point that Alice has £𝑖. We want to use the martingale method to prove our expression for 𝑑𝑖 (in fact we have draws, so are even more general).
-(i) Find a constant 𝑐 so that 𝑀𝑛= 𝑋𝑛+𝑛𝑐 is a martingale.
-(ii) Suppose that 𝑝 ≠ 𝑞. Using the optional stopping theorem with the martingale you found in part (i) and stopping time 𝑇, the first time the walk hits level 0 or 𝑚 (so 𝔼(𝑇) is the expected duration of the game), show that
-𝔼(𝑑𝑎) = 1/(𝑞−𝑝) (𝑎−𝑚(1−𝜌^𝑎)/(1−𝜌^𝑚)) where 𝜌 = 𝑞/𝑝.
-(iii) Show that 𝑀𝑛= 𝑋^2_𝑛−𝑛 is a martingale with respect to the increments of the random walk when 𝑝 = 𝑞.
-(iv) Suppose that 𝑝 = 𝑞. Using the optional stopping theorem with the martingale you found in part (iii) and stopping time 𝑇, the first time the walk hits level 0 or 𝑚 (so 𝔼(𝑇) is the expected duration of the game), show that
-𝔼(𝑑𝑎) = 𝑎(𝑚−𝑎).
-(c) Alice starts playing against Bob in a standard gambler’s ruin game with probabilities 𝑝 ≠ 𝑞 and 𝑠 = 0. A draw probability 𝑠 > 0 is then introduced in such a way that the ratio 𝜌 = 𝑞/𝑝 remains constant. Comment on how this changes Alice’s ruin probability and the expected duration of the game.
+(i) For the case $p \neq q$, show that $M_n = (q/p)^{X_n}$ is a martingale with respect to the increments of the random walk (so adding draws does not affect $M_n$ from lectures).
+(ii) Use the optional stopping theorem to conclude that $r_a$ does not depend on $s$ in this case.
+(b) Let $d_i$ be the expected duration of the game from the point that Alice has £$i$. We want to use the martingale method to prove our expression for $d_i$ (in fact we have draws, so are even more general).
+(i) Find a constant $c$ so that $M_n = X_n + nc$ is a martingale.
+(ii) Suppose that $p \neq q$. Using the optional stopping theorem with the martingale you found in part (i) and stopping time $T$, the first time the walk hits level $0$ or $m$ (so $\mathbb{E}(T)$ is the expected duration of the game), show that
+$$\mathbb{E}(d_a) = \frac{1}{q-p}\left(a - m\frac{1-\rho^a}{1-\rho^m}\right)$$
+where $\rho = q/p$.
+(iii) Show that $M_n = X_n^2 - n$ is a martingale with respect to the increments of the random walk when $p = q$.
+(iv) Suppose that $p = q$. Using the optional stopping theorem with the martingale you found in part (iii) and stopping time $T$, the first time the walk hits level $0$ or $m$ (so $\mathbb{E}(T)$ is the expected duration of the game), show that
+$$\mathbb{E}(d_a) = a(m-a).$$
+(c) Alice starts playing against Bob in a standard gambler’s ruin game with probabilities $p \neq q$ and $s=0$. A draw probability $s>0$ is then introduced in such a way that the ratio $\rho = q/p$ remains constant. Comment on how this changes Alice’s ruin probability and the expected duration of the game.
 
-**中文翻译:**
-考虑带有平局的赌徒破产问题：每一步，Alice以概率𝑝赢得£1，以概率𝑞输掉£1，以概率𝑠不赢不输，其中𝑝+𝑞+𝑠=1，且0<𝑝,𝑞,𝑠<1。我们假设𝑝≠𝑞。Alice初始有£𝑎，Bob有£(𝑚−𝑎)。
-(a) (i) 对于𝑝≠𝑞的情况，证明𝑀𝑛= (𝑞/𝑝)^(𝑋𝑛) 是一个关于随机游走增量的鞅（因此加入平局不影响从课堂上学到的𝑀𝑛）。
-(ii) 使用可选停止定理得出结论：在这种情况下，𝑟𝑎不依赖于𝑠。
-(b) 令𝑑𝑖为从Alice拥有£𝑖开始，游戏的期望持续时间。我们想用鞅方法来证明𝑑𝑖的表达式（实际上我们有平局，所以更一般化）。
-(i) 找到一个常数𝑐，使得𝑀𝑛= 𝑋𝑛+𝑛𝑐是一个鞅。
-(ii) 假设𝑝≠𝑞。使用你在(i)中找到的鞅和停止时间𝑇（首次击中0或𝑚水平的时间，因此𝔼(𝑇)是游戏的期望持续时间），结合可选停止定理，证明：
-𝔼(𝑑𝑎) = 1/(𝑞−𝑝) (𝑎−𝑚(1−𝜌^𝑎)/(1−𝜌^𝑚))，其中𝜌 = 𝑞/𝑝。
-(iii) 当𝑝=𝑞时，证明𝑀𝑛= 𝑋^2_𝑛−𝑛是一个关于随机游走增量的鞅。
-(iv) 假设𝑝=𝑞。使用你在(iii)中找到的鞅和停止时间𝑇，结合可选停止定理，证明：
-𝔼(𝑑𝑎) = 𝑎(𝑚−𝑎)。
-(c) Alice在一个标准赌徒破产问题中开始与Bob对局，其中概率𝑝≠𝑞且𝑠=0。然后引入一个平局概率𝑠>0，使得比率𝜌=𝑞/𝑝保持不变。评论这如何改变Alice的破产概率和游戏的期望持续时间。
+**中文翻译 / Chinese Translation:**
+考虑带有平局的赌徒破产问题：在每一步，Alice 以概率 $p$ 赢得 £1，以概率 $q$ 输掉 £1，以概率 $s$ 不赢不输，其中 $p+q+s=1$，且 $0 < p, q, s < 1$。我们假设 $p \neq q$。Alice 初始有 £$a$，Bob 有 £$(m-a)$。
+(a) .
+(i) 对于 $p \neq q$ 的情况，证明 $M_n = (q/p)^{X_n}$ 是关于随机游走增量（increments）的一个鞅（因此平局的加入不影响课堂上学到的 $M_n$）。
+(ii) 使用可选停止定理（optional stopping theorem）得出结论：在这种情况下，$r_a$（Alice的破产概率）不依赖于 $s$。
+(b) 令 $d_i$ 为从 Alice 拥有 £$i$ 的时刻开始，游戏的期望持续时间。我们想用鞅方法来证明 $d_i$ 的表达式（实际上我们这里有平局，所以情况更一般）。
+(i) 找到一个常数 $c$，使得 $M_n = X_n + nc$ 是一个鞅。
+(ii) 假设 $p \neq q$。使用你在 (i) 部分找到的鞅和停时 $T$（即游走首次触及 0 或 $m$ 的时刻，所以 $\mathbb{E}(T)$ 是游戏的期望持续时间），结合可选停止定理，证明：
+$$\mathbb{E}(d_a) = \frac{1}{q-p}\left(a - m\frac{1-\rho^a}{1-\rho^m}\right)$$
+其中 $\rho = q/p$。
+(iii) 证明当 $p = q$ 时，$M_n = X_n^2 - n$ 是关于随机游走增量的一个鞅。
+(iv) 假设 $p = q$。使用你在 (iii) 部分找到的鞅和停时 $T$，结合可选停止定理，证明：
+$$\mathbb{E}(d_a) = a(m-a).$$
+(c) Alice 在一个标准的赌徒破产问题中（概率 $p \neq q$ 且 $s=0$）开始与 Bob 对弈。然后引入一个平局概率 $s>0$，使得比值 $\rho = q/p$ 保持不变。评论这如何改变 Alice 的破产概率和游戏的期望持续时间。
 
 **Knowledge Points / 考查知识点:**
-- Martingales (鞅)
-- Optional Stopping Theorem (可选停止定理)
-- Gambler's Ruin Problem (赌徒破产问题)
-- Conditional Expectation (条件期望)
+- **鞅 (Martingales):** 鞅的定义，如何通过条件期望验证一个过程是否为鞅。
+- **可选停止定理 (Optional Stopping Theorem, OST):** 在满足特定条件（有界停时、一致可积等）下，鞅在停时的期望等于其初始值。
+- **赌徒破产问题 (Gambler's Ruin Problem):** 破产概率和期望持续时间的推导。
+- **随机游走 (Random Walk):** 带有平局的随机游走，其增量分布。
+- **条件期望 (Conditional Expectation):** 鞅性质的核心。
 
 **Step-by-Step Solution / 逐步解答:**
 
-**(a) (i)**
+#### Part (a)(i)
 
-**Step 1: Define the process and the filtration.**
-We define $X_n$ as Alice's fortune after $n$ steps. The increments are $Z_{n+1} = X_{n+1} - X_n$, where $Z_{n+1} \in \{-1, 0, 1\}$ with probabilities $q, s, p$ respectively. The filtration $\mathcal{F}_n$ is the information generated by $X_0, X_1, ..., X_n$ (or equivalently by the increments $Z_1, ..., Z_n$). We want to show $M_n = (q/p)^{X_n}$ is a martingale, i.e., $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n$.
+**Step 1: 定义随机游走和增量 / Define the Random Walk and Increments**
 
-**Step 2: Compute the conditional expectation of $M_{n+1}$.**
-We start with the definition:
-$$M_{n+1} = (q/p)^{X_{n+1}} = (q/p)^{X_n + Z_{n+1}} = M_n \cdot (q/p)^{Z_{n+1}}$$
-Taking the conditional expectation given $\mathcal{F}_n$:
-$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = \mathbb{E}[M_n \cdot (q/p)^{Z_{n+1}} | \mathcal{F}_n]$$
-Since $M_n$ is a function of $X_n$, it is $\mathcal{F}_n$-measurable. Therefore, we can take it out of the conditional expectation:
-$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n \cdot \mathbb{E}[(q/p)^{Z_{n+1}} | \mathcal{F}_n]$$
+**中文思路 / Chinese reasoning:**
+首先，我们需要明确随机游走 $X_n$ 的定义。$X_n$ 表示 Alice 在第 $n$ 步后的资金。其增量 $\xi_n = X_n - X_{n-1}$ 是一个随机变量，取值为 $+1$（赢），$-1$（输），$0$（平局），对应的概率分别为 $p, q, s$。我们要验证 $M_n = (q/p)^{X_n}$ 是一个鞅，即验证 $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n$，其中 $\mathcal{F}_n$ 是到第 $n$ 步为止的信息（自然滤波）。
 
-**Step 3: Calculate the expectation of $(q/p)^{Z_{n+1}}$.**
-The increment $Z_{n+1}$ is independent of the past $\mathcal{F}_n$. So the conditional expectation is just the unconditional expectation.
-$$\mathbb{E}[(q/p)^{Z_{n+1}}] = \sum_{z \in \{-1,0,1\}} (q/p)^z \cdot \mathbb{P}(Z_{n+1}=z)$$
-$$= (q/p)^{-1} \cdot q + (q/p)^0 \cdot s + (q/p)^1 \cdot p$$
-$$= \frac{p}{q} \cdot q + 1 \cdot s + \frac{q}{p} \cdot p$$
-$$= p + s + q = 1$$
-**Explanation:** We use the probabilities: $P(Z=-1)=q$, $P(Z=0)=s$, $P(Z=1)=p$. The term $(q/p)^{-1} = p/q$.
+**English reasoning:**
+First, we need to define the random walk $X_n$. $X_n$ represents Alice's fortune after $n$ steps. Its increment $\xi_n = X_n - X_{n-1}$ is a random variable taking values $+1$ (win), $-1$ (lose), $0$ (draw), with probabilities $p, q, s$ respectively. We want to verify that $M_n = (q/p)^{X_n}$ is a martingale, i.e., $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n$, where $\mathcal{F}_n$ is the information up to step $n$ (natural filtration).
 
-**Step 4: Conclude the martingale property.**
-Since $\mathbb{E}[(q/p)^{Z_{n+1}}] = 1$, we have:
-$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n \cdot 1 = M_n$$
-This proves that $M_n = (q/p)^{X_n}$ is a martingale, regardless of the value of $s$, as long as $p+q+s=1$.
+**计算过程 / Working:**
+Let $X_n$ be Alice's fortune after $n$ steps. $X_0 = a$. The increment $\xi_{n+1} = X_{n+1} - X_n$ has distribution:
+$$\mathbb{P}(\xi_{n+1} = 1) = p, \quad \mathbb{P}(\xi_{n+1} = -1) = q, \quad \mathbb{P}(\xi_{n+1} = 0) = s.$$
 
-**(a) (ii)**
+**Step 2: 计算条件期望 / Compute the Conditional Expectation**
 
-**Step 1: Define the stopping time and the ruin probability.**
-Let $T$ be the first time the process hits either 0 or $m$. $T$ is a stopping time. Alice's ruin probability $r_a$ is the probability that the process hits 0 before $m$, starting from $a$. So $r_a = \mathbb{P}(X_T = 0)$.
+**中文思路 / Chinese reasoning:**
+我们计算 $\mathbb{E}[M_{n+1} | \mathcal{F}_n]$。由于 $M_{n+1} = (q/p)^{X_{n+1}} = (q/p)^{X_n + \xi_{n+1}} = M_n \cdot (q/p)^{\xi_{n+1}}$。因此，$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n \cdot \mathbb{E}[(q/p)^{\xi_{n+1}} | \mathcal{F}_n]$。由于 $\xi_{n+1}$ 独立于 $\mathcal{F}_n$，条件期望等于无条件期望。我们只需计算 $\mathbb{E}[(q/p)^{\xi_{n+1}}]$。
 
-**Step 2: Apply the Optional Stopping Theorem (OST).**
-We need to check the conditions for OST. Since $0 \le X_n \le m$, $M_n = (q/p)^{X_n}$ is bounded between $(q/p)^0 = 1$ and $(q/p)^m$ (or vice versa if $q/p < 1$). A bounded martingale satisfies the conditions for OST. Therefore:
-$$\mathbb{E}[M_T] = \mathbb{E}[M_0] = (q/p)^{X_0} = (q/p)^a$$
+**English reasoning:**
+We compute $\mathbb{E}[M_{n+1} | \mathcal{F}_n]$. Since $M_{n+1} = (q/p)^{X_{n+1}} = (q/p)^{X_n + \xi_{n+1}} = M_n \cdot (q/p)^{\xi_{n+1}}$. Thus, $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n \cdot \mathbb{E}[(q/p)^{\xi_{n+1}} | \mathcal{F}_n]$. Since $\xi_{n+1}$ is independent of $\mathcal{F}_n$, the conditional expectation equals the unconditional expectation. We just need to compute $\mathbb{E}[(q/p)^{\xi_{n+1}}]$.
 
-**Step 3: Express $\mathbb{E}[M_T]$ in terms of ruin probability.**
-$X_T$ can only be 0 or $m$. So:
-$$\mathbb{E}[M_T] = \mathbb{E}[(q/p)^{X_T}] = (q/p)^0 \cdot \mathbb{P}(X_T=0) + (q/p)^m \cdot \mathbb{P}(X_T=m)$$
-$$= 1 \cdot r_a + (q/p)^m \cdot (1 - r_a)$$
+**计算过程 / Working:**
+$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = \mathbb{E}[ (q/p)^{X_n + \xi_{n+1}} | \mathcal{F}_n] = (q/p)^{X_n} \mathbb{E}[ (q/p)^{\xi_{n+1}} | \mathcal{F}_n] = M_n \mathbb{E}[ (q/p)^{\xi_{n+1}}].$$
 
-**Step 4: Solve for $r_a$.**
-Equating the two expressions for $\mathbb{E}[M_T]$:
-$$r_a + (q/p)^m (1 - r_a) = (q/p)^a$$
-$$r_a + (q/p)^m - (q/p)^m r_a = (q/p)^a$$
+**Step 3: 计算期望值 / Compute the Expectation**
+
+**中文思路 / Chinese reasoning:**
+现在计算 $\mathbb{E}[(q/p)^{\xi_{n+1}}]$。我们需要对 $\xi_{n+1}$ 的所有可能取值进行加权求和。当 $\xi_{n+1}=1$ 时，$(q/p)^1 = q/p$；当 $\xi_{n+1}=-1$ 时，$(q/p)^{-1} = p/q$；当 $\xi_{n+1}=0$ 时，$(q/p)^0 = 1$。将这些值与对应的概率相乘并求和。
+
+**English reasoning:**
+Now compute $\mathbb{E}[(q/p)^{\xi_{n+1}}]$. We need to sum over all possible values of $\xi_{n+1}$ weighted by their probabilities. When $\xi_{n+1}=1$, $(q/p)^1 = q/p$; when $\xi_{n+1}=-1$, $(q/p)^{-1} = p/q$; when $\xi_{n+1}=0$, $(q/p)^0 = 1$. Multiply these values by their corresponding probabilities and sum.
+
+**计算过程 / Working:**
+$$\begin{aligned}
+\mathbb{E}[(q/p)^{\xi_{n+1}}] &= p \cdot (q/p)^1 + q \cdot (q/p)^{-1} + s \cdot (q/p)^0 \\
+&= p \cdot \frac{q}{p} + q \cdot \frac{p}{q} + s \cdot 1 \\
+&= q + p + s \\
+&= 1.
+\end{aligned}$$
+
+**Step 4: 得出结论 / Conclude**
+
+**中文思路 / Chinese reasoning:**
+由于 $\mathbb{E}[(q/p)^{\xi_{n+1}}] = 1$，我们得到 $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n \cdot 1 = M_n$。这正好是鞅的定义。注意，这个结果与 $s$ 无关，因为 $p+q+s=1$ 保证了期望值为 1。这与课堂上没有平局（$s=0$）的情况完全一致。
+
+**English reasoning:**
+Since $\mathbb{E}[(q/p)^{\xi_{n+1}}] = 1$, we get $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n \cdot 1 = M_n$. This is exactly the definition of a martingale. Notice that this result is independent of $s$, because $p+q+s=1$ ensures the expectation is 1. This is identical to the case without draws ($s=0$) from the lectures.
+
+**计算过程 / Working:**
+$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n.$$
+Thus, $M_n = (q/p)^{X_n}$ is a martingale.
+
+#### Part (a)(ii)
+
+**Step 1: 定义停时和破产概率 / Define Stopping Time and Ruin Probability**
+
+**中文思路 / Chinese reasoning:**
+定义停时 $T = \min\{n \ge 0: X_n = 0 \text{ or } X_n = m\}$，即游戏结束的时刻。Alice 的破产概率 $r_a = \mathbb{P}(X_T = 0 | X_0 = a)$。我们将使用可选停止定理（OST）于鞅 $M_n$ 和停时 $T$。我们需要检查 OST 的条件是否满足。由于状态空间有限（0 到 m），且 $T$ 几乎必然有限（因为 $p,q>0$，最终会破产或赢光），并且 $M_n$ 是有界的（因为 $X_n$ 在 0 和 m 之间，所以 $M_n$ 在 $(q/p)^m$ 和 $(q/p)^0=1$ 之间），因此 OST 适用。
+
+**English reasoning:**
+Define the stopping time $T = \min\{n \ge 0: X_n = 0 \text{ or } X_n = m\}$, the time the game ends. Alice's ruin probability $r_a = \mathbb{P}(X_T = 0 | X_0 = a)$. We will apply the Optional Stopping Theorem (OST) to the martingale $M_n$ and stopping time $T$. We need to check the conditions for OST. Since the state space is finite (0 to m), and $T$ is almost surely finite (because $p,q>0$, ruin or victory will eventually happen), and $M_n$ is bounded (since $X_n$ is between 0 and m, $M_n$ is between $(q/p)^m$ and $(q/p)^0=1$), OST applies.
+
+**Step 2: 应用可选停止定理 / Apply Optional Stopping Theorem**
+
+**中文思路 / Chinese reasoning:**
+根据可选停止定理，$\mathbb{E}[M_T] = \mathbb{E}[M_0] = (q/p)^a$。另一方面，$M_T$ 是一个随机变量，取决于 $T$ 时刻的状态。如果 $X_T = 0$，则 $M_T = (q/p)^0 = 1$。如果 $X_T = m$，则 $M_T = (q/p)^m$。因此，$\mathbb{E}[M_T] = 1 \cdot \mathbb{P}(X_T=0) + (q/p)^m \cdot \mathbb{P}(X_T=m)$。注意 $\mathbb{P}(X_T=m) = 1 - r_a$。
+
+**English reasoning:**
+By the Optional Stopping Theorem, $\mathbb{E}[M_T] = \mathbb{E}[M_0] = (q/p)^a$. On the other hand, $M_T$ is a random variable depending on the state at time $T$. If $X_T = 0$, then $M_T = (q/p)^0 = 1$. If $X_T = m$, then $M_T = (q/p)^m$. Thus, $\mathbb{E}[M_T] = 1 \cdot \mathbb{P}(X_T=0) + (q/p)^m \cdot \mathbb{P}(X_T=m)$. Note $\mathbb{P}(X_T=m) = 1 - r_a$.
+
+**计算过程 / Working:**
+$$\mathbb{E}[M_T] = r_a \cdot 1 + (1 - r_a) \cdot (q/p)^m.$$
+By OST, $\mathbb{E}[M_T] = M_0 = (q/p)^a$.
+So,
+$$r_a + (1 - r_a)(q/p)^m = (q/p)^a.$$
+
+**Step 3: 解出破产概率 / Solve for Ruin Probability**
+
+**中文思路 / Chinese reasoning:**
+解这个关于 $r_a$ 的方程。将含有 $r_a$ 的项移到一边，然后求解。
+
+**English reasoning:**
+Solve this equation for $r_a$. Move the terms containing $r_a$ to one side and solve.
+
+**计算过程 / Working:**
+$$r_a + (q/p)^m - r_a (q/p)^m = (q/p)^a$$
 $$r_a (1 - (q/p)^m) = (q/p)^a - (q/p)^m$$
-$$r_a = \frac{(q/p)^a - (q/p)^m}{1 - (q/p)^m}$$
-This is the standard gambler's ruin probability. The derivation did not involve $s$ at any point, as the martingale property held for any $s$. Therefore, $r_a$ does not depend on $s$.
+$$r_a = \frac{(q/p)^a - (q/p)^m}{1 - (q/p)^m}.$$
 
-**(b) (i)**
+**Step 4: 分析结果 / Analyze the Result**
 
-**Step 1: Define the candidate martingale.**
-We want to find $c$ such that $M_n = X_n + nc$ is a martingale. This means $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n$.
+**中文思路 / Chinese reasoning:**
+我们得到的 $r_a$ 表达式只依赖于 $p$ 和 $q$（通过比值 $\rho = q/p$），而不依赖于平局概率 $s$。这是因为在 (a)(i) 部分中，我们证明了 $M_n$ 是一个鞅，且其鞅性质与 $s$ 无关。因此，可选停止定理给出的结果也与 $s$ 无关。这证明了 $r_a$ 不依赖于 $s$。
 
-**Step 2: Compute the conditional expectation.**
-$$M_{n+1} = X_{n+1} + (n+1)c = X_n + Z_{n+1} + nc + c = M_n + Z_{n+1} + c$$
-Taking conditional expectation:
-$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = \mathbb{E}[M_n + Z_{n+1} + c | \mathcal{F}_n] = M_n + \mathbb{E}[Z_{n+1} | \mathcal{F}_n] + c$$
+**English reasoning:**
+The expression for $r_a$ we obtained depends only on $p$ and $q$ (through the ratio $\rho = q/p$), and not on the draw probability $s$. This is because in part (a)(i), we proved that $M_n$ is a martingale, and its martingale property is independent of $s$. Therefore, the result from the Optional Stopping Theorem is also independent of $s$. This proves that $r_a$ does not depend on $s$.
 
-**Step 3: Calculate the expected increment.**
-Since $Z_{n+1}$ is independent of $\mathcal{F}_n$:
-$$\mathbb{E}[Z_{n+1} | \mathcal{F}_n] = \mathbb{E}[Z_{n+1}] = 1 \cdot p + 0 \cdot s + (-1) \cdot q = p - q$$
+**计算过程 / Working:**
+The final expression for the ruin probability is:
+$$r_a = \frac{\rho^a - \rho^m}{1 - \rho^m}, \quad \text{where } \rho = q/p.$$
+This expression contains no $s$, so $r_a$ does not depend on $s$.
 
-**Step 4: Solve for $c$.**
-For $M_n$ to be a martingale, we need $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n$. This gives:
-$$M_n + (p-q) + c = M_n$$
-$$(p-q) + c = 0$$
-$$c = q - p$$
-**Final Answer for (b)(i):** $c = q-p$.
+#### Part (b)(i)
 
-**(b) (ii)**
+**Step 1: 寻找常数 $c$ 使得 $M_n$ 是鞅 / Find constant $c$ such that $M_n$ is a martingale**
 
-**Step 1: Set up the martingale and stopping time.**
-From (b)(i), $M_n = X_n + n(q-p)$ is a martingale. Let $T$ be the first time the process hits 0 or $m$. $T$ is a stopping time. We want to find $\mathbb{E}[T] = d_a$, the expected duration starting from $X_0 = a$.
+**中文思路 / Chinese reasoning:**
+我们想找到一个常数 $c$，使得 $M_n = X_n + nc$ 是一个鞅。这意味着 $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n$。计算条件期望 $\mathbb{E}[X_{n+1} + (n+1)c | \mathcal{F}_n]$，并令其等于 $X_n + nc$，然后解出 $c$。
 
-**Step 2: Apply the Optional Stopping Theorem.**
-We need to check the OST conditions. The process $X_n$ is bounded between 0 and $m$, and $n$ is unbounded. However, $T$ has a finite expectation (since it's a gambler's ruin with draws, which is a finite state space Markov chain with absorbing states). The martingale $M_n$ has bounded increments ($|M_{n+1} - M_n| = |Z_{n+1} + (q-p)| \le 1 + |q-p|$). For such a martingale with $\mathbb{E}[T] < \infty$, OST applies: $\mathbb{E}[M_T] = \mathbb{E}[M_0]$.
+**English reasoning:**
+We want to find a constant $c$ such that $M_n = X_n + nc$ is a martingale. This means $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n$. Compute the conditional expectation $\mathbb{E}[X_{n+1} + (n+1)c | \mathcal{F}_n]$, set it equal to $X_n + nc$, and solve for $c$.
 
-**Step 3: Calculate $\mathbb{E}[M_0]$ and $\mathbb{E}[M_T]$.**
-$$\mathbb{E}[M_0] = X_0 + 0 \cdot (q-p) = a$$
-$$\mathbb{E}[M_T] = \mathbb{E}[X_T + T(q-p)] = \mathbb{E}[X_T] + (q-p)\mathbb{E}[T]$$
+**计算过程 / Working:**
+$$\begin{aligned}
+\mathbb{E}[M_{n+1} | \mathcal{F}_n] &= \mathbb{E}[X_{n+1} + (n+1)c | \mathcal{F}_n] \\
+&= \mathbb{E}[X_n + \xi_{n+1} + (n+1)c | \mathcal{F}_n] \\
+&= X_n + \mathbb{E}[\xi_{n+1}] + (n+1)c \quad (\text{since } \xi_{n+1} \perp \mathcal{F}_n) \\
+&= X_n + (p \cdot 1 + q \cdot (-1) + s \cdot 0) + (n+1)c \\
+&= X_n + (p - q) + (n+1)c.
+\end{aligned}$$
 
-**Step 4: Calculate $\mathbb{E}[X_T]$.**
-$X_T$ is either 0 or $m$. We know the probability of hitting 0 is $r_a$ from part (a)(ii). So:
-$$\mathbb{E}[X_T] = 0 \cdot r_a + m \cdot (1 - r_a) = m(1 - r_a)$$
-Where $r_a = \frac{\rho^a - \rho^m}{1 - \rho^m}$ and $\rho = q/p$.
+**Step 2: 令其等于 $M_n$ 并解出 $c$ / Set equal to $M_n$ and solve for $c$**
 
-**Step 5: Solve for $\mathbb{E}[T] = d_a$.**
-From OST: $\mathbb{E}[M_T] = \mathbb{E}[M_0]$.
-$$m(1 - r_a) + (q-p)d_a = a$$
-$$(q-p)d_a = a - m(1 - r_a)$$
-$$d_a = \frac{1}{q-p} \left( a - m(1 - r_a) \right)$$
-Substitute $r_a$:
-$$d_a = \frac{1}{q-p} \left( a - m \left(1 - \frac{\rho^a - \rho^m}{1 - \rho^m} \right) \right)$$
-$$d_a = \frac{1}{q-p} \left( a - m \left( \frac{1 - \rho^m - \rho^a + \rho^m}{1 - \rho^m} \right) \right)$$
-$$d_a = \frac{1}{q-p} \left( a - m \left( \frac{1 - \rho^a}{1 - \rho^m} \right) \right)$$
+**中文思路 / Chinese reasoning:**
+为了 $M_n$ 是鞅，我们需要 $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n = X_n + nc$。因此，$X_n + (p-q) + (n+1)c = X_n + nc$。化简后解出 $c$。
+
+**English reasoning:**
+For $M_n$ to be a martingale, we need $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n = X_n + nc$. Thus, $X_n + (p-q) + (n+1)c = X_n + nc$. Simplify and solve for $c$.
+
+**计算过程 / Working:**
+$$X_n + (p-q) + (n+1)c = X_n + nc$$
+$$(p-q) + nc + c = nc$$
+$$p - q + c = 0$$
+$$c = q - p.$$
+
+**Step 3: 验证 / Verification**
+
+**中文思路 / Chinese reasoning:**
+我们找到 $c = q-p$。因此，$M_n = X_n + n(q-p)$ 是一个鞅。注意，当 $p=q$ 时，$c=0$，$M_n = X_n$ 本身就是一个鞅（因为期望增量为0）。当 $p \neq q$ 时，$c$ 非零，通过减去趋势项 $n(p-q)$ 来构造鞅。
+
+**English reasoning:**
+We found $c = q-p$. Therefore, $M_n = X_n + n(q-p)$ is a martingale. Note that when $p=q$, $c=0$, and $M_n = X_n$ itself is a martingale (since the expected increment is 0). When $p \neq q$, $c$ is non-zero, and we construct a martingale by subtracting the trend term $n(p-q)$.
+
+**计算过程 / Working:**
+The constant is $c = q-p$. The martingale is $M_n = X_n + n(q-p)$.
+
+#### Part (b)(ii)
+
+**Step 1: 应用可选停止定理 / Apply Optional Stopping Theorem**
+
+**中文思路 / Chinese reasoning:**
+我们使用在 (b)(i) 中找到的鞅 $M_n = X_n + n(q-p)$ 和停时 $T$（首次触及 0 或 m 的时刻）。可选停止定理给出 $\mathbb{E}[M_T] = \mathbb{E}[M_0] = X_0 + 0 \cdot (q-p) = a$。注意 $M_T = X_T + T(q-p)$。$X_T$ 是 $T$ 时刻的状态，要么是 0，要么是 m。$T$ 是游戏持续时间，其期望 $\mathbb{E}[T] = \mathbb{E}[d_a]$ 正是我们想求的。
+
+**English reasoning:**
+We use the martingale $M_n = X_n + n(q-p)$ found in (b)(i) and the stopping time $T$ (first time hitting 0 or m). The Optional Stopping Theorem gives $\mathbb{E}[M_T] = \mathbb{E}[M_0] = X_0 + 0 \cdot (q-p) = a$. Note $M_T = X_T + T(q-p)$. $X_T$ is the state at time $T$, either 0 or m. $T$ is the duration of the game, and its expectation $\mathbb{E}[T] = \mathbb{E}[d_a]$ is what we want to find.
+
+**计算过程 / Working:**
+$$\mathbb{E}[M_T] = \mathbb{E}[X_T + T(q-p)] = \mathbb{E}[X_T] + (q-p)\mathbb{E}[T].$$
+By OST, $\mathbb{E}[M_T] = a$.
+So,
+$$\mathbb{E}[X_T] + (q-p)\mathbb{E}[d_a] = a.$$
+
+**Step 2: 计算 $\mathbb{E}[X_T]$ / Compute $\mathbb{E}[X_T]$**
+
+**中文思路 / Chinese reasoning:**
+我们需要计算 $\mathbb{E}[X_T]$。$X_T$ 是游戏结束时的资金。它以概率 $r_a$ 为 0，以概率 $1-r_a$ 为 m。因此，$\mathbb{E}[X_T] = 0 \cdot r_a + m \cdot (1-r_a) = m(1-r_a)$。我们在 (a)(ii) 中已经得到了 $r_a$ 的表达式。
+
+**English reasoning:**
+We need to compute $\mathbb{E}[X_T]$. $X_T$ is the fortune at the end of the game. It is 0 with probability $r_a$, and m with probability $1-r_a$. Thus, $\mathbb{E}[X_T] = 0 \cdot r_a + m \cdot (1-r_a) = m(1-r_a)$. We already have the expression for $r_a$ from (a)(ii).
+
+**计算过程 / Working:**
+From part (a)(ii), $r_a = \frac{\rho^a - \rho^m}{1 - \rho^m}$, where $\rho = q/p$.
+So,
+$$1 - r_a = 1 - \frac{\rho^a - \rho^m}{1 - \rho^m} = \frac{1 - \rho^m - \rho^a + \rho^m}{1 - \rho^m} = \frac{1 - \rho^a}{1 - \rho^m}.$$
+Thus,
+$$\mathbb{E}[X_T] = m \cdot \frac{1 - \rho^a}{1 - \rho^m}.$$
+
+**Step 3: 代入并解出 $\mathbb{E}[d_a]$ / Substitute and solve for $\mathbb{E}[d_a]$**
+
+**中文思路 / Chinese reasoning:**
+将 $\mathbb{E}[X_T]$ 的表达式代入方程 $\mathbb{E}[X_T] + (q-p)\mathbb{E}[d_a] = a$，然后解出 $\mathbb{E}[d_a]$。注意 $q-p = -(p-q)$。
+
+**English reasoning:**
+Substitute the expression for $\mathbb{E}[X_T]$ into the equation $\mathbb{E}[X_T] + (q-p)\mathbb{E}[d_a] = a$, and solve for $\mathbb{E}[d_a]$. Note $q-p = -(p-q)$.
+
+**计算过程 / Working:**
+$$m\frac{1 - \rho^a}{1 - \rho^m} + (q-p)\mathbb{E}[d_a] = a$$
+$$(q-p)\mathbb{E}[d_a] = a - m\frac{1 - \rho^a}{1 - \rho^m}$$
+$$\mathbb{E}[d_a] = \frac{1}{q-p}\left(a - m\frac{1 - \rho^a}{1 - \rho^m}\right).$$
 This is the required expression.
 
-**(b) (iii)**
+#### Part (b)(iii)
 
-**Step 1: Define the candidate martingale.**
-We want to show $M_n = X_n^2 - n$ is a martingale when $p = q = \frac{1-s}{2}$.
-
-**Step 2: Compute the conditional expectation.**
-$$M_{n+1} = X_{n+1}^2 - (n+1) = (X_n + Z_{n+1})^2 - n - 1 = X_n^2 + 2X_n Z_{n+1} + Z_{n+1}^2 - n - 1$$
-$$= M_n + 2X_n Z_{n+1} + Z_{n+1}^2 - 1$$
-Taking conditional expectation:
-$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n + 2X_n \mathbb{E}[Z_{n+1} | \mathcal{F}_n] + \mathbb{E}[Z_{n+1}^2 | \mathcal{F}_n] - 1$$
-
-**Step 3: Calculate the expectations of $Z_{n+1}$ and $Z_{n+1}^2$.**
-Since $p=q$, $\mathbb{E}[Z_{n+1}] = p - q = 0$.
-For $Z_{n+1}^2$, it takes value $1^2=1$ with probability $p+q = 2p = 1-s$, and $0^2=0$ with probability $s$.
-So $\mathbb{E}[Z_{n+1}^2] = 1 \cdot (p+q) + 0 \cdot s = p+q = 1-s$.
-
-**Step 4: Verify the martingale property.**
-Substituting these values:
-$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n + 2X_n \cdot 0 + (1-s) - 1 = M_n - s$$
-This is not equal to $M_n$ unless $s=0$. The problem statement says "when $p=q$", but this implies $p=q=1/2$ and $s=0$ for the standard symmetric random walk. The problem likely intends the standard case without draws for this part. Let's check the standard case $p=q=1/2, s=0$.
-Then $\mathbb{E}[Z_{n+1}^2] = 1$.
-$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n + 2X_n \cdot 0 + 1 - 1 = M_n$$
-So $M_n = X_n^2 - n$ is a martingale for the standard symmetric random walk ($p=q=1/2, s=0$).
-
-**(b) (iv)**
-
-**Step 1: Set up the martingale and stopping time.**
-For $p=q=1/2$, $M_n = X_n^2 - n$ is a martingale. Let $T$ be the first time the process hits 0 or $m$.
-
-**Step 2: Apply the Optional Stopping Theorem.**
-$X_n$ is bounded between 0 and $m$, so $M_n$ is bounded up to time $T$. OST applies: $\mathbb{E}[M_T] = \mathbb{E}[M_0]$.
-
-**Step 3: Calculate $\mathbb{E}[M_0]$ and $\mathbb{E}[M_T]$.**
-$$\mathbb{E}[M_0] = X_0^2 - 0 = a^2$$
-$$\mathbb{E}[M_T] = \mathbb{E}[X_T^2 - T] = \mathbb{E}[X_T^2] - \mathbb{E}[T]$$
-
-**Step 4: Calculate $\mathbb{E}[X_T^2]$.**
-For $p=q=1/2$, the ruin probability is $r_a = 1 - a/m$ (from the standard formula with $\rho=1$). So:
-$$\mathbb{E}[X_T^2] = 0^2 \cdot r_a + m^2 \cdot (1 - r_a) = m^2 \cdot (a/m) = am$$
-
-**Step 5: Solve for $\mathbb{E}[T] = d_a$.**
-From OST: $\mathbb{E}[M_T] = \mathbb{E}[M_0]$.
-$$am - d_a = a^2$$
-$$d_a = am - a^2 = a(m-a)$$
-This is the required expression.
-
-**(c)**
-
-**Step 1: Analyze the effect on ruin probability.**
-From part (a)(ii), the ruin probability $r_a$ depends only on $\rho = q/p$ and $a, m$. If we introduce draws ($s>0$) while keeping the ratio $\rho = q/p$ constant, the ruin probability does not change. The draws do not affect the relative odds of winning vs. losing.
-
-**Step 2: Analyze the effect on expected duration.**
-From part (b)(ii), the expected duration $d_a$ depends on $q-p$. If we introduce draws, $p$ and $q$ both decrease proportionally to keep $\rho$ constant. For example, if we scale $p$ and $q$ by a factor $k<1$, then $p' = kp$, $q' = kq$, $s = 1-k(p+q)$. Then $q'-p' = k(q-p) < q-p$. The denominator in the expression for $d_a$ becomes smaller, so the expected duration increases. Intuitively, draws make the game last longer because steps where nothing happens don't bring the game closer to conclusion.
-
-**Final Answer / 最终答案:**
-(a)(i) $M_n = (q/p)^{X_n}$ is a martingale. (ii) $r_a = \frac{(q/p)^a - (q/p)^m}{1 - (q/p)^m}$, independent of $s$.
-(b)(i) $c = q-p$. (ii) $d_a = \frac{1}{q-p} \left( a - m\frac{1-\rho^a}{1-\rho^m} \right)$. (iii) $M_n = X_n^2 - n$ is a martingale for $p=q=1/2, s=0$. (iv) $d_a = a(m-a)$.
-(c) Ruin probability unchanged; expected duration increases.
-
-**Key Insight / 解题要点:**
-The martingale method separates the effect of draws: the geometric martingale $(q/p)^{X_n}$ depends only on the ratio $q/p$, while the linear martingale $X_n + n(q-p)$ depends on the difference $q-p$, which is reduced by draws, increasing the expected duration.
-
----
-
-### Question 2 / 第2题
-
-**Problem / 题目原文:**
-Consider a simple symmetric random walk on the state space $S = \{0,1,\dots,m\}$ with an absorbing barrier at 0 and a reflecting barrier at $m$. In other words,
-$\mathbb{P}(X_{n+1}=0 \mid X_n=0) = 1$ and $\mathbb{P}(X_{n+1}=m-1 \mid X_n=m) = 1$.
-Let $\eta_i$ be the expected time until the walk hits 0 when starting from $i \in S$.
-(a) Show that $M_n = (X_n - m)^2 - n$ is a martingale with respect to the increments of the random walk.
-(b) Using the optional stopping theorem with the martingale you found in part (a) and stopping time $T$, the first time the walk hits level 0 (so $\mathbb{E}(T)$ is the expected duration of the game), show that $\eta_i = i(2m - i)$.
-(c) You should notice that your answer is the same as the expected duration of the gambler’s ruin for $p = \frac{1}{2}$, except with $m$ replaced by $2m$. Can you explain why this might be?
-
-**中文翻译:**
-考虑一个在状态空间 $S = \{0,1,\dots,m\}$ 上的简单对称随机游走，在0处有吸收壁，在$m$处有反射壁。换句话说，
-$\mathbb{P}(X_{n+1}=0 \mid X_n=0) = 1$ 且 $\mathbb{P}(X_{n+1}=m-1 \mid X_n=m) = 1$。
-令 $\eta_i$ 为从 $i \in S$ 出发，游走首次击中0的期望时间。
-(a) 证明 $M_n = (X_n - m)^2 - n$ 是一个关于随机游走增量的鞅。
-(b) 使用你在(a)中找到的鞅和停止时间 $T$（首次击中0的时间，因此 $\mathbb{E}(T)$ 是游戏的期望持续时间），结合可选停止定理，证明 $\eta_i = i(2m - i)$。
-(c) 你应该注意到你的答案与 $p = \frac{1}{2}$ 时赌徒破产问题的期望持续时间相同，只是将 $m$ 替换为 $2m$。你能解释为什么吗？
-
-**Knowledge Points / 考查知识点:**
-- Martingales (鞅)
-- Optional Stopping Theorem (可选停止定理)
-- Random Walk with Reflecting/Absorbing Barriers (带反射/吸收壁的随机游走)
-- Method of Images (镜像法)
-
-**Step-by-Step Solution / 逐步解答:**
-
-**(a)**
-
-**Step 1: Define the process and the candidate martingale.**
-We have a symmetric random walk on $\{0,1,\dots,m\}$ with absorbing at 0 and reflecting at $m$. The increments $Z_{n+1} = X_{n+1} - X_n$ are:
-- If $X_n = 0$, then $X_{n+1}=0$, so $Z_{n+1}=0$.
-- If $X_n = m$, then $X_{n+1}=m-1$, so $Z_{n+1}=-1$.
-- If $0 < X_n < m$, then $Z_{n+1} = \pm 1$ with probability $1/2$ each.
-We want to show $M_n = (X_n - m)^2 - n$ is a martingale.
-
-**Step 2: Compute the conditional expectation for interior points ($0 < X_n < m$).**
-Let $Y_n = X_n - m$. Then $M_n = Y_n^2 - n$. We compute $\mathbb{E}[M_{n+1} | \mathcal{F}_n]$.
-$$M_{n+1} = Y_{n+1}^2 - (n+1) = (Y_n + Z_{n+1})^2 - n - 1 = Y_n^2 + 2Y_n Z_{n+1} + Z_{n+1}^2 - n - 1$$
-$$= M_n + 2Y_n Z_{n+1} + Z_{n+1}^2 - 1$$
-Taking conditional expectation:
-$$\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n + 2Y_n \mathbb{E}[Z_{n+1} | \mathcal{F}_n] + \mathbb{E}[Z_{n+1}^2 | \mathcal{F}_n] - 1$$
-For $0 < X_n < m$, $\mathbb{E}[Z_{n+1}] = 0$ and $\mathbb{E}[Z_{n+1}^2] = 1$ (since $Z_{n+1} = \pm 1$ with equal probability).
-So $\mathbb{E}[M_{n+1} | \mathcal{F}_n] = M_n + 0 + 1 - 1 = M_n$.
-
-**Step 3: Check the boundary at $X_n = m$.**
-If $X_n = m$, then $Y_n = 0$. The next step is deterministic: $X_{n+1} = m-1$, so $Z_{n+1} = -1$, $Y_{n+1} = -1$.
-$$M_{n+1} = (-1)^2 - (n+1) = 1 - n - 
+**Step

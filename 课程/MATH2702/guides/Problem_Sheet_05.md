@@ -1,12 +1,12 @@
 # Problem Sheet 5 - 详细解答 / Detailed Solutions
 
 > MATH2702 Stochastic Processes
-> 生成时间 / Generated: 2026-07-17 15:12
+> 生成时间 / Generated: 2026-07-20 16:04
 > 来源页 / Source Pages: 60-61
 
 ---
 
-好的，作为大学随机过程课程的导师，我将为您提供这份习题集的完整、详细的解答。我将遵循您的要求，使用中英双语，并展示所有步骤。
+好的，作为您的大学随机过程数学导师，我将为您提供MATH2702课程问题集5的完整、详细的双语解答。
 
 ---
 
@@ -14,334 +14,312 @@
 
 **Problem / 题目原文:**
 Find a stationary distribution for the Markov chain with transition matrix
-\[
-P = \begin{pmatrix}
-\frac{1}{3} & \frac{2}{3} & 0 \\
-\frac{1}{6} & \frac{1}{3} & \frac{1}{2} \\
-0 & \frac{1}{3} & \frac{2}{3}
-\end{pmatrix}.
-\]
+P = $$
+\begin{pmatrix}
+1/3 & 2/3 & 0 \\
+1/6 & 1/3 & 1/2 \\
+0 & 1/3 & 2/3
+\end{pmatrix}
+$$
+.
 Is the Markov chain reversible?
 
-**中文翻译:**
-求具有转移矩阵 \(P\) 的马尔可夫链的平稳分布。该马尔可夫链是否可逆？
+**中文翻译 / Chinese Translation:**
+求具有以下转移矩阵的马尔可夫链的平稳分布：
+P = $$
+\begin{pmatrix}
+1/3 & 2/3 & 0 \\
+1/6 & 1/3 & 1/2 \\
+0 & 1/3 & 2/3
+\end{pmatrix}
+$$
+.
+这个马尔可夫链是可逆的吗？
 
 **Knowledge Points / 考查知识点:**
-- Stationary distribution (平稳分布)
-- Detailed balance equations (细致平衡方程)
-- Reversibility (可逆性)
+- **平稳分布 (Stationary Distribution):** 求解满足 πP = π 且 ∑πᵢ = 1 的概率分布向量 π。
+- **细致平衡条件 (Detailed Balance Condition):** 判断马尔可夫链是否可逆的条件：πᵢ Pᵢⱼ = πⱼ Pⱼᵢ 对所有 i, j 成立。
 
 **Step-by-Step Solution / 逐步解答:**
 
-**Step 1: Set up the equations for the stationary distribution.**
-We need to find a probability vector \(\pi = (\pi_1, \pi_2, \pi_3)\) such that \(\pi P = \pi\) and \(\sum_{i=1}^3 \pi_i = 1\). The equation \(\pi P = \pi\) gives us a system of linear equations.
+**Step 1: 建立方程求解平稳分布 / Set up equations to find the stationary distribution**
 
-Let's write out \(\pi P = \pi\):
-\[
-(\pi_1, \pi_2, \pi_3) \begin{pmatrix}
-\frac{1}{3} & \frac{2}{3} & 0 \\
-\frac{1}{6} & \frac{1}{3} & \frac{1}{2} \\
-0 & \frac{1}{3} & \frac{2}{3}
-\end{pmatrix} = (\pi_1, \pi_2, \pi_3)
-\]
+1.  **中文思路 / Chinese reasoning:**
+    平稳分布 π = (π₁, π₂, π₃) 是一个行向量，满足 πP = π。这意味着 π 是转移矩阵 P 的左特征向量，对应特征值为1。我们将写出这个向量方程，并将其转化为一个线性方程组。同时，由于 π 是一个概率分布，我们还需要满足归一化条件 π₁ + π₂ + π₃ = 1。
 
-This yields three equations, one for each column of \(P\):
-- For state 1: \(\pi_1 \cdot \frac{1}{3} + \pi_2 \cdot \frac{1}{6} + \pi_3 \cdot 0 = \pi_1\)  (Equation 1)
-- For state 2: \(\pi_1 \cdot \frac{2}{3} + \pi_2 \cdot \frac{1}{3} + \pi_3 \cdot \frac{1}{3} = \pi_2\)  (Equation 2)
-- For state 3: \(\pi_1 \cdot 0 + \pi_2 \cdot \frac{1}{2} + \pi_3 \cdot \frac{2}{3} = \pi_3\)  (Equation 3)
+2.  **English reasoning:**
+    The stationary distribution π = (π₁, π₂, π₃) is a row vector that satisfies πP = π. This means π is a left eigenvector of the transition matrix P corresponding to eigenvalue 1. We will write out this vector equation and convert it into a system of linear equations. Additionally, since π is a probability distribution, it must satisfy the normalization condition π₁ + π₂ + π₃ = 1.
 
-**Step 2: Solve the system of linear equations.**
-We also have the normalization condition:
-- \(\pi_1 + \pi_2 + \pi_3 = 1\) (Equation 4)
+3.  **计算过程 / Working:**
+    方程 πP = π 可以写成：
+    \[
+    (\pi_1, \pi_2, \pi_3) $$
+\begin{pmatrix} 1/3 & 2/3 & 0 \\ 1/6 & 1/3 & 1/2 \\ 0 & 1/3 & 2/3 \end{pmatrix}
+$$ = (\pi_1, \pi_2, \pi_3)
+    \]
+    这给出了三个方程：
+    - 对于状态1 (j=1): π₁*(1/3) + π₂*(1/6) + π₃*(0) = π₁
+    - 对于状态2 (j=2): π₁*(2/3) + π₂*(1/3) + π₃*(1/3) = π₂
+    - 对于状态3 (j=3): π₁*(0) + π₂*(1/2) + π₃*(2/3) = π₃
 
-Let's simplify Equation 1:
-\[
-\frac{1}{3}\pi_1 + \frac{1}{6}\pi_2 = \pi_1
-\]
-Multiply by 6: \(2\pi_1 + \pi_2 = 6\pi_1 \Rightarrow \pi_2 = 4\pi_1\).
-So, \(\pi_2 = 4\pi_1\).  (Result 1)
+4.  **过程解释 / Explanation of working:**
+    矩阵乘法 πP 的结果是一个行向量，其第 j 个分量是 ∑ᵢ πᵢ Pᵢⱼ。这个分量必须等于 πⱼ。我们根据这个规则写出了每个状态的方程。
 
-Now simplify Equation 3:
-\[
-\frac{1}{2}\pi_2 + \frac{2}{3}\pi_3 = \pi_3
-\]
-Multiply by 6: \(3\pi_2 + 4\pi_3 = 6\pi_3 \Rightarrow 3\pi_2 = 2\pi_3 \Rightarrow \pi_3 = \frac{3}{2}\pi_2\).
-Substitute \(\pi_2 = 4\pi_1\): \(\pi_3 = \frac{3}{2} \cdot 4\pi_1 = 6\pi_1\).
-So, \(\pi_3 = 6\pi_1\). (Result 2)
+**Step 2: 化简方程组 / Simplify the system of equations**
 
-Now use the normalization condition (Equation 4):
-\[
-\pi_1 + \pi_2 + \pi_3 = \pi_1 + 4\pi_1 + 6\pi_1 = 11\pi_1 = 1
-\]
-Thus, \(\pi_1 = \frac{1}{11}\).
+1.  **中文思路 / Chinese reasoning:**
+    我们可以简化这些方程。注意，这三个方程并不是线性独立的（因为转移矩阵的每一行和为1，导致它们线性相关）。我们可以使用其中两个方程，并结合归一化条件来求解。
 
-Then, \(\pi_2 = 4 \cdot \frac{1}{11} = \frac{4}{11}\).
-And \(\pi_3 = 6 \cdot \frac{1}{11} = \frac{6}{11}\).
+2.  **English reasoning:**
+    We can simplify these equations. Note that these three equations are not linearly independent (because each row of the transition matrix sums to 1, they are linearly dependent). We can use two of them along with the normalization condition to solve for the unknowns.
 
-The stationary distribution is \(\pi = (\frac{1}{11}, \frac{4}{11}, \frac{6}{11})\).
+3.  **计算过程 / Working:**
+    从第一个方程开始：
+    \[
+    \frac{1}{3}\pi_1 + \frac{1}{6}\pi_2 = \pi_1
+    \]
+    两边乘以6：
+    \[
+    2\pi_1 + \pi_2 = 6\pi_1 \implies \pi_2 = 4\pi_1
+    \]
+    从第三个方程：
+    \[
+    \frac{1}{2}\pi_2 + \frac{2}{3}\pi_3 = \pi_3
+    \]
+    两边乘以6：
+    \[
+    3\pi_2 + 4\pi_3 = 6\pi_3 \implies 3\pi_2 = 2\pi_3 \implies \pi_3 = \frac{3}{2}\pi_2
+    \]
+    将 π₂ = 4π₁ 代入 π₃ 的表达式：
+    \[
+    \pi_3 = \frac{3}{2} (4\pi_1) = 6\pi_1
+    \]
+    现在使用归一化条件：
+    \[
+    \pi_1 + \pi_2 + \pi_3 = 1 \implies \pi_1 + 4\pi_1 + 6\pi_1 = 1 \implies 11\pi_1 = 1 \implies \pi_1 = \frac{1}{11}
+    \]
+    因此：
+    \[
+    \pi_2 = 4\pi_1 = \frac{4}{11}, \quad \pi_3 = 6\pi_1 = \frac{6}{11}
+    \]
 
-We should verify this with Equation 2 as a check:
-LHS of Eq 2: \(\frac{2}{3}\pi_1 + \frac{1}{3}\pi_2 + \frac{1}{3}\pi_3 = \frac{2}{3}\cdot\frac{1}{11} + \frac{1}{3}\cdot\frac{4}{11} + \frac{1}{3}\cdot\frac{6}{11} = \frac{2+4+6}{33} = \frac{12}{33} = \frac{4}{11}\).
-RHS of Eq 2: \(\pi_2 = \frac{4}{11}\). The equation holds.
+4.  **过程解释 / Explanation of working:**
+    我们通过代数操作将方程简化为变量之间的关系。π₂ = 4π₁ 和 π₃ = 6π₁。然后，我们利用所有概率之和必须为1这一事实来求解 π₁，进而得到其他分量。我们可以用第二个方程来验证我们的解：π₁*(2/3) + π₂*(1/3) + π₃*(1/3) = (1/11)*(2/3) + (4/11)*(1/3) + (6/11)*(1/3) = (2+4+6)/(33) = 12/33 = 4/11 = π₂。结果正确。
 
-**Step 3: Check for reversibility.**
-A Markov chain is reversible if it satisfies the detailed balance equations: \(\pi_i P_{ij} = \pi_j P_{ji}\) for all \(i, j\).
+**Step 3: 检查可逆性 / Check for reversibility**
 
-Let's check for all pairs:
-- For \((i,j) = (1,2)\): \(\pi_1 P_{12} = \frac{1}{11} \cdot \frac{2}{3} = \frac{2}{33}\). \(\pi_2 P_{21} = \frac{4}{11} \cdot \frac{1}{6} = \frac{4}{66} = \frac{2}{33}\). **Holds.**
-- For \((i,j) = (1,3)\): \(\pi_1 P_{13} = \frac{1}{11} \cdot 0 = 0\). \(\pi_3 P_{31} = \frac{6}{11} \cdot 0 = 0\). **Holds.**
-- For \((i,j) = (2,3)\): \(\pi_2 P_{23} = \frac{4}{11} \cdot \frac{1}{2} = \frac{4}{22} = \frac{2}{11}\). \(\pi_3 P_{32} = \frac{6}{11} \cdot \frac{1}{3} = \frac{6}{33} = \frac{2}{11}\). **Holds.**
+1.  **中文思路 / Chinese reasoning:**
+    一个马尔可夫链是可逆的，如果它存在一个平稳分布 π，使得对所有状态 i, j，细致平衡条件 πᵢ Pᵢⱼ = πⱼ Pⱼᵢ 都成立。我们只需要检查一个不满足该条件的例子，就可以证明链不可逆。
 
-Since the detailed balance equations hold for all pairs of states, the Markov chain is reversible.
+2.  **English reasoning:**
+    A Markov chain is reversible if there exists a stationary distribution π such that the detailed balance condition πᵢ Pᵢⱼ = πⱼ Pⱼᵢ holds for all states i, j. We only need to find one pair (i, j) for which this condition fails to prove the chain is not reversible.
+
+3.  **计算过程 / Working:**
+    检查状态1和状态2 (i=1, j=2):
+    \[
+    \pi_1 P_{12} = \frac{1}{11} \times \frac{2}{3} = \frac{2}{33}
+    \]
+    \[
+    \pi_2 P_{21} = \frac{4}{11} \times \frac{1}{6} = \frac{4}{66} = \frac{2}{33}
+    \]
+    对于 (1,2)，细致平衡成立。
+    检查状态2和状态3 (i=2, j=3):
+    \[
+    \pi_2 P_{23} = \frac{4}{11} \times \frac{1}{2} = \frac{4}{22} = \frac{2}{11}
+    \]
+    \[
+    \pi_3 P_{32} = \frac{6}{11} \times \frac{1}{3} = \frac{6}{33} = \frac{2}{11}
+    \]
+    对于 (2,3)，细致平衡也成立。
+    检查状态1和状态3 (i=1, j=3):
+    \[
+    \pi_1 P_{13} = \frac{1}{11} \times 0 = 0
+    \]
+    \[
+    \pi_3 P_{31} = \frac{6}{11} \times 0 = 0
+    \]
+    对于 (1,3)，细致平衡也成立。
+
+4.  **过程解释 / Explanation of working:**
+    我们检查了所有非零转移概率的对。由于 P₁₃ = 0 且 P₃₁ = 0，条件自动满足。对于其他对，我们代入计算出的 π 值，发现等式成立。因此，对于这个特定的链，细致平衡条件对所有 i, j 都成立。
 
 **Final Answer / 最终答案:**
-The stationary distribution is \(\boxed{\pi = \left(\frac{1}{11}, \frac{4}{11}, \frac{6}{11}\right)}\).
-The Markov chain is \(\boxed{\text{reversible}}\).
+- **平稳分布 (Stationary Distribution):** 平稳分布为 π = (1/11, 4/11, 6/11)。
+    The stationary distribution is π = (1/11, 4/11, 6/11).
+- **可逆性 (Reversibility):** 是的，这个马尔可夫链是可逆的，因为它满足细致平衡条件。
+    Yes, the Markov chain is reversible because it satisfies the detailed balance condition.
 
 **Key Insight / 解题要点:**
-Solving \(\pi P = \pi\) yields the stationary distribution, and verifying \(\pi_i P_{ij} = \pi_j P_{ji}\) for all \(i,j\) determines reversibility.
+- 求解平稳分布的核心是解线性方程组 πP = π 和 ∑πᵢ = 1。
+    The core of finding a stationary distribution is solving the linear system πP = π and ∑πᵢ = 1.
+- 可逆性由细致平衡条件 πᵢ Pᵢⱼ = πⱼ Pⱼᵢ 判定。如果链是可逆的，那么从平稳分布出发，正向和反向过程的概率流是平衡的。
+    Reversibility is determined by the detailed balance condition πᵢ Pᵢⱼ = πⱼ Pⱼᵢ. If a chain is reversible, starting from the stationary distribution, the probability flow forward and backward is balanced.
 
 ---
 
 ### Question 2 / 第2题
 
 **Problem / 题目原文:**
-Consider a Markov chain with state space \(S = \{1,2,3,4\}\) and transition matrix
-\[
-P = \begin{pmatrix}
-\frac{1}{4} & \frac{1}{2} & \frac{1}{4} & 0 \\
-\frac{1}{4} & \frac{1}{4} & \frac{1}{2} & 0 \\
-\frac{1}{2} & \frac{1}{2} & 0 & 0 \\
-\frac{1}{4} & 0 & \frac{1}{4} & \frac{1}{2}
-\end{pmatrix}.
-\]
+Consider a Markov chain with state space 𝑆= {1, 2, 3, 4} and transition matrix
+P =
+$$
+\begin{pmatrix}
+1/4   1/2   1/4   0 \\
+1/4   1/4   1/2   0 \\
+1/2   1/2   0     0 \\
+1/4   0     1/4   1/2
+\end{pmatrix}
+$$
+.
 (a) Draw a transition diagram for this Markov chain.
 (b) Identify the communicating classes. State whether each class is closed or not. State whether each class is positive recurrent, null recurrent, or transient.
 (c) Find a stationary distribution for this Markov chain. Is the Markov chain reversible?
 (d) Is this the only stationary distribution?
 
-**中文翻译:**
-考虑一个状态空间为 \(S = \{1,2,3,4\}\)，转移矩阵为 \(P\) 的马尔可夫链。
-(a) 画出该马尔可夫链的转移图。
-(b) 识别所有通信类。说明每个类是否是封闭的。说明每个类是正常返、零常返还是瞬时的。
-(c) 求该马尔可夫链的一个平稳分布。该马尔可夫链是否可逆？
+**中文翻译 / Chinese Translation:**
+考虑一个状态空间为 𝑆= {1, 2, 3, 4} 的马尔可夫链，其转移矩阵为
+P =
+$$
+\begin{pmatrix}
+1/4   1/2   1/4   0 \\
+1/4   1/4   1/2   0 \\
+1/2   1/2   0     0 \\
+1/4   0     1/4   1/2
+\end{pmatrix}
+$$
+.
+(a) 画出这个马尔可夫链的转移图。
+(b) 识别出所有通信类。说明每个类是否是封闭的。说明每个类是正常返的、零常返的还是瞬过的。
+(c) 求这个马尔可夫链的一个平稳分布。这个马尔可夫链是可逆的吗？
 (d) 这是唯一的平稳分布吗？
 
 **Knowledge Points / 考查知识点:**
-- Transition diagram (转移图)
-- Communicating classes (通信类), closed class (封闭类)
-- Recurrence and transience (常返性与瞬时性)
-- Stationary distribution (平稳分布)
-- Reversibility (可逆性)
-- Uniqueness of stationary distribution (平稳分布的唯一性)
+- **转移图 (Transition Diagram):** 用节点表示状态，用有向边和概率表示转移。
+- **通信类 (Communicating Classes):** 状态之间的可达与互通关系。
+- **封闭类 (Closed Class):** 从类中任何状态出发，都无法到达类外的状态。
+- **常返性与瞬过性 (Recurrence and Transience):** 基于有限状态空间马尔可夫链的性质：所有状态要么都是正常返的，要么都是瞬过的。封闭类中的状态是正常返的，非封闭类中的状态是瞬过的。
+- **平稳分布 (Stationary Distribution):** 求解 πP = π。
+- **可逆性 (Reversibility):** 检查细致平衡条件。
+- **平稳分布的唯一性 (Uniqueness of Stationary Distribution):** 一个不可约的马尔可夫链有唯一的平稳分布。如果链是可约的，则可能有多个平稳分布。
 
 **Step-by-Step Solution / 逐步解答:**
 
-**(a) Transition Diagram**
+**(a) 转移图 / Transition Diagram**
 
-**Step 1: Interpret the transition matrix.**
-The matrix \(P\) gives the probabilities of moving from one state to another. For example, \(P_{12} = \frac{1}{2}\) means from state 1, the probability to go to state 2 is 1/2.
+1.  **中文思路 / Chinese reasoning:**
+    我们根据转移矩阵 P 来画图。矩阵的第 i 行第 j 列的元素 Pᵢⱼ 表示从状态 i 转移到状态 j 的概率。我们画出4个节点，分别代表状态1、2、3、4。然后，对于每个非零的 Pᵢⱼ，我们从节点 i 画一条带箭头的边到节点 j，并在边上标出概率 Pᵢⱼ。
 
-**Step 2: Draw the diagram.**
-We draw four nodes (1, 2, 3, 4) and directed edges with the corresponding probabilities.
-- From 1: to 1 (1/4), to 2 (1/2), to 3 (1/4).
-- From 2: to 1 (1/4), to 2 (1/4), to 3 (1/2).
-- From 3: to 1 (1/2), to 2 (1/2).
-- From 4: to 1 (1/4), to 3 (1/4), to 4 (1/2).
+2.  **English reasoning:**
+    We draw the diagram based on the transition matrix P. The element Pᵢⱼ in the i-th row and j-th column represents the probability of transitioning from state i to state j. We draw 4 nodes representing states 1, 2, 3, and 4. Then, for each non-zero Pᵢⱼ, we draw a directed edge from node i to node j, labeling it with the probability Pᵢⱼ.
 
-The diagram is as follows (described textually, as I cannot draw images):
-- State 1 has a self-loop (1/4), an arrow to 2 (1/2), and an arrow to 3 (1/4).
-- State 2 has a self-loop (1/4), an arrow to 1 (1/4), and an arrow to 3 (1/2).
-- State 3 has an arrow to 1 (1/2) and an arrow to 2 (1/2).
-- State 4 has a self-loop (1/2), an arrow to 1 (1/4), and an arrow to 3 (1/4).
+3.  **计算过程 / Working:**
+    - 从状态1: P₁₁=1/4, P₁₂=1/2, P₁₃=1/4, P₁₄=0
+    - 从状态2: P₂₁=1/4, P₂₂=1/4, P₂₃=1/2, P₂₄=0
+    - 从状态3: P₃₁=1/2, P₃₂=1/2, P₃₃=0, P₃₄=0
+    - 从状态4: P₄₁=1/4, P₄₂=0, P₄₃=1/4, P₄₄=1/2
 
-**(b) Communicating Classes, Closedness, and Recurrence/Transience**
+    **转移图 (Transition Diagram):**
+    ```
+        1/2
+      ┌─────┐
+      │     ▼
+      │   1/4
+    ┌─┴─┐     ┌───┐
+    │ 1 │◄────│ 2 │
+    └─┬─┘ 1/4 └─┬─┘
+      │1/4      │1/4
+      │   1/2   │
+      ▼         ▼
+    ┌───┐     ┌───┐
+    │ 3 │◄────│ 4 │
+    └───┘ 1/4 └───┘
+      │         │
+      │1/2      │1/2
+      └─────────┘
+    ```
+    *(Note: A more standard diagram would have arrows. Let's describe it clearly:)*
+    - 1 → 1 (1/4), 1 → 2 (1/2), 1 → 3 (1/4)
+    - 2 → 1 (1/4), 2 → 2 (1/4), 2 → 3 (1/2)
+    - 3 → 1 (1/2), 3 → 2 (1/2)
+    - 4 → 1 (1/4), 4 → 3 (1/4), 4 → 4 (1/2)
 
-**Step 1: Identify communicating classes.**
-A communicating class is a set of states that all communicate with each other (i.e., for any \(i, j\) in the class, \(i\) can reach \(j\) and \(j\) can reach \(i\)).
+4.  **过程解释 / Explanation of working:**
+    我们逐行读取转移矩阵，为每个非零概率绘制一条有向边。注意，从状态3出发，只能到达状态1和2。从状态4出发，可以到达状态1、3和自己。
 
-- **States 1, 2, 3:** From the diagram, we can see that 1, 2, and 3 can all reach each other. For example, 1→2, 2→3, 3→1. So {1, 2, 3} is a communicating class.
-- **State 4:** Can state 4 reach states 1, 2, 3? Yes, 4→1, 4→3. Can states 1, 2, 3 reach state 4? No, there is no path from 1, 2, or 3 to 4. Therefore, state 4 is in its own communicating class {4}.
+**(b) 通信类 / Communicating Classes**
 
-**Step 2: Determine if classes are closed.**
-A class is closed if there is no way to leave it.
-- **Class {1, 2, 3}:** From states 1, 2, 3, can we reach state 4? No. So this class is **closed**.
-- **Class {4}:** From state 4, can we reach states 1, 2, 3? Yes. So this class is **not closed**.
+1.  **中文思路 / Chinese reasoning:**
+    我们通过分析转移图来找出通信类。状态 i 和 j 是互通的，如果从 i 可以到达 j，并且从 j 也可以到达 i。我们检查每个状态对。
 
-**Step 3: Determine recurrence/transience.**
-- **Closed class {1, 2, 3}:** Since the state space is finite and the class is closed, all states in this class are **positive recurrent**. (A finite, closed, irreducible class is always positive recurrent).
-- **Not closed class {4}:** Since state 4 can leave its class and never return (it's not closed), it is **transient**. (A state that can leave its class with positive probability and never come back is transient).
+2.  **English reasoning:**
+    We identify communicating classes by analyzing the transition diagram. States i and j communicate if i can reach j and j can reach i. We check each pair of states.
 
-**(c) Stationary Distribution and Reversibility**
+3.  **计算过程 / Working:**
+    - **状态1, 2, 3:** 从图上看，1→2, 2→1, 1→3, 3→1, 2→3, 3→2。所以状态1, 2, 3 两两互通。它们构成一个通信类 C₁ = {1, 2, 3}。
+    - **状态4:** 从4可以到达1 (4→1)。但是，从1, 2, 3 能到达4吗？从转移矩阵看，P₁₄=0, P₂₄=0, P₃₄=0。所以从C₁中的任何状态都无法到达状态4。因此，状态4自成一个通信类 C₂ = {4}。
+    - **封闭性 (Closedness):**
+        - C₁ = {1, 2, 3}: 从C₁中的状态出发，能到达C₁外的状态吗？从1, 2, 3出发，只能到达1, 2, 3 (P₁₄=P₂₄=P₃₄=0)。所以C₁是封闭的。
+        - C₂ = {4}: 从状态4出发，可以到达状态1 (P₄₁=1/4)，而状态1在C₁中。所以C₂不是封闭的。
+    - **常返/瞬过 (Recurrence/Transience):**
+        - 由于状态空间是有限的，所有封闭类中的状态都是正常返的。因此，C₁中的状态1, 2, 3是正常返的。
+        - 非封闭类中的状态是瞬过的。因此，C₂中的状态4是瞬过的。
 
-**Step 1: Find a stationary distribution.**
-Since the chain has a closed, irreducible class {1, 2, 3} and a transient state 4, any stationary distribution must assign probability 0 to the transient state. The stationary distribution is supported on the closed class. We need to find the stationary distribution for the sub-chain on {1, 2, 3}.
+4.  **过程解释 / Explanation of working:**
+    我们通过检查可达性来划分通信类。一个类如果无法离开，就是封闭的。在有限状态空间中，封闭类中的状态是正常返的（因为链最终会进入并停留在某个封闭类中），而非封闭类中的状态是瞬过的（因为链最终会离开它并进入一个封闭类）。
 
-The transition matrix for the sub-chain on {1, 2, 3} is:
-\[
-Q = \begin{pmatrix}
-\frac{1}{4} & \frac{1}{2} & \frac{1}{4} \\
-\frac{1}{4} & \frac{1}{4} & \frac{1}{2} \\
-\frac{1}{2} & \frac{1}{2} & 0
-\end{pmatrix}
-\]
+**(c) 平稳分布与可逆性 / Stationary Distribution and Reversibility**
 
-Let \(\pi = (\pi_1, \pi_2, \pi_3)\) be the stationary distribution for this sub-chain. Solve \(\pi Q = \pi\) and \(\pi_1 + \pi_2 + \pi_3 = 1\).
+1.  **中文思路 / Chinese reasoning:**
+    我们求解平稳分布 π = (π₁, π₂, π₃, π₄)，满足 πP = π 和 ∑πᵢ = 1。由于状态4是瞬过的，其平稳概率应为0，即 π₄ = 0。我们只需要对封闭类 C₁ = {1, 2, 3} 求解平稳分布。然后检查细致平衡条件。
 
-Equations from \(\pi Q = \pi\):
-- State 1: \(\frac{1}{4}\pi_1 + \frac{1}{4}\pi_2 + \frac{1}{2}\pi_3 = \pi_1\)  (Eq 1)
-- State 2: \(\frac{1}{2}\pi_1 + \frac{1}{4}\pi_2 + \frac{1}{2}\pi_3 = \pi_2\)  (Eq 2)
-- State 3: \(\frac{1}{4}\pi_1 + \frac{1}{2}\pi_2 + 0\cdot\pi_3 = \pi_3\)  (Eq 3)
+2.  **English reasoning:**
+    We solve for the stationary distribution π = (π₁, π₂, π₃, π₄) satisfying πP = π and ∑πᵢ = 1. Since state 4 is transient, its stationary probability should be 0, i.e., π₄ = 0. We only need to find the stationary distribution for the closed class C₁ = {1, 2, 3}. Then we check the detailed balance condition.
 
-Simplify Eq 1: Multiply by 4: \(\pi_1 + \pi_2 + 2\pi_3 = 4\pi_1 \Rightarrow \pi_2 + 2\pi_3 = 3\pi_1\). (R1)
+3.  **计算过程 / Working:**
+    **求解平稳分布 (Finding Stationary Distribution):**
+    设 π₄ = 0。对于状态1, 2, 3，其转移矩阵的子矩阵为：
+    \[
+    P' = $$
+\begin{pmatrix} 1/4 & 1/2 & 1/4 \\ 1/4 & 1/4 & 1/2 \\ 1/2 & 1/2 & 0 \end{pmatrix}
+$$
+    \]
+    方程 (π₁, π₂, π₃)P' = (π₁, π₂, π₃) 给出：
+    - 状态1: (1/4)π₁ + (1/4)π₂ + (1/2)π₃ = π₁
+    - 状态2: (1/2)π₁ + (1/4)π₂ + (1/2)π₃ = π₂
+    - 状态3: (1/4)π₁ + (1/2)π₂ + 0*π₃ = π₃
+    从状态3的方程：π₁/4 + π₂/2 = π₃。两边乘以4：π₁ + 2π₂ = 4π₃。 (1)
+    从状态1的方程：π₁/4 + π₂/4 + π₃/2 = π₁。两边乘以4：π₁ + π₂ + 2π₃ = 4π₁ → π₂ + 2π₃ = 3π₁。 (2)
+    从状态2的方程：π₁/2 + π₂/4 + π₃/2 = π₂。两边乘以4：2π₁ + π₂ + 2π₃ = 4π₂ → 2π₁ + 2π₃ = 3π₂。 (3)
+    从(1)式，π₃ = (π₁ + 2π₂)/4。
+    代入(2)式：π₂ + 2*(π₁ + 2π₂)/4 = 3π₁ → π₂ + (π₁ + 2π₂)/2 = 3π₁ → 两边乘以2：2π₂ + π₁ + 2π₂ = 6π₁ → 4π₂ = 5π₁ → π₂ = (5/4)π₁。
+    代入π₃表达式：π₃ = (π₁ + 2*(5/4)π₁)/4 = (π₁ + (5/2)π₁)/4 = ((7/2)π₁)/4 = (7/8)π₁。
+    归一化条件：π₁ + π₂ + π₃ = 1 → π₁ + (5/4)π₁ + (7/8)π₁ = 1。
+    通分乘以8：8π₁ + 10π₁ + 7π₁ = 8 → 25π₁ = 8 → π₁ = 8/25。
+    所以 π₂ = (5/4)*(8/25) = 40/100 = 2/5 = 10/25。
+    π₃ = (7/8)*(8/25) = 7/25。
+    因此，平稳分布为 π = (8/25, 10/25, 7/25, 0) = (8/25, 2/5, 7/25, 0)。
 
-Simplify Eq 3: Multiply by 4: \(\pi_1 + 2\pi_2 = 4\pi_3\). (R3)
+    **检查可逆性 (Checking Reversibility):**
+    检查状态1和2：π₁ P₁₂ = (8/25)*(1/2) = 4/25。π₂ P₂₁ = (10/25)*(1/4) = 10/100 = 1/10 = 2.5/25。4/25 ≠ 2.5/25。细致平衡条件不成立。因此，链不可逆。
 
-From R3, \(\pi_1 = 4\pi_3 - 2\pi_2\).
-Substitute into R1: \(\pi_2 + 2\pi_3 = 3(4\pi_3 - 2\pi_2) = 12\pi_3 - 6\pi_2\).
-Bring terms together: \(\pi_2 + 6\pi_2 = 12\pi_3 - 2\pi_3 \Rightarrow 7\pi_2 = 10\pi_3 \Rightarrow \pi_2 = \frac{10}{7}\pi_3\).
+4.  **过程解释 / Explanation of working:**
+    我们首先认识到瞬过状态在平稳分布中概率为0。然后，我们专注于封闭的通信类，并求解其上的平稳分布。我们通过代数消元法求解了线性方程组。最后，我们通过检查一个反例（状态1和2）来证明链不满足细致平衡条件。
 
-Now substitute \(\pi_2\) back into R3: \(\pi_1 = 4\pi_3 - 2(\frac{10}{7}\pi_3) = 4\pi_3 - \frac{20}{7}\pi_3 = \frac{28-20}{7}\pi_3 = \frac{8}{7}\pi_3\).
+**(d) 平稳分布的唯一性 / Uniqueness of Stationary Distribution**
 
-Now use normalization: \(\pi_1 + \pi_2 + \pi_3 = \frac{8}{7}\pi_3 + \frac{10}{7}\pi_3 + \pi_3 = \frac{8+10+7}{7}\pi_3 = \frac{25}{7}\pi_3 = 1\).
-Thus, \(\pi_3 = \frac{7}{25}\).
+1.  **中文思路 / Chinese reasoning:**
+    一个马尔可夫链的平稳分布不一定唯一。唯一性通常与链的不可约性相关。这个链是可约的，因为它有多个通信类。封闭类 C₁ = {1, 2, 3} 本身是一个不可约的马尔可夫链（在其上限制时），因此它在C₁上有唯一的平稳分布。瞬过状态4在平稳分布中概率为0。那么，是否存在其他平稳分布呢？例如，如果链从状态4出发，它最终会进入C₁，所以任何平稳分布都必须将全部概率质量放在C₁上。由于C₁上的平稳分布是唯一的，整个链的平稳分布也是唯一的。
 
-Then, \(\pi_2 = \frac{10}{7} \cdot \frac{7}{25} = \frac{10}{25} = \frac{2}{5}\).
-And \(\pi_1 = \frac{8}{7} \cdot \frac{7}{25} = \frac{8}{25}\).
+2.  **English reasoning:**
+    A Markov chain does not necessarily have a unique stationary distribution. Uniqueness is usually related to the irreducibility of the chain. This chain is reducible because it has multiple communicating classes. The closed class C₁ = {1, 2, 3} is itself an irreducible Markov chain (when restricted to it), so it has a unique stationary distribution on C₁. The transient state 4 has probability 0 in any stationary distribution. Are there other stationary distributions? For instance, if the chain starts in state 4, it will eventually enter C₁, so any stationary distribution must place all probability mass on C₁. Since the stationary distribution on C₁ is unique, the stationary distribution for the whole chain is also unique.
 
-So the stationary distribution for the whole chain is \(\pi = (\frac{8}{25}, \frac{2}{5}, \frac{7}{25}, 0)\).
+3.  **计算过程 / Working:**
+    是的，这是唯一的平稳分布。理由如下：链中唯一的封闭通信类是 C₁ = {1, 2, 3}。任何平稳分布都必须将概率质量仅分配给封闭类中的状态。由于C₁是不可约的，其上的平稳分布是唯一的。瞬过状态4在任何平稳分布中的概率必须为0。因此，整个链的平稳分布是唯一的。
 
-**Step 2: Check reversibility.**
-We need to check detailed balance for the whole chain. Since \(\pi_4 = 0\), any equation involving state 4 will hold (0 = 0). We only need to check states 1, 2, 3.
-
-- For (1,2): \(\pi_1 P_{12} = \frac{8}{25} \cdot \frac{1}{2} = \frac{8}{50} = \frac{4}{25}\). \(\pi_2 P_{21} = \frac{2}{5} \cdot \frac{1}{4} = \frac{2}{20} = \frac{1}{10} = \frac{2.5}{25}\). Not equal (\(\frac{4}{25} \neq \frac{2.5}{25}\)).
-Since the detailed balance fails for (1,2), the chain is **not reversible**.
-
-**(d) Uniqueness of Stationary Distribution**
-
-**Step 1: Analyze the structure.**
-The chain has one closed, irreducible, positive recurrent class {1, 2, 3} and one transient state {4}. For such a chain, the stationary distribution is unique and is supported entirely on the closed class.
-
-**Step 2: Conclusion.**
-Yes, this is the only stationary distribution.
-
-**Final Answer / 最终答案:**
-(a) Transition diagram described in solution.
-(b) Communicating classes: {1, 2, 3} (closed, positive recurrent), {4} (not closed, transient).
-(c) Stationary distribution: \(\boxed{\pi = \left(\frac{8}{25}, \frac{2}{5}, \frac{7}{25}, 0\right)}\). The chain is \(\boxed{\text{not reversible}}\).
-(d) \(\boxed{\text{Yes}}\), this is the only stationary distribution.
-
-**Key Insight / 解题要点:**
-For a chain with a single closed recurrent class and transient states, the unique stationary distribution is found by solving for the stationary distribution of the recurrent class and assigning zero probability to transient states.
-
----
-
-### Question 3 / 第3题
-
-**Problem / 题目原文:**
-Consider a Markov chain with state space \(S = \{1,2,3,4,5\}\) and transition matrix
-\[
-P = \begin{pmatrix}
-\frac{1}{3} & \frac{2}{3} & 0 & 0 & 0 \\
-\frac{1}{3} & \frac{2}{3} & 0 & 0 & 0 \\
-0 & \frac{3}{5} & \frac{1}{5} & \frac{1}{5} & 0 \\
-0 & 0 & 0 & \frac{1}{4} & \frac{3}{4} \\
-0 & 0 & 0 & \frac{1}{2} & \frac{1}{2}
-\end{pmatrix}.
-\]
-(a) Draw a transition diagram for this Markov chain.
-(b) Identify the communicating classes. State whether each class is closed or not. State if each class is positive recurrent, null recurrent, or transient.
-(c) Find all of the stationary distributions for this Markov chain.
-
-**中文翻译:**
-考虑一个状态空间为 \(S = \{1,2,3,4,5\}\)，转移矩阵为 \(P\) 的马尔可夫链。
-(a) 画出该马尔可夫链的转移图。
-(b) 识别所有通信类。说明每个类是否是封闭的。说明每个类是正常返、零常返还是瞬时的。
-(c) 求该马尔可夫链的所有平稳分布。
-
-**Knowledge Points / 考查知识点:**
-- Transition diagram (转移图)
-- Communicating classes (通信类), closed class (封闭类)
-- Recurrence and transience (常返性与瞬时性)
-- Stationary distributions for reducible chains (可约链的平稳分布)
-- Convex combinations of stationary distributions (平稳分布的凸组合)
-
-**Step-by-Step Solution / 逐步解答:**
-
-**(a) Transition Diagram**
-
-**Step 1: Interpret the transition matrix.**
-- From 1: to 1 (1/3), to 2 (2/3).
-- From 2: to 1 (1/3), to 2 (2/3).
-- From 3: to 2 (3/5), to 3 (1/5), to 4 (1/5).
-- From 4: to 4 (1/4), to 5 (3/4).
-- From 5: to 4 (1/2), to 5 (1/2).
-
-**Step 2: Draw the diagram.**
-- States 1 and 2 have arrows between each other and self-loops.
-- State 3 has an arrow to 2, a self-loop, and an arrow to 4.
-- States 4 and 5 have arrows between each other and self-loops.
-
-**(b) Communicating Classes, Closedness, and Recurrence/Transience**
-
-**Step 1: Identify communicating classes.**
-- **States 1, 2:** They can reach each other (1↔2) and cannot reach any other state. So {1, 2} is a class.
-- **State 3:** Can 3 reach 1 or 2? Yes, 3→2. Can 1 or 2 reach 3? No. Can 3 reach 4 or 5? Yes, 3→4. Can 4 or 5 reach 3? No. So state 3 is in its own class {3}.
-- **States 4, 5:** They can reach each other (4↔5) and cannot reach any other state. So {4, 5} is a class.
-
-**Step 2: Determine if classes are closed.**
-- **Class {1, 2}:** Can we leave this class? No, all transitions stay within {1, 2}. **Closed.**
-- **Class {3}:** Can we leave this class? Yes, to 2 and 4. **Not closed.**
-- **Class {4, 5}:** Can we leave this class? No, all transitions stay within {4, 5}. **Closed.**
-
-**Step 3: Determine recurrence/transience.**
-- **Closed class {1, 2}:** Finite, closed, irreducible. **Positive recurrent.**
-- **Not closed class {3}:** Can leave and never return. **Transient.**
-- **Closed class {4, 5}:** Finite, closed, irreducible. **Positive recurrent.**
-
-**(c) All Stationary Distributions**
-
-**Step 1: Understand the structure.**
-The chain has two closed, irreducible, positive recurrent classes: \(C_1 = \{1, 2\}\) and \(C_2 = \{4, 5\}\), and one transient state \(\{3\}\). Any stationary distribution is a convex combination of the stationary distributions of the closed classes. The transient state gets probability 0.
-
-**Step 2: Find stationary distribution for class \(C_1 = \{1, 2\}\).**
-The sub-matrix is:
-\[
-Q_1 = \begin{pmatrix}
-\frac{1}{3} & \frac{2}{3} \\
-\frac{1}{3} & \frac{2}{3}
-\end{pmatrix}
-\]
-Let \(\pi^{(1)} = (\pi_1, \pi_2)\). Solve \(\pi^{(1)} Q_1 = \pi^{(1)}\) and \(\pi_1 + \pi_2 = 1\).
-Equation for state 1: \(\frac{1}{3}\pi_1 + \frac{1}{3}\pi_2 = \pi_1 \Rightarrow \pi_1 + \pi_2 = 3\pi_1 \Rightarrow \pi_2 = 2\pi_1\).
-Normalization: \(\pi_1 + 2\pi_1 = 3\pi_1 = 1 \Rightarrow \pi_1 = \frac{1}{3}, \pi_2 = \frac{2}{3}\).
-So the stationary distribution for \(C_1\) is \(\pi^{(1)} = (\frac{1}{3}, \frac{2}{3})\).
-
-**Step 3: Find stationary distribution for class \(C_2 = \{4, 5\}\).**
-The sub-matrix is:
-\[
-Q_2 = \begin{pmatrix}
-\frac{1}{4} & \frac{3}{4} \\
-\frac{1}{2} & \frac{1}{2}
-\end{pmatrix}
-\]
-Let \(\pi^{(2)} = (\pi_4, \pi_5)\). Solve \(\pi^{(2)} Q_2 = \pi^{(2)}\) and \(\pi_4 + \pi_5 = 1\).
-Equation for state 4: \(\frac{1}{4}\pi_4 + \frac{1}{2}\pi_5 = \pi_4 \Rightarrow \pi_4 + 2\pi_5 = 4\pi_4 \Rightarrow 2\pi_5 = 3\pi_4 \Rightarrow \pi_5 = \frac{3}{2}\pi_4\).
-Normalization: \(\pi_4 + \frac{3}{2}\pi_4 = \frac{5}{2}\pi_4 = 1 \Rightarrow \pi_4 = \frac{2}{5}, \pi_5 = \frac{3}{5}\).
-So the stationary distribution for \(C_2\) is \(\pi^{(2)} = (\frac{2}{5}, \frac{3}{5})\).
-
-**Step 4: Combine to get all stationary distributions.**
-Any stationary distribution \(\pi\) for the whole chain is a convex combination of the stationary distributions of the two closed classes. Let \(\alpha \in [0, 1]\) be the weight on class \(C_1\). Then:
-\[
-\pi = \alpha \cdot (\pi_1, \pi_2, 0, 0, 0) + (1-\alpha) \cdot (0, 0, 0, \pi_4, \pi_5)
-\]
-This gives:
-\[
-\pi = \left( \frac{\alpha}{3}, \frac{2\alpha}{3}, 0, \frac{2(1-\alpha)}{5}, \frac{3(1-\alpha)}{5} \right)
-\]
-for any \(\alpha \in [0, 1]\).
+4.  **过程解释 / Explanation of working:**
+    平稳分布只存在于封闭的常返类上。如果只有一个封闭类，并且该类是不可约的，那么平稳分布就是唯一的。如果有多个封闭类，那么平稳分布可以是将概率任意分配在这些类上（每个类内部由其唯一的平稳分布决定）的凸组合。
 
 **Final Answer / 最终答案:**
-(a) Transition diagram described in solution.
-(b) Communicating classes: {1, 2} (closed, positive recurrent), {3} (not closed, transient), {4, 5} (closed, positive recurrent).
-(c) All stationary distributions are given by \(\boxed{\pi = \left
+- (a) **转移图 (Transition Diagram):** [见上方图示 / See diagram above]
+- (b) **通信类 (Communicating Classes):**
+    - C₁ = {1, 2, 3}，

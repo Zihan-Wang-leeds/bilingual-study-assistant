@@ -1,296 +1,342 @@
 # Problem Sheet 9 - 详细解答 / Detailed Solutions
 
 > MATH2702 Stochastic Processes
-> 生成时间 / Generated: 2026-07-17 15:15
+> 生成时间 / Generated: 2026-07-20 16:06
 > 来源页 / Source Pages: 89-90
 
 ---
 
-好的，作为大学随机过程课程的导师，我将为您提供MATH2702课程习题集9的完整、详细的逐步解答。
+好的，作为您的大学随机过程数学导师，我将为您提供MATH2702课程问题集9的完整、详细的双语解答。
 
 ---
 
 ### Question 1 / 第1题
 
 **Problem / 题目原文:**
-Consider a Markov jump process with state space 𝒮 = {0,1,2,…,𝑁} and generator matrix
-Q = 
-⎛⎜⎜⎜⎜⎜⎜
-⎝−𝑞₀ 𝑞₀₁ 𝑞₀₂ ⋯ 𝑞₀ₙ
-0 0 0 ⋯ 0
-0 0 0 ⋯ 0
-⋮ ⋮ ⋮ ⋱ ⋮
-0 0 0 ⋯ 0⎞⎟⎟⎟⎟⎟⎟
-⎠.
+Consider a Markov jump process with state space 𝒮= {0, 1, 2, … , 𝑁} and generator matrix
+Q =
+$$
+\begin{pmatrix}
+−𝑞0 & 𝑞01 & 𝑞02 & ⋯ & 𝑞0𝑁 \\
+0 & 0 & 0 & ⋯ & 0 \\
+0 & 0 & 0 & ⋯ & 0 \\
+⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+0 & 0 & 0 & ⋯ & 0
+\end{pmatrix}
+$$
+.
 (a) Draw a transition rate diagram for this jump process.
-This process is a “multiple decrement model”: there is one “active state” 0 and a number of “exit states” 1,2,…,𝑁 .
+This process is a “multiple decrement model”: there is one “active state” 0 and a number of “exit states”
+1, 2, … , 𝑁.
 (b) What is the probability that the process exits at state 𝑖?
-(c) Give a 95% prediction interval for the amount of time spent in the active state. (Your answer will be in terms of 𝑞₀.)
+(c) Give a 95% prediction interval for the amount of time spent in the active state. (Your answer will
+be in terms of 𝑞0.)
 
-**中文翻译:**
-考虑一个状态空间为 𝒮 = {0,1,2,…,𝑁} 的马尔可夫跳跃过程，其生成元矩阵为
-Q = 
-⎛⎜⎜⎜⎜⎜⎜
-⎝−𝑞₀ 𝑞₀₁ 𝑞₀₂ ⋯ 𝑞₀ₙ
-0 0 0 ⋯ 0
-0 0 0 ⋯ 0
-⋮ ⋮ ⋮ ⋱ ⋮
-0 0 0 ⋯ 0⎞⎟⎟⎟⎟⎟⎟
-⎠。
-(a) 画出该跳跃过程的转移速率图。
-这个过程是一个“多重减因模型”：有一个“活跃状态”0和多个“退出状态”1,2,…,𝑁。
+**中文翻译 / Chinese Translation:**
+考虑一个状态空间为 𝒮= {0, 1, 2, … , 𝑁}，生成矩阵为
+Q =
+$$
+\begin{pmatrix}
+−𝑞0 & 𝑞01 & 𝑞02 & ⋯ & 𝑞0𝑁 \\
+0 & 0 & 0 & ⋯ & 0 \\
+0 & 0 & 0 & ⋯ & 0 \\
+⋮ & ⋮ & ⋮ & ⋱ & ⋮ \\
+0 & 0 & 0 & ⋯ & 0
+\end{pmatrix}
+$$
+的马尔可夫跳跃过程。
+(a) 画出这个跳跃过程的转移速率图。
+这个过程是一个“多重减因模型”：有一个“活跃状态”0和若干个“退出状态”1, 2, … , 𝑁。
 (b) 过程在状态𝑖退出的概率是多少？
-(c) 给出在活跃状态中停留时间的95%预测区间。（你的答案将用𝑞₀表示。）
+(c) 给出在活跃状态中停留时间的95%预测区间。（你的答案将用𝑞0表示。）
 
 **Knowledge Points / 考查知识点:**
-- 马尔可夫跳跃过程 (Markov Jump Process)
-- 生成元矩阵 (Generator Matrix)
-- 转移速率图 (Transition Rate Diagram)
-- 指数分布与停留时间 (Exponential Distribution and Holding Time)
-- 多重减因模型 (Multiple Decrement Model)
+- 马尔可夫跳跃过程（Markov Jump Process）的生成矩阵（Generator Matrix）和转移速率图（Transition Rate Diagram）。
+- 多重减因模型（Multiple Decrement Model）中，从活跃状态到各个吸收状态的转移概率。
+- 指数分布（Exponential Distribution）的性质：在活跃状态的停留时间服从参数为总退出速率𝑞0的指数分布。
+- 指数分布的预测区间（Prediction Interval）计算。
 
 **Step-by-Step Solution / 逐步解答:**
 
 **(a) Transition Rate Diagram / 转移速率图**
 
-**Step 1: Interpret the Generator Matrix / 解读生成元矩阵**
-The generator matrix Q defines the rates of jumping between states. The off-diagonal entry $q_{ij}$ for $i \neq j$ is the rate of jumping from state $i$ to state $j$. The diagonal entry $q_{ii}$ is defined as $q_{ii} = -\sum_{j \neq i} q_{ij}$.
-生成元矩阵Q定义了状态间跳跃的速率。对于$i \neq j$，非对角线元素$q_{ij}$是从状态$i$跳跃到状态$j$的速率。对角线元素$q_{ii}$定义为$q_{ii} = -\sum_{j \neq i} q_{ij}$。
+**Step 1: 理解生成矩阵的结构 / Understanding the Structure of the Generator Matrix**
 
-**Step 2: Identify the Rates / 识别速率**
-From the given Q matrix:
-- Row 0: $q_{00} = -q_0$, and $q_{0i} = q_{0i}$ for $i=1,2,...,N$. This means from state 0, the process can jump to any state $i$ with rate $q_{0i}$. The total rate of leaving state 0 is $q_0 = \sum_{i=1}^N q_{0i}$.
-- Rows 1 to N: All entries are 0. This means $q_{ii} = 0$ and $q_{ij} = 0$ for $i \neq j$. A row of all zeros indicates that these are **absorbing states**. Once the process enters any state $i \ge 1$, it stays there forever.
-根据给定的Q矩阵：
-- 第0行：$q_{00} = -q_0$，且对于$i=1,2,...,N$，$q_{0i} = q_{0i}$。这意味着从状态0，过程可以以速率$q_{0i}$跳跃到任何状态$i$。离开状态0的总速率是$q_0 = \sum_{i=1}^N q_{0i}$。
-- 第1到N行：所有元素都是0。这意味着$q_{ii} = 0$且对于$i \neq j$，$q_{ij} = 0$。全零行表示这些是**吸收状态**。一旦过程进入任何$i \ge 1$的状态，它将永远停留在那里。
+**中文思路 / Chinese reasoning:**
+生成矩阵Q的行和必须为0。第一行对应状态0。对角线元素是-𝑞0，其中𝑞0 = Σ_{j=1}^{N} 𝑞0j，即从状态0出发的所有转移速率之和。非对角线元素𝑞0j (j=1,...,N) 是从状态0到状态j的转移速率。其他所有行（状态1到N）都是全零行，这意味着这些状态是吸收态（absorbing states）：一旦进入，就不会再离开。
 
-**Step 3: Draw the Diagram / 画出图形**
-The diagram has state 0 as the only non-absorbing state. From state 0, there are arrows pointing to each absorbing state $i$, labeled with the rate $q_{0i}$.
-图中，状态0是唯一的非吸收状态。从状态0出发，有指向每个吸收状态$i$的箭头，并标有速率$q_{0i}$。
+**English reasoning:**
+The rows of the generator matrix Q must sum to zero. The first row corresponds to state 0. The diagonal element is -𝑞0, where 𝑞0 = Σ_{j=1}^{N} 𝑞0j, which is the total rate of leaving state 0. The off-diagonal elements 𝑞0j (j=1,...,N) are the transition rates from state 0 to state j. All other rows (states 1 to N) are entirely zero, which means these states are absorbing: once entered, the process stays there forever.
 
+**Step 2: 绘制速率图 / Drawing the Diagram**
+
+**中文思路 / Chinese reasoning:**
+在转移速率图中，我们用圆圈表示状态，用带箭头的弧线表示可能的转移，并在弧线上标注转移速率。从状态0出发，有N条弧线分别指向状态1, 2, ..., N，速率分别为𝑞01, 𝑞02, ..., 𝑞0N。由于状态1到N是吸收态，没有离开它们的弧线。
+
+**English reasoning:**
+In a transition rate diagram, we represent states with circles and possible transitions with arrows labeled by their rates. From state 0, there are N arrows pointing to states 1, 2, ..., N, with rates 𝑞01, 𝑞02, ..., 𝑞0N respectively. Since states 1 to N are absorbing, there are no arrows leaving them.
+
+**计算过程 / Working:**
+```mermaid
+graph LR
+    0((0)) -- "q01" --> 1((1))
+    0 -- "q02" --> 2((2))
+    0 -- "..." --> N((N))
+    1 --> 1
+    2 --> 2
+    N --> N
 ```
-      q_01     q_02     q_03           q_0N
-  1 <------ 0 ------> 2 ------> 3 ... ------> N
-  (abs.)   (active)  (abs.)   (abs.)        (abs.)
-```
+*Note: The self-loops on states 1, 2, ..., N are implied for absorbing states but are not strictly necessary in a rate diagram as they have rate 0.*
+
+**过程解释 / Explanation of working:**
+速率图直观地展示了所有可能的转移。状态0是唯一一个可以离开的状态，它按照给定的速率跳转到各个吸收状态。吸收态没有向外的箭头，表示一旦进入，过程就停留在那里。
+
+The rate diagram visually shows all possible transitions. State 0 is the only state from which the process can leave, jumping to each absorbing state at the given rates. Absorbing states have no outgoing arrows, indicating that once entered, the process stays there.
 
 **(b) Probability of Exiting at State i / 在状态i退出的概率**
 
-**Step 1: Recall the Jump Chain / 回顾跳跃链**
-The probability that the process, upon leaving state 0, jumps to a specific state $i$ is given by the transition probability of the embedded Markov jump chain. This probability is proportional to the jump rate.
-过程在离开状态0时，跳跃到特定状态$i$的概率由嵌入的马尔可夫跳跃链的转移概率给出。这个概率与跳跃速率成正比。
+**Step 1: 识别概率 / Identifying the Probability**
 
-**Step 2: Calculate the Probability / 计算概率**
-The total rate of leaving state 0 is $q_0 = \sum_{j=1}^N q_{0j}$. The rate of jumping to state $i$ is $q_{0i}$. The probability of the first jump being to state $i$ is:
-离开状态0的总速率是$q_0 = \sum_{j=1}^N q_{0j}$。跳跃到状态$i$的速率是$q_{0i}$。第一次跳跃到状态$i$的概率是：
-$$P(\text{exit at state } i) = \frac{q_{0i}}{q_0} = \frac{q_{0i}}{\sum_{j=1}^N q_{0j}}$$
-Since all other states are absorbing, the process "exits" at the state it first jumps to.
-由于所有其他状态都是吸收态，过程在其首次跳跃到的状态“退出”。
+**中文思路 / Chinese reasoning:**
+这是一个多重减因模型。过程从状态0开始，最终会跳转到某个吸收状态i。由于在状态0的停留时间服从指数分布，而跳转到哪个状态是由一个独立的“竞争性”指数过程决定的。从状态0跳转到状态i的概率，等于从0到i的转移速率𝑞0i除以从0出发的总转移速率𝑞0。
 
-**(c) 95% Prediction Interval for Time in Active State / 活跃状态停留时间的95%预测区间**
+**English reasoning:**
+This is a multiple decrement model. The process starts in state 0 and will eventually jump to one of the absorbing states i. Since the holding time in state 0 is exponentially distributed, and the choice of which state to jump to is determined by independent "competing" exponential processes. The probability of jumping from state 0 to state i is equal to the transition rate from 0 to i, 𝑞0i, divided by the total rate of leaving state 0, 𝑞0.
 
-**Step 1: Identify the Distribution of Holding Time / 确定停留时间的分布**
-In a Markov jump process, the time spent in a state $i$ before jumping, $T_i$, is exponentially distributed with parameter $-q_{ii}$ (the total exit rate from that state).
-在马尔可夫跳跃过程中，在跳跃前停留在状态$i$的时间$T_i$，服从参数为$-q_{ii}$（离开该状态的总速率）的指数分布。
+**计算过程 / Working:**
+The probability that the process exits at state i is:
+$$P(\text{exit at state } i) = \frac{q_{0i}}{q_0}$$
+where $q_0 = \sum_{j=1}^{N} q_{0j}$.
 
-**Step 2: Apply to State 0 / 应用于状态0**
-Here, the total exit rate from state 0 is $q_0 = -q_{00}$. So, the holding time in the active state, $T_0$, is:
-这里，离开状态0的总速率是$q_0 = -q_{00}$。所以，在活跃状态的停留时间$T_0$为：
-$$T_0 \sim \text{Exp}(q_0)$$
-The probability density function (pdf) is $f(t) = q_0 e^{-q_0 t}$ for $t \ge 0$. The mean is $1/q_0$.
-概率密度函数为$f(t) = q_0 e^{-q_0 t}$，$t \ge 0$。均值为$1/q_0$。
+**过程解释 / Explanation of working:**
+这个公式是马尔可夫跳跃过程中跳跃概率的标准结果。在状态0，有N个独立的指数时钟在运行，每个时钟的速率为𝑞0i。第一个响起的时钟决定了跳转的目标状态。因此，时钟i最先响起的概率就是𝑞0i / (𝑞01 + 𝑞02 + ... + 𝑞0N) = 𝑞0i / 𝑞0。
 
-**Step 3: Find the Quantiles / 找到分位数**
-A 95% prediction interval $[a, b]$ for $T_0$ satisfies $P(a \le T_0 \le b) = 0.95$. A common choice is the equal-tailed interval, where $P(T_0 < a) = 0.025$ and $P(T_0 > b) = 0.025$.
-一个95%的预测区间$[a, b]$满足$P(a \le T_0 \le b) = 0.95$。一个常见的选择是等尾区间，其中$P(T_0 < a) = 0.025$且$P(T_0 > b) = 0.025$。
+This formula is a standard result for jump probabilities in a Markov jump process. In state 0, there are N independent exponential clocks running, each with rate 𝑞0i. The first clock to ring determines the target state of the jump. Therefore, the probability that clock i rings first is 𝑞0i / (𝑞01 + 𝑞02 + ... + 𝑞0N) = 𝑞0i / 𝑞0.
 
-**Step 4: Calculate the Lower Bound / 计算下限**
-$P(T_0 \le a) = 1 - e^{-q_0 a} = 0.025$
-$e^{-q_0 a} = 0.975$
-$-q_0 a = \ln(0.975)$
-$a = -\frac{\ln(0.975)}{q_0}$
+**(c) 95% Prediction Interval for Time in Active State / 在活跃状态停留时间的95%预测区间**
 
-**Step 5: Calculate the Upper Bound / 计算上限**
-$P(T_0 \ge b) = e^{-q_0 b} = 0.025$
-$-q_0 b = \ln(0.025)$
-$b = -\frac{\ln(0.025)}{q_0}$
+**Step 1: 确定停留时间的分布 / Identifying the Distribution of the Holding Time**
 
-**Step 6: State the Interval / 写出区间**
-The 95% prediction interval for the time spent in the active state is:
-在活跃状态中停留时间的95%预测区间为：
-$$\left[ -\frac{\ln(0.975)}{q_0}, -\frac{\ln(0.025)}{q_0} \right]$$
+**中文思路 / Chinese reasoning:**
+在马尔可夫跳跃过程中，在状态0的停留时间𝑇服从参数为𝑞0的指数分布，即𝑇 ~ Exp(𝑞0)。这是因为从状态0出发的总转移速率为𝑞0，所以离开速率就是𝑞0。
+
+**English reasoning:**
+In a Markov jump process, the holding time 𝑇 in state 0 follows an exponential distribution with parameter 𝑞0, i.e., 𝑇 ~ Exp(𝑞0). This is because the total rate of leaving state 0 is 𝑞0.
+
+**Step 2: 寻找预测区间 / Finding the Prediction Interval**
+
+**中文思路 / Chinese reasoning:**
+一个95%的预测区间是指，区间覆盖随机变量𝑇的概率为0.95。对于指数分布，我们可以通过其累积分布函数（CDF）来找到这个区间。一个常见的方法是找到分布的下α/2分位数和上α/2分位数，其中α = 0.05。所以我们需要找到𝑡_low和𝑡_high，使得P(𝑇 ≤ 𝑡_low) = 0.025 且 P(𝑇 ≤ 𝑡_high) = 0.975。由于指数分布是右偏的，一个更简单的等尾区间是[0, 𝑡_0.95]，其中𝑡_0.95是95%分位数，即P(𝑇 ≤ 𝑡_0.95) = 0.95。但更标准的做法是使用等尾区间。
+
+**English reasoning:**
+A 95% prediction interval is an interval that covers the random variable 𝑇 with probability 0.95. For an exponential distribution, we can find this interval using its cumulative distribution function (CDF). A common approach is to find the lower α/2 and upper α/2 quantiles, where α = 0.05. So we need to find 𝑡_low and 𝑡_high such that P(𝑇 ≤ 𝑡_low) = 0.025 and P(𝑇 ≤ 𝑡_high) = 0.975. Since the exponential distribution is right-skewed, a simpler equal-tailed interval is [0, 𝑡_0.95], where 𝑡_0.95 is the 95th percentile, i.e., P(𝑇 ≤ 𝑡_0.95) = 0.95. However, a more standard approach is to use an equal-tailed interval.
+
+**计算过程 / Working:**
+The CDF of an exponential distribution with rate λ is $F(t) = 1 - e^{-λt}$.
+We want to find $t_{low}$ and $t_{high}$ such that:
+$$P(T \le t_{low}) = 0.025 \quad \text{and} \quad P(T \le t_{high}) = 0.975$$
+$$1 - e^{-q_0 t_{low}} = 0.025 \implies e^{-q_0 t_{low}} = 0.975 \implies -q_0 t_{low} = \ln(0.975) \implies t_{low} = -\frac{\ln(0.975)}{q_0}$$
+$$1 - e^{-q_0 t_{high}} = 0.975 \implies e^{-q_0 t_{high}} = 0.025 \implies -q_0 t_{high} = \ln(0.025) \implies t_{high} = -\frac{\ln(0.025)}{q_0}$$
+
+**过程解释 / Explanation of working:**
+我们使用指数分布的CDF来解出分位数。对于下界，我们设CDF等于0.025；对于上界，设CDF等于0.975。然后解出t。注意，由于指数分布的定义域是[0, ∞)，下界是正数。我们可以计算这些对数值的近似值：ln(0.975) ≈ -0.0253，ln(0.025) ≈ -3.6889。所以，t_low ≈ 0.0253/q0，t_high ≈ 3.6889/q0。
+
+We use the CDF of the exponential distribution to solve for the quantiles. For the lower bound, we set the CDF equal to 0.025; for the upper bound, we set it to 0.975. Then we solve for t. Note that since the exponential distribution is defined on [0, ∞), the lower bound is positive. We can compute approximate values for these logarithms: ln(0.975) ≈ -0.0253, ln(0.025) ≈ -3.6889. So, t_low ≈ 0.0253/q0, t_high ≈ 3.6889/q0.
 
 **Final Answer / 最终答案:**
-(a) Diagram as shown above.
-(b) $P(\text{exit at state } i) = \frac{q_{0i}}{q_0}$
-(c) 95% prediction interval: $\boxed{\left[ -\frac{\ln(0.975)}{q_0}, -\frac{\ln(0.025)}{q_0} \right]}$
+(a) The transition rate diagram is shown above.
+(b) $P(\text{exit at state } i) = \frac{q_{0i}}{q_0}$, where $q_0 = \sum_{j=1}^N q_{0j}$.
+(c) A 95% prediction interval for the time spent in the active state is:
+$$\left[-\frac{\ln(0.975)}{q_0}, -\frac{\ln(0.025)}{q_0}\right] \approx \left[\frac{0.0253}{q_0}, \frac{3.6889}{q_0}\right]$$
+
+(a) 转移速率图如上所示。
+(b) 在状态i退出的概率为 $P(\text{在状态 } i \text{ 退出}) = \frac{q_{0i}}{q_0}$，其中 $q_0 = \sum_{j=1}^N q_{0j}$。
+(c) 在活跃状态停留时间的95%预测区间为：
+$$\left[-\frac{\ln(0.975)}{q_0}, -\frac{\ln(0.025)}{q_0}\right] \approx \left[\frac{0.0253}{q_0}, \frac{3.6889}{q_0}\right]$$
 
 **Key Insight / 解题要点:**
-The key is recognizing that the diagonal element $-q_0$ is the total exit rate, which determines the exponential holding time, and the off-diagonal elements $q_{0i}$ determine the probabilities of the embedded jump chain.
-关键在于认识到对角线元素$-q_0$是总退出速率，它决定了指数停留时间，而非对角线元素$q_{0i}$决定了嵌入跳跃链的概率。
+- 多重减因模型的核心是，从活跃状态到各个吸收状态的转移概率由相对速率决定，而停留时间由总速率决定。
+- The core of the multiple decrement model is that the transition probabilities from the active state to each absorbing state are determined by the relative rates, while the holding time is determined by the total rate.
+- 预测区间的计算依赖于指数分布的分位数。
+- The calculation of the prediction interval relies on the quantiles of the exponential distribution.
 
 ---
 
 ### Question 2 / 第2题
 
 **Problem / 题目原文:**
-Consider the Markov jump process $(X(t))$ with state space $\mathcal{S} = \{1,2,3\}$ and generator matrix
-$$Q = \begin{pmatrix} -4 & 3 & 1 \\ 2 & -6 & 4 \\ 1 & 2 & -3 \end{pmatrix}.$$
-The process begins from the state $X(0) = 1$. Let $(Y_n)$ be the associated Markov jump chain.
-(a) Write down the transition matrix $R$ of the jump chain.
-(b) What is the expected time of the first jump $J_1$?
+Consider the Markov jump process (𝑋(𝑡)) with state space 𝒮= {1, 2, 3} and generator matrix
+Q = $$
+\begin{pmatrix}
+−4 \\
+3 \\
+1 \\
+2 \\
+−6 \\
+4 \\
+1 \\
+2 \\
+−3
+\end{pmatrix}
+$$
+.
+The process begins from the state 𝑋(0) = 1. Let (𝑌𝑛) be the associated Markov jump chain.
+(a) Write down the transition matrix R of the jump chain.
+(b) What is the expected time of the first jump 𝐽1?
 (c) What is the probability the first jump is to state 2?
-(d) By conditioning on the first jump, calculate the expected time of the second jump time $J_2 = T_1 + T_2$.
+(d) By conditioning on the first jump, calculate the expected time of the second jump time 𝐽2 = 𝑇1 +𝑇2.
 (e) What is the probability that the second jump is to state 2?
 (f) What is the probability that the third jump is to state 2?
 
-**中文翻译:**
-考虑一个马尔可夫跳跃过程$(X(t))$，其状态空间为$\mathcal{S} = \{1,2,3\}$，生成元矩阵为
-$$Q = \begin{pmatrix} -4 & 3 & 1 \\ 2 & -6 & 4 \\ 1 & 2 & -3 \end{pmatrix}.$$
-过程从状态$X(0) = 1$开始。令$(Y_n)$为相关的马尔可夫跳跃链。
-(a) 写出跳跃链的转移矩阵$R$。
-(b) 第一次跳跃时间$J_1$的期望是多少？
+**中文翻译 / Chinese Translation:**
+考虑一个状态空间为 𝒮= {1, 2, 3}，生成矩阵为
+Q = $$
+\begin{pmatrix}
+−4 \\
+3 \\
+1 \\
+2 \\
+−6 \\
+4 \\
+1 \\
+2 \\
+−3
+\end{pmatrix}
+$$
+的马尔可夫跳跃过程 (𝑋(𝑡))。
+过程从状态 𝑋(0) = 1 开始。令 (𝑌𝑛) 为相关的马尔可夫跳跃链。
+(a) 写出跳跃链的转移矩阵 R。
+(b) 第一次跳跃时间 𝐽1 的期望是多少？
 (c) 第一次跳跃到状态2的概率是多少？
-(d) 通过对第一次跳跃进行条件化，计算第二次跳跃时间$J_2 = T_1 + T_2$的期望。
+(d) 通过对第一次跳跃进行条件期望，计算第二次跳跃时间 𝐽2 = 𝑇1 + 𝑇2 的期望。
 (e) 第二次跳跃到状态2的概率是多少？
 (f) 第三次跳跃到状态2的概率是多少？
 
 **Knowledge Points / 考查知识点:**
-- 马尔可夫跳跃链 (Markov Jump Chain)
-- 转移概率矩阵 (Transition Probability Matrix)
-- 指数分布与期望 (Exponential Distribution and Expectation)
-- 条件期望 (Conditional Expectation)
-- 全概率公式 (Law of Total Probability)
+- 马尔可夫跳跃过程（MJP）与嵌入的马尔可夫跳跃链（Embedded Markov Jump Chain）的关系。
+- 从生成矩阵Q推导跳跃链转移矩阵R的方法。
+- 指数分布停留时间的期望。
+- 跳跃概率的计算。
+- 通过条件期望（Conditioning on the first jump）计算期望时间。
+- 马尔可夫链的n步转移概率（n-step transition probabilities）。
 
 **Step-by-Step Solution / 逐步解答:**
 
 **(a) Transition Matrix R of the Jump Chain / 跳跃链的转移矩阵R**
 
-**Step 1: Recall the Formula for R / 回顾R的公式**
-The transition matrix $R$ of the embedded jump chain has entries $r_{ij} = P(Y_{n+1} = j | Y_n = i)$. For $i \neq j$, $r_{ij} = q_{ij} / (-q_{ii})$. For $i = j$, $r_{ii} = 0$ (since the process must jump to a different state).
-嵌入跳跃链的转移矩阵$R$的元素为$r_{ij} = P(Y_{n+1} = j | Y_n = i)$。对于$i \neq j$，$r_{ij} = q_{ij} / (-q_{ii})$。对于$i = j$，$r_{ii} = 0$（因为过程必须跳跃到不同的状态）。
+**Step 1: 理解跳跃链 / Understanding the Jump Chain**
 
-**Step 2: Calculate the Rows of R / 计算R的各行**
-- **From state 1:** $-q_{11} = 4$. $r_{12} = 3/4$, $r_{13} = 1/4$.
-- **From state 2:** $-q_{22} = 6$. $r_{21} = 2/6 = 1/3$, $r_{23} = 4/6 = 2/3$.
-- **From state 3:** $-q_{33} = 3$. $r_{31} = 1/3$, $r_{32} = 2/3$.
+**中文思路 / Chinese reasoning:**
+马尔可夫跳跃链 (𝑌𝑛) 记录了过程在每次跳跃后所处的状态。它的转移矩阵R可以通过生成矩阵Q的非对角线元素计算得出。具体来说，从状态i到状态j (i≠j) 的转移概率是 r_{ij} = q_{ij} / q_i，其中 q_i = -q_{ii} 是从状态i出发的总速率。对角线元素 r_{ii} = 0，因为跳跃链不允许停留在原状态（除非是吸收态，但这里没有吸收态）。
 
-**Step 3: Write the Matrix / 写出矩阵**
-$$R = \begin{pmatrix} 0 & 3/4 & 1/4 \\ 1/3 & 0 & 2/3 \\ 1/3 & 2/3 & 0 \end{pmatrix}$$
+**English reasoning:**
+The Markov jump chain (𝑌𝑛) records the state of the process after each jump. Its transition matrix R can be calculated from the off-diagonal elements of the generator matrix Q. Specifically, the transition probability from state i to state j (i≠j) is r_{ij} = q_{ij} / q_i, where q_i = -q_{ii} is the total rate of leaving state i. The diagonal elements r_{ii} = 0 because the jump chain does not allow staying in the same state (unless it's an absorbing state, which is not the case here).
 
-**(b) Expected Time of the First Jump / 第一次跳跃的期望时间**
+**Step 2: 计算每个状态的q_i / Calculating q_i for each state**
 
-**Step 1: Identify the Distribution / 确定分布**
-The first jump time $J_1 = T_1$ is the holding time in the initial state $X(0)=1$. It is exponentially distributed with parameter $\lambda = -q_{11} = 4$.
-第一次跳跃时间$J_1 = T_1$是在初始状态$X(0)=1$的停留时间。它服从参数为$\lambda = -q_{11} = 4$的指数分布。
+**中文思路 / English reasoning:**
+从Q的对角线元素，我们得到离开每个状态的总速率。
+From the diagonal elements of Q, we get the total rate of leaving each state.
 
-**Step 2: Calculate the Expectation / 计算期望**
-The expectation of an exponential random variable with rate $\lambda$ is $1/\lambda$.
-参数为$\lambda$的指数随机变量的期望是$1/\lambda$。
-$$E[J_1] = E[T_1] = \frac{1}{4}$$
+**计算过程 / Working:**
+$q_1 = -q_{11} = 4$
+$q_2 = -q_{22} = 6$
+$q_3 = -q_{33} = 3$
+
+**Step 3: 计算转移概率 / Calculating Transition Probabilities**
+
+**中文思路 / English reasoning:**
+对于每个非对角线元素，我们计算 r_{ij} = q_{ij} / q_i。
+For each off-diagonal element, we calculate r_{ij} = q_{ij} / q_i.
+
+**计算过程 / Working:**
+From state 1:
+$r_{12} = \frac{q_{12}}{q_1} = \frac{3}{4}$
+$r_{13} = \frac{q_{13}}{q_1} = \frac{1}{4}$
+
+From state 2:
+$r_{21} = \frac{q_{21}}{q_2} = \frac{2}{6} = \frac{1}{3}$
+$r_{23} = \frac{q_{23}}{q_2} = \frac{4}{6} = \frac{2}{3}$
+
+From state 3:
+$r_{31} = \frac{q_{31}}{q_3} = \frac{1}{3}$
+$r_{32} = \frac{q_{32}}{q_3} = \frac{2}{3}$
+
+**过程解释 / Explanation of working:**
+我们逐行计算。对于状态1，总离开速率是4。转移到状态2的速率是3，所以概率是3/4。转移到状态3的速率是1，所以概率是1/4。对于状态2，总离开速率是6。转移到状态1的速率是2，所以概率是2/6=1/3。转移到状态3的速率是4，所以概率是4/6=2/3。对于状态3，总离开速率是3。转移到状态1的速率是1，所以概率是1/3。转移到状态2的速率是2，所以概率是2/3。
+
+We calculate row by row. For state 1, the total exit rate is 4. The rate of transitioning to state 2 is 3, so the probability is 3/4. The rate of transitioning to state 3 is 1, so the probability is 1/4. For state 2, the total exit rate is 6. The rate of transitioning to state 1 is 2, so the probability is 2/6=1/3. The rate of transitioning to state 3 is 4, so the probability is 4/6=2/3. For state 3, the total exit rate is 3. The rate of transitioning to state 1 is 1, so the probability is 1/3. The rate of transitioning to state 2 is 2, so the probability is 2/3.
+
+**Final Answer for (a) / (a)的最终答案:**
+$$R = $$
+\begin{pmatrix}
+0 & 3/4 & 1/4 \\
+1/3 & 0 & 2/3 \\
+1/3 & 2/3 & 0
+\end{pmatrix}
+$$$$
+
+**(b) Expected Time of the First Jump J1 / 第一次跳跃时间J1的期望**
+
+**Step 1: 确定J1的分布 / Identifying the Distribution of J1**
+
+**中文思路 / Chinese reasoning:**
+过程从状态1开始。在状态1的停留时间T1服从参数为q1=4的指数分布。第一次跳跃时间J1就是T1。
+
+**English reasoning:**
+The process starts in state 1. The holding time T1 in state 1 follows an exponential distribution with parameter q1=4. The first jump time J1 is exactly T1.
+
+**Step 2: 计算期望 / Calculating the Expectation**
+
+**中文思路 / English reasoning:**
+指数分布的期望是其参数的倒数。
+The expectation of an exponential distribution is the reciprocal of its parameter.
+
+**计算过程 / Working:**
+$$E[J_1] = E[T_1] = \frac{1}{q_1} = \frac{1}{4}$$
+
+**Final Answer for (b) / (b)的最终答案:**
+$$E[J_1] = \frac{1}{4}$$
 
 **(c) Probability the First Jump is to State 2 / 第一次跳跃到状态2的概率**
 
-**Step 1: Use the Jump Chain / 使用跳跃链**
-This is simply the transition probability $r_{12}$ from the jump chain.
-这即是跳跃链中的转移概率$r_{12}$。
-$$P(\text{first jump to state 2}) = r_{12} = \frac{3}{4}$$
+**Step 1: 使用跳跃概率 / Using the Jump Probability**
 
-**(d) Expected Time of the Second Jump / 第二次跳跃的期望时间**
+**中文思路 / Chinese reasoning:**
+第一次跳跃到状态2的概率，就是跳跃链从状态1到状态2的转移概率，即r_{12}。
 
-**Step 1: Define the Problem / 定义问题**
-$J_2 = T_1 + T_2$. We need $E[J_2] = E[T_1 + T_2] = E[T_1] + E[T_2]$. We know $E[T_1] = 1/4$. We need to find $E[T_2]$.
-$J_2 = T_1 + T_2$。我们需要$E[J_2] = E[T_1 + T_2] = E[T_1] + E[T_2]$。我们知道$E[T_1] = 1/4$。我们需要找到$E[T_2]$。
+**English reasoning:**
+The probability that the first jump is to state 2 is exactly the transition probability of the jump chain from state 1 to state 2, which is r_{12}.
 
-**Step 2: Condition on the First Jump / 对第一次跳跃进行条件化**
-$T_2$ is the holding time in the state visited after the first jump, $Y_1$. We use the Law of Total Expectation:
-$T_2$是在第一次跳跃后访问的状态$Y_1$中的停留时间。我们使用全期望公式：
-$$E[T_2] = E[E[T_2 | Y_1]]$$
-$$E[T_2 | Y_1 = i] = \frac{1}{-q_{ii}}$$
+**计算过程 / Working:**
+$$P(Y_1 = 2 | Y_0 = 1) = r_{12} = \frac{3}{4}$$
 
-**Step 3: Calculate the Conditional Expectations / 计算条件期望**
-- If $Y_1 = 1$: $E[T_2 | Y_1=1] = 1/4$
-- If $Y_1 = 2$: $E[T_2 | Y_1=2] = 1/6$
-- If $Y_1 = 3$: $E[T_2 | Y_1=3] = 1/3$
+**Final Answer for (c) / (c)的最终答案:**
+$$P(\text{first jump to state 2}) = \frac{3}{4}$$
 
-**Step 4: Apply the Law of Total Expectation / 应用全期望公式**
-$$E[T_2] = \sum_{i=1}^3 P(Y_1 = i | X(0)=1) \cdot E[T_2 | Y_1 = i]$$
-$$E[T_2] = r_{12} \cdot \frac{1}{6} + r_{13} \cdot \frac{1}{3}$$
-$$E[T_2] = \frac{3}{4} \cdot \frac{1}{6} + \frac{1}{4} \cdot \frac{1}{3} = \frac{3}{24} + \frac{1}{12} = \frac{3}{24} + \frac{2}{24} = \frac{5}{24}$$
+**(d) Expected Time of the Second Jump J2 = T1 + T2 / 第二次跳跃时间J2 = T1 + T2的期望**
 
-**Step 5: Sum the Expectations / 求和**
-$$E[J_2] = E[T_1] + E[T_2] = \frac{1}{4} + \frac{5}{24} = \frac{6}{24} + \frac{5}{24} = \frac{11}{24}$$
+**Step 1: 使用条件期望 / Using Conditional Expectation**
 
-**(e) Probability the Second Jump is to State 2 / 第二次跳跃到状态2的概率**
+**中文思路 / Chinese reasoning:**
+我们需要计算E[J2] = E[T1 + T2]。我们可以通过对第一次跳跃的结果进行条件期望来计算。J2 = T1 + T2，其中T1是状态1的停留时间，T2是第一次跳跃后到达的状态的停留时间。我们不知道第一次跳到哪里，所以我们需要对所有可能的目标状态进行平均。
 
-**Step 1: Condition on the First Jump / 对第一次跳跃进行条件化**
-We want $P(Y_2 = 2 | X(0)=1)$. We use the Law of Total Probability:
-我们想要$P(Y_2 = 2 | X(0)=1)$。我们使用全概率公式：
-$$P(Y_2 = 2 | Y_0=1) = \sum_{i=1}^3 P(Y_1 = i | Y_0=1) \cdot P(Y_2 = 2 | Y_1 = i)$$
-$$= \sum_{i=1}^3 r_{1i} \cdot r_{i2}$$
+**English reasoning:**
+We need to calculate E[J2] = E[T1 + T2]. We can do this by conditioning on the outcome of the first jump. J2 = T1 + T2, where T1 is the holding time in state 1, and T2 is the holding time in the state reached after the first jump. We don't know where the first jump goes, so we need to average over all possible target states.
 
-**Step 2: Calculate the Terms / 计算各项**
-- $i=1$: $r_{11} \cdot r_{12} = 0 \cdot (3/4) = 0$
-- $i=2$: $r_{12} \cdot r_{22} = (3/4) \cdot 0 = 0$
-- $i=3$: $r_{13} \cdot r_{32} = (1/4) \cdot (2/3) = 2/12 = 1/6$
+**Step 2: 应用条件期望公式 / Applying the Law of Total Expectation**
 
-**Step 3: Sum the Probabilities / 求和**
-$$P(Y_2 = 2 | Y_0=1) = 0 + 0 + \frac{1}{6} = \frac{1}{6}$$
+**中文思路 / English reasoning:**
+根据全期望公式，E[J2] = E[E[J2 | Y1]]。给定第一次跳跃到达的状态Y1，J2 = T1 + T2，其中T1和T2是独立的指数随机变量（因为MJP的马尔可夫性）。所以E[J2 | Y1 = j] = E[T1] + E[T2 | Y1 = j] = 1/q1 + 1/qj。
 
-**(f) Probability the Third Jump is to State 2 / 第三次跳跃到状态2的概率**
+By the Law of Total Expectation, E[J2] = E[E[J2 | Y1]]. Given the state Y1 reached after the first jump, J2 = T1 + T2, where T1 and T2 are independent exponential random variables (due to the Markov property of the MJP). So E[J2 | Y1 = j] = E[T1] + E[T2 | Y1 = j] = 1/q1 + 1/qj.
 
-**Step 1: Use Matrix Powers / 使用矩阵幂**
-The $n$-step transition probabilities of the jump chain are given by the $n$-th power of the transition matrix $R$. We need $(R^3)_{12}$.
-跳跃链的$n$步转移概率由转移矩阵$R$的$n$次幂给出。我们需要$(R^3)_{12}$。
+**计算过程 / Working:**
+$$E[J_2] = E[E[J_2 | Y_1]] = \sum_{j \in \{2,3\}} E[J_2 | Y_1 = j] \cdot P(Y_1 = j | Y_0 = 1)$$
+$$E[J_2 | Y_1 = 2] = \frac{1}{q_1} + \frac{1}{q_2} = \frac{1}{4} + \frac{1}{6} = \frac{3}{12} + \frac{2}{12} = \frac{5}{12}$$
+$$E[J_2 | Y_1 = 3] = \frac{1}{q_1} + \frac{1}{q_3} = \frac{1}{4} + \frac{1}{3} = \frac{3}{12} + \frac{4}{12} = \frac{7}{12}$$
+$$P(Y_1 = 2 | Y_0 = 1) = \frac{3}{4}, \quad P(Y_1 = 3 | Y_0 = 1) = \frac{1}{4}$$
+$$E[J_2] = \left(\frac{5}{12}\right) \cdot \frac{3}{4} + \left(\frac{7}{12}\right) \cdot \frac{1}{4} = \frac{15}{48} + \frac{7}{48} = \frac{22}{48} = \frac{11}{24}$$
 
-**Step 2: Calculate $R^2$ / 计算$R^2$**
-$$R^2 = R \times R = \begin{pmatrix} 0 & 3/4 & 1/4 \\ 1/3 & 0 & 2/3 \\ 1/3 & 2/3 & 0 \end{pmatrix} \times \begin{pmatrix} 0 & 3/4 & 1/4 \\ 1/3 & 0 & 2/3 \\ 1/3 & 2/3 & 0 \end{pmatrix}$$
-Let's calculate the entry $(R^2)_{12}$:
-$(R^2)_{12} = (0)(3/4) + (3/4)(0) + (1/4)(2/3) = 0 + 0 + 2/12 = 1/6$
-Let's calculate the full matrix to be safe:
-- Row 1: $(0, 3/4, 1/4)$
-  - Col 1: $0(0) + (3/4)(1/3) + (1/4)(1/3) = 0 + 1/4 + 1/12 = 3/12 + 1/12 = 4/12 = 1/3$
-  - Col 2: $0(3/4) + (3/4)(0) + (1/4)(2/3) = 0 + 0 + 2/12 = 1/6$
-  - Col 3: $0(1/4) + (3/4)(2/3) + (1/4)(0) = 0 + 1/2 + 0 = 1/2$
-- Row 2: $(1/3, 0, 2/3)$
-  - Col 1: $(1/3)(0) + 0(1/3) + (2/3)(1/3) = 0 + 0 + 2/9$
-  - Col 2: $(1/3)(3/4) + 0(0) + (2/3)(2/3) = 1/4 + 0 + 4/9 = 9/36 + 16/36 = 25/36$
-  - Col 3: $(1/3)(1/4) + 0(2/3) + (2/3)(0) = 1/12 + 0 + 0 = 1/12$
-- Row 3: $(1/3, 2/3, 0)$
-  - Col 1: $(1/3)(0) + (2/3)(1/3) + 0(1/3) = 0 + 2/9 + 0 = 2/9$
-  - Col 2: $(1/3)(3/4) + (2/3)(0) + 0(2/3) = 1/4 + 0 + 0 = 1/4$
-  - Col 3: $(1/3)(1/4) + (2/3)(2/3) + 0(0) = 1/12 + 4/9 = 3/36 + 16/36 = 19/36$
-
-So $R^2 = \begin{pmatrix} 1/3 & 1/6 & 1/2 \\ 2/9 & 25/36 & 1/12 \\ 2/9 & 1/4 & 19/36 \end{pmatrix}$
-
-**Step 3: Calculate $R^3$ / 计算$R^3$**
-We need $(R^3)_{12} = (R^2 \times R)_{12}$.
-$(R^3)_{12} = (R^2)_{11} r_{12} + (R^2)_{12} r_{22} + (R^2)_{13} r_{32}$
-$(R^3)_{12} = (1/3)(3/4) + (1/6)(0) + (1/2)(2/3)$
-$(R^3)_{12} = 1/4 + 0 + 1/3 = 3/12 + 4/12 = 7/12$
-
-**Final Answer / 最终答案:**
-(a) $R = \begin{pmatrix} 0 & 3/4 & 1/4 \\ 1/3 & 0 & 2/3 \\ 1/3 & 2/3 & 0 \end{pmatrix}$
-(b) $E[J_1] = \boxed{\frac{1}{4}}$
-(c) $P(\text{first jump to state 2}) = \boxed{\frac{3}{4}}$
-(d) $E[J_2] = \boxed{\frac{11}{24}}$
-(e) $P(\text{second jump to state 2}) = \boxed{\frac{1}{6}}$
-(f) $P(\text{third jump to state 2}) = \boxed{\frac{7}{12}}$
-
-**Key Insight / 解题要点:**
-The jump chain's transition matrix $R$ is derived by normalizing the rows of the generator $Q$. The holding times are independent exponential random variables, and their expectations depend on the state visited.
-跳跃链的转移矩阵$R$是通过对生成元$Q$的行进行归一化得到的。停留时间是独立的指数随机变量，它们的期望取决于所访问的状态。
-
----
-
-### Question 3 / 第3题
-
-**Problem / 题目原文:**
-Consider the Markov jump process on $\mathcal{S} = \{1,2\}$ with generator matrix
-$$Q = \begin{pmatrix} -\alpha & \alpha \\ \beta & -\beta \end{pmatrix},$$
-where $\alpha, \beta > 0$.
-(a) Write down the Kolmogorov forward equation for $p_{11}(t)$, including the initial condition.
-(b) Hence, show that
-$$p'_{11}(t) + (\alpha+\beta)p_{11}(t) = \beta.$$
-(c) Solve this differential equation to find $p_{11}(
+**过程解释 / Explanation of working:**
+我们首先计算了在给定第一次跳跃到状态2或3的条件下，J2的条件期望。然后，

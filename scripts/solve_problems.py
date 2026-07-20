@@ -5,17 +5,16 @@ import os
 import sys
 import re
 import time
-import json
 from datetime import datetime
-from openai import OpenAI
-from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from config import API_KEY, BASE_URL, MODEL_NAME, COURSES_DIR
-from pdf_loader import extract_text_from_pdf, extract_course_info
-
-load_dotenv()
+from config import (
+    COURSES_DIR,
+    GENERATION_TEMPERATURE, GENERATION_MAX_TOKENS, GENERATION_SLEEP,
+)
+from pdf_loader import extract_text_from_pdf
+from llm_client import call_llm_with_prompts
 
 OUTPUT_DIR = "guides"
 
@@ -27,11 +26,6 @@ class ProblemSolver:
         self.course_code = course_code
         self.pdf_path = pdf_path
         self.output_dir = os.path.join(os.path.dirname(pdf_path), OUTPUT_DIR)
-
-        self.client = OpenAI(
-            api_key=os.getenv("DEEPSEEK_API_KEY", API_KEY),
-            base_url=BASE_URL
-        )
 
         print(f"Loading PDF: {pdf_path}")
         self.pages = extract_text_from_pdf(pdf_path)
@@ -149,7 +143,7 @@ class ProblemSolver:
 
                 print(f"  Saved: {filepath}")
                 generated.append(ps)
-                time.sleep(2)
+                time.sleep(GENERATION_SLEEP)
 
             except Exception as e:
                 print(f"  ERROR: {e}")
@@ -183,7 +177,7 @@ class ProblemSolver:
         if len(problem_text) > max_chars:
             problem_text = problem_text[:max_chars] + "\n\n[Content truncated]"
 
-        prompt = f"""You are a university tutor creating detailed solutions for a Problem Sheet from the course {self.course_code}: Stochastic Processes.
+        prompt = f"""You are a university tutor creating detailed bilingual (Chinese/English) solutions for a Problem Sheet from the course {self.course_code}: Stochastic Processes.
 
 Below is the problem sheet content. Your task: generate COMPLETE, STEP-BY-STEP solutions for EVERY question.
 
@@ -199,52 +193,53 @@ For EACH question, provide:
 **Problem / 题目原文:**
 (Copy the original English problem statement)
 
-**中文翻译:**
-(Chinese translation of the problem)
+**中文翻译 / Chinese Translation:**
+(Full Chinese translation of the problem — NOT a one-line summary, translate the ENTIRE problem statement)
 
 **Knowledge Points / 考查知识点:**
-- Which sections/concepts from the course this tests
+- Which sections/concepts from the course this tests (bilingual: Chinese explanation + English terms)
 
 **Step-by-Step Solution / 逐步解答:**
 
-For EACH step:
-1. State what we're doing in this step
-2. Show the mathematical working
-3. Explain WHY we do this
-4. Intermediate result
+⚠️ CRITICAL: Every step MUST have BOTH Chinese and English explanations of comparable depth.
 
-Use proper mathematical notation.
-Explain every formula and every symbol.
+For EACH step:
+1. **中文思路 / Chinese reasoning:** Explain in Chinese what we're doing in this step, why we do it, and what the strategy is
+2. **English reasoning:** Same explanation in English with proper technical terms
+3. **计算过程 / Working:** Show the mathematical working in clear LaTeX
+4. **Explanation of working / 过程解释:** Explain the math in Chinese — every formula, every symbol, every algebraic manipulation
+
+Use proper mathematical notation (LaTeX).
+**CRITICAL: All matrices MUST use LaTeX `\\begin{pmatrix}...\\end{pmatrix}` — NEVER use Unicode box-drawing characters.**
 For derivations, show ALL algebraic steps.
 For probability questions, explicitly state which probability rules are used.
 
 **Final Answer / 最终答案:**
-Box the final answer clearly.
+Box the final answer clearly. Include BOTH Chinese and English statement of the result.
 
 **Key Insight / 解题要点:**
-One sentence summary of the most important idea.
+Bilingual summary of the most important idea from this question.
 
 ---
 
-RULES:
+⚠️ BILINGUAL RULES (MUST FOLLOW):
 1. Solve EVERY question completely - no skipping
 2. Show ALL working - partial credit matters in exams
-3. Use bilingual format: English math + Chinese explanations
-4. Reference course sections when using theorems
-5. For proof questions, explain the logical structure
-6. Double-check all calculations"""
+3. Every explanation MUST be in BOTH Chinese and English, with comparable depth
+4. Chinese explanations go FIRST, followed by English
+5. Reference course sections when using theorems
+6. For proof questions, explain the logical structure in Chinese then English
+7. Double-check all calculations
+8. NEVER write English-only steps — each step needs Chinese explanation too"""
 
-        response = self.client.chat.completions.create(
-            model=MODEL_NAME,
-            messages=[
-                {"role": "system", "content": "You are a university mathematics tutor specializing in stochastic processes. You create detailed, step-by-step solutions with bilingual (Chinese/English) explanations. You never skip steps and always explain the reasoning."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,
-            max_tokens=6000
+        response = call_llm_with_prompts(
+            "You are a university mathematics tutor specializing in stochastic processes. You create truly bilingual (Chinese/English) detailed step-by-step solutions — every explanation step has substantial content in BOTH languages, Chinese first then English. You never write English-only steps. You never skip steps and always explain the reasoning.",
+            prompt,
+            temperature=GENERATION_TEMPERATURE,
+            max_tokens=GENERATION_MAX_TOKENS,
         )
 
-        content = response.choices[0].message.content
+        content = response
 
         header = f"""# Problem Sheet {ps['number']} - 详细解答 / Detailed Solutions
 
@@ -266,11 +261,28 @@ def main():
     import argparse
 
     ap = argparse.ArgumentParser(description="Generate solutions for Problem Sheets")
+    ap.add_argument("--course", type=str, default=None,
+                    help="Course code (e.g. MATH2702). Auto-detects if not specified.")
     ap.add_argument("--all", action="store_true", help="Solve ALL Problem Sheets")
     ap.add_argument("--sheet", type=int, default=1, help="Solve single Problem Sheet (default: 1)")
     args = ap.parse_args()
 
-    course_code = "MATH2702"
+    # Auto-detect course if not specified
+    if args.course:
+        course_code = args.course
+    else:
+        courses = [
+            d for d in os.listdir(COURSES_DIR)
+            if os.path.isdir(os.path.join(COURSES_DIR, d))
+        ]
+        if not courses:
+            print(f"ERROR: No course directories found in {COURSES_DIR}")
+            return
+        course_code = courses[0]
+        if len(courses) > 1:
+            print(f"Multiple courses found: {courses}")
+            print(f"Using first: {course_code}. Use --course to specify.")
+
     pdf_path = os.path.join(COURSES_DIR, course_code, "课件.pdf")
 
     if not os.path.exists(pdf_path):

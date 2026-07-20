@@ -1,344 +1,267 @@
 # Problem Sheet 7 - 详细解答 / Detailed Solutions
 
 > MATH2702 Stochastic Processes
-> 生成时间 / Generated: 2026-07-17 15:14
+> 生成时间 / Generated: 2026-07-20 16:05
 > 来源页 / Source Pages: 75-75
 
 ---
 
-好的，作为大学数学导师，我将为MATH2702: 随机过程 的习题第7套提供详细、逐步的解答。
+好的，作为您的大学随机过程课程导师，我将为您提供这份习题集的完整双语解答。
 
 ---
 
 ### Question 1 / 第1题
 
 **Problem / 题目原文:**
-Let (𝑋(𝑡)) be a Poisson process with rate 𝜆 = 5. Calculate:
-(a) ℙ(𝑋(0.6) ≤ 2);
+Let (𝑋(𝑡)) be a Poisson process with rate 𝜆= 5. Calculate:
+(a) ℙ(𝑋(0.6) ≤2);
 (b) 𝔼𝑋(3.2);
 (c) ℙ(𝑋(0.5) = 0 and 𝑋(1) = 1).
-Let 𝑇𝑛 be the 𝑛th holding time, and let 𝐽𝑛 = 𝑇₁+⋯+𝑇𝑛 be the 𝑛th arrival time. Calculate:
-(d) ℙ(0.1 ≤ 𝑇₂ < 0.3);
-(e) 𝔼𝐽₅₀;
-(f) Var(𝐽₅₀).
-(g) Using a normal approximation, approximate ℙ(8 ≤ 𝐽₅₀ ≤ 12).
+Let 𝑇𝑛be the 𝑛th holding time, and let 𝐽𝑛= 𝑇1 + ⋯+ 𝑇𝑛be the 𝑛th arrival time. Calculate:
+(d) ℙ(0.1 ≤𝑇2 < 0.3);
+(e) 𝔼𝐽50;
+(f) Var(𝐽50).
+(g) Using a normal approximation, approximate ℙ(8 ≤𝐽50 ≤12).
 
-**中文翻译:**
-设 (𝑋(𝑡)) 是速率为 𝜆 = 5 的泊松过程。计算：
-(a) ℙ(𝑋(0.6) ≤ 2)；
+**中文翻译 / Chinese Translation:**
+设 (𝑋(𝑡)) 是一个速率为 𝜆= 5 的泊松过程。计算：
+(a) ℙ(𝑋(0.6) ≤2)；
 (b) 𝔼𝑋(3.2)；
 (c) ℙ(𝑋(0.5) = 0 且 𝑋(1) = 1)。
-设 𝑇𝑛 为第 𝑛 个逗留时间，𝐽𝑛 = 𝑇₁+⋯+𝑇𝑛 为第 𝑛 个到达时间。计算：
-(d) ℙ(0.1 ≤ 𝑇₂ < 0.3)；
-(e) 𝔼𝐽₅₀；
-(f) Var(𝐽₅₀)。
-(g) 使用正态近似，近似计算 ℙ(8 ≤ 𝐽₅₀ ≤ 12)。
+设 𝑇𝑛 为第 𝑛 个逗留时间，并设 𝐽𝑛 = 𝑇1 + ⋯ + 𝑇𝑛 为第 𝑛 个到达时间。计算：
+(d) ℙ(0.1 ≤𝑇2 < 0.3)；
+(e) 𝔼𝐽50；
+(f) Var(𝐽50)。
+(g) 使用正态近似，近似计算 ℙ(8 ≤𝐽50 ≤12)。
 
 **Knowledge Points / 考查知识点:**
 - 泊松过程的定义和性质 (Definition and properties of Poisson process)
-- 泊松分布 (Poisson distribution)
-- 指数分布 (Exponential distribution)
-- 伽马分布 (Gamma distribution)
-- 期望和方差的性质 (Properties of expectation and variance)
-- 中心极限定理 (Central Limit Theorem)
+- 泊松分布的概率质量函数 (PMF of Poisson distribution)
+- 泊松过程的期望和方差 (Expectation and variance of Poisson process)
+- 逗留时间 (Holding times) 的指数分布性质
+- 到达时间 (Arrival times) 的伽马分布性质
+- 中心极限定理和正态近似 (Central Limit Theorem and normal approximation)
 
 **Step-by-Step Solution / 逐步解答:**
 
-**(a) ℙ(𝑋(0.6) ≤ 2)**
+**(a) ℙ(𝑋(0.6) ≤2)**
 
-**Step 1: 确定随机变量的分布**
-在泊松过程中，对于任意时间间隔 $t$，计数 $X(t)$ 服从参数为 $\lambda t$ 的泊松分布。
-这里 $\lambda = 5$, $t = 0.6$，所以 $X(0.6) \sim \text{Poisson}(\lambda t = 5 \times 0.6 = 3)$。
+1.  **中文思路 / Chinese reasoning:**
+    我们需要计算在时间区间 [0, 0.6] 内，事件发生次数不超过 2 次的概率。根据泊松过程的定义，在长度为 t 的时间区间内，事件发生次数服从参数为 λt 的泊松分布。这里 λ=5，t=0.6，所以 λt = 5 * 0.6 = 3。因此，X(0.6) ~ Poisson(3)。我们需要计算 P(X ≤ 2) = P(X=0) + P(X=1) + P(X=2)。
 
-**Step 2: 写出概率表达式**
-我们需要计算 $P(X(0.6) \le 2) = P(X=0) + P(X=1) + P(X=2)$。
-泊松分布的概率质量函数为 $P(X=k) = \frac{e^{-\mu} \mu^k}{k!}$，其中 $\mu = 3$。
+    **English reasoning:**
+    We need to calculate the probability that the number of events occurring in the time interval [0, 0.6] is at most 2. By the definition of a Poisson process, the number of events in an interval of length t follows a Poisson distribution with parameter λt. Here λ=5, t=0.6, so λt = 5 * 0.6 = 3. Therefore, X(0.6) ~ Poisson(3). We need to compute P(X ≤ 2) = P(X=0) + P(X=1) + P(X=2).
 
-**Step 3: 逐项计算并求和**
-- $P(X=0) = \frac{e^{-3} \cdot 3^0}{0!} = e^{-3}$
-- $P(X=1) = \frac{e^{-3} \cdot 3^1}{1!} = 3e^{-3}$
-- $P(X=2) = \frac{e^{-3} \cdot 3^2}{2!} = \frac{9}{2}e^{-3} = 4.5e^{-3}$
+2.  **计算过程 / Working:**
+    X = X(0.6) ~ Poisson(3)
+    ℙ(X = k) = e^{-3} * (3^k) / k!
+    ℙ(X ≤ 2) = ℙ(X=0) + ℙ(X=1) + ℙ(X=2)
+    ℙ(X=0) = e^{-3} * (3^0) / 0! = e^{-3}
+    ℙ(X=1) = e^{-3} * (3^1) / 1! = 3e^{-3}
+    ℙ(X=2) = e^{-3} * (3^2) / 2! = 9e^{-3} / 2 = 4.5e^{-3}
+    ℙ(X ≤ 2) = e^{-3} + 3e^{-3} + 4.5e^{-3} = 8.5e^{-3}
 
-求和：
-$P(X(0.6) \le 2) = e^{-3} + 3e^{-3} + 4.5e^{-3} = 8.5e^{-3}$
+3.  **Explanation of working / 过程解释:**
+    我们首先确定了随机变量 X(0.6) 服从参数为 3 的泊松分布。然后，我们使用泊松分布的概率质量函数 (PMF) 公式 P(X=k) = e^{-λt} (λt)^k / k! 来计算 k=0, 1, 2 的概率。最后，将这些概率相加得到最终结果。注意，0! = 1。
 
-**Step 4: 数值计算**
-$e^{-3} \approx 0.049787$
-$P(X(0.6) \le 2) = 8.5 \times 0.049787 \approx 0.42319$
+    We first determined that the random variable X(0.6) follows a Poisson distribution with parameter 3. Then, we used the Poisson probability mass function (PMF) formula P(X=k) = e^{-λt} (λt)^k / k! to calculate the probabilities for k=0, 1, 2. Finally, we summed these probabilities to get the final result. Note that 0! = 1.
+
+**Final Answer / 最终答案:**
+ℙ(𝑋(0.6) ≤2) = 8.5e^{-3}
 
 **(b) 𝔼𝑋(3.2)**
 
-**Step 1: 应用期望公式**
-对于泊松过程，$X(t) \sim \text{Poisson}(\lambda t)$。泊松分布的期望等于其参数。
-$\mathbb{E}[X(t)] = \lambda t$
+1.  **中文思路 / Chinese reasoning:**
+    泊松过程 X(t) 的期望值等于其速率 λ 乘以时间 t。这是一个基本性质：E[X(t)] = λt。这里 λ=5，t=3.2，所以直接计算即可。
 
-**Step 2: 代入数值**
-$\mathbb{E}[X(3.2)] = 5 \times 3.2 = 16$
+    **English reasoning:**
+    The expected value of a Poisson process X(t) is equal to its rate λ multiplied by the time t. This is a fundamental property: E[X(t)] = λt. Here λ=5, t=3.2, so we can calculate directly.
+
+2.  **计算过程 / Working:**
+    𝔼𝑋(3.2) = λ * t = 5 * 3.2 = 16
+
+3.  **Explanation of working / 过程解释:**
+    这个结果直接来自于泊松过程的定义。因为 X(t) ~ Poisson(λt)，而泊松分布的期望就是其参数 λt。
+
+    This result comes directly from the definition of a Poisson process. Since X(t) ~ Poisson(λt), the expectation of a Poisson distribution is its parameter λt.
+
+**Final Answer / 最终答案:**
+𝔼𝑋(3.2) = 16
 
 **(c) ℙ(𝑋(0.5) = 0 and 𝑋(1) = 1)**
 
-**Step 1: 利用独立增量性**
-泊松过程具有独立增量性。事件 $\{X(0.5)=0\}$ 和 $\{X(1)=1\}$ 不是独立的，因为后者包含了前者的信息。我们需要将事件转化为独立增量上的事件。
-$X(1) = X(0.5) + (X(1) - X(0.5))$。
-事件 $\{X(0.5)=0\}$ 且 $\{X(1)=1\}$ 等价于 $\{X(0.5)=0\}$ 且 $\{X(1)-X(0.5)=1\}$。
+1.  **中文思路 / Chinese reasoning:**
+    我们需要计算两个事件同时发生的概率：在时间 0.5 之前没有事件发生，并且在时间 1 时恰好有 1 个事件发生。这等价于在 [0, 0.5] 内没有事件发生，并且在 (0.5, 1] 内恰好有 1 个事件发生。由于泊松过程具有独立增量性，这两个区间内的事件数是独立的。因此，联合概率等于两个独立泊松概率的乘积。
 
-**Step 2: 利用独立增量性分解概率**
-由于增量 $X(0.5)$ 和 $X(1)-X(0.5)$ 是独立的，我们有：
-$P(X(0.5)=0, X(1)=1) = P(X(0.5)=0, X(1)-X(0.5)=1)$
-$= P(X(0.5)=0) \cdot P(X(1)-X(0.5)=1)$
+    **English reasoning:**
+    We need to calculate the probability of two events occurring simultaneously: no events before time 0.5, and exactly 1 event by time 1. This is equivalent to having 0 events in [0, 0.5] and exactly 1 event in (0.5, 1]. Due to the independent increments property of the Poisson process, the number of events in these two disjoint intervals are independent. Therefore, the joint probability is the product of two independent Poisson probabilities.
 
-**Step 3: 确定各增量的分布**
-- $X(0.5) \sim \text{Poisson}(5 \times 0.5 = 2.5)$
-- $X(1)-X(0.5) \sim \text{Poisson}(5 \times (1-0.5) = 2.5)$
+2.  **计算过程 / Working:**
+    Let A = {X(0.5) = 0}, B = {X(1) = 1}.
+    The event {X(0.5)=0 and X(1)=1} is equivalent to {X(0.5)=0 and X(1)-X(0.5)=1}.
+    X(0.5) ~ Poisson(5 * 0.5) = Poisson(2.5)
+    X(1)-X(0.5) ~ Poisson(5 * (1-0.5)) = Poisson(2.5)
+    ℙ(X(0.5)=0) = e^{-2.5} * (2.5^0) / 0! = e^{-2.5}
+    ℙ(X(1)-X(0.5)=1) = e^{-2.5} * (2.5^1) / 1! = 2.5e^{-2.5}
+    ℙ(𝑋(0.5) = 0 and 𝑋(1) = 1) = e^{-2.5} * 2.5e^{-2.5} = 2.5e^{-5}
 
-**Step 4: 计算概率**
-$P(X(0.5)=0) = \frac{e^{-2.5} \cdot 2.5^0}{0!} = e^{-2.5}$
-$P(X(1)-X(0.5)=1) = \frac{e^{-2.5} \cdot 2.5^1}{1!} = 2.5 e^{-2.5}$
+3.  **Explanation of working / 过程解释:**
+    我们利用了泊松过程的独立增量性，将联合概率分解为两个独立区间上概率的乘积。第一个区间 [0, 0.5] 的长度为 0.5，第二个区间 (0.5, 1] 的长度也为 0.5。两个区间的事件数都服从参数为 2.5 的泊松分布。然后我们分别计算了 P(X=0) 和 P(X=1)，并将它们相乘。
 
-**Step 5: 相乘得到最终结果**
-$P = (e^{-2.5}) \times (2.5 e^{-2.5}) = 2.5 e^{-5}$
-
-**(d) ℙ(0.1 ≤ 𝑇₂ < 0.3)**
-
-**Step 1: 识别逗留时间的分布**
-在泊松过程中，逗留时间 $T_n$ 是独立同分布的，服从参数为 $\lambda$ 的指数分布。
-$T_n \sim \text{Exp}(\lambda = 5)$。
-
-**Step 2: 写出指数分布的概率**
-指数分布的概率密度函数为 $f(t) = \lambda e^{-\lambda t}$，累积分布函数为 $F(t) = 1 - e^{-\lambda t}$。
-我们需要计算 $P(0.1 \le T_2 < 0.3) = F(0.3) - F(0.1)$。
-
-**Step 3: 代入计算**
-$F(0.3) = 1 - e^{-5 \times 0.3} = 1 - e^{-1.5}$
-$F(0.1) = 1 - e^{-5 \times 0.1} = 1 - e^{-0.5}$
-$P(0.1 \le T_2 < 0.3) = (1 - e^{-1.5}) - (1 - e^{-0.5}) = e^{-0.5} - e^{-1.5}$
-
-**(e) 𝔼𝐽₅₀**
-
-**Step 1: 识别到达时间的分布**
-第 $n$ 个到达时间 $J_n = T_1 + T_2 + \dots + T_n$ 是 $n$ 个独立同分布的指数随机变量之和。这服从形状参数为 $n$，速率参数为 $\lambda$ 的伽马分布（或厄兰分布）。
-$J_n \sim \text{Gamma}(n, \lambda)$。
-
-**Step 2: 应用伽马分布的期望公式**
-伽马分布 $\text{Gamma}(n, \lambda)$ 的期望为 $\mathbb{E}[J_n] = \frac{n}{\lambda}$。
-
-**Step 3: 代入数值**
-$\mathbb{E}[J_{50}] = \frac{50}{5} = 10$
-
-**(f) Var(𝐽₅₀)**
-
-**Step 1: 应用伽马分布的方差公式**
-伽马分布 $\text{Gamma}(n, \lambda)$ 的方差为 $\text{Var}(J_n) = \frac{n}{\lambda^2}$。
-
-**Step 2: 代入数值**
-$\text{Var}(J_{50}) = \frac{50}{5^2} = \frac{50}{25} = 2$
-
-**(g) 使用正态近似，近似计算 ℙ(8 ≤ 𝐽₅₀ ≤ 12)**
-
-**Step 1: 应用中心极限定理**
-由于 $J_{50}$ 是 50 个独立同分布随机变量之和，根据中心极限定理，其分布近似于正态分布。
-$J_{50} \approx N(\mu, \sigma^2)$，其中 $\mu = \mathbb{E}[J_{50}] = 10$，$\sigma^2 = \text{Var}(J_{50}) = 2$。
-因此，标准差 $\sigma = \sqrt{2}$。
-
-**Step 2: 标准化**
-我们需要计算 $P(8 \le J_{50} \le 12)$。标准化为 $Z = \frac{J_{50} - \mu}{\sigma} = \frac{J_{50} - 10}{\sqrt{2}}$。
-$P(8 \le J_{50} \le 12) = P\left(\frac{8-10}{\sqrt{2}} \le Z \le \frac{12-10}{\sqrt{2}}\right)$
-$= P\left(\frac{-2}{\sqrt{2}} \le Z \le \frac{2}{\sqrt{2}}\right)$
-$= P(-\sqrt{2} \le Z \le \sqrt{2})$
-$\sqrt{2} \approx 1.414$
-
-**Step 3: 使用标准正态分布表**
-$P(-1.414 \le Z \le 1.414) = \Phi(1.414) - \Phi(-1.414)$
-由于 $\Phi(-x) = 1 - \Phi(x)$，我们有：
-$= \Phi(1.414) - (1 - \Phi(1.414)) = 2\Phi(1.414) - 1$
-查标准正态分布表，$\Phi(1.41) \approx 0.9207$，$\Phi(1.42) \approx 0.9222$。插值得 $\Phi(1.414) \approx 0.9215$。
-
-**Step 4: 计算最终近似概率**
-$P(8 \le J_{50} \le 12) \approx 2 \times 0.9215 - 1 = 1.843 - 1 = 0.843$
+    We used the independent increments property of the Poisson process to decompose the joint probability into a product of probabilities over two independent intervals. The length of the first interval [0, 0.5] is 0.5, and the length of the second interval (0.5, 1] is also 0.5. The number of events in both intervals follows a Poisson distribution with parameter 2.5. We then calculated P(X=0) and P(X=1) separately and multiplied them.
 
 **Final Answer / 最终答案:**
-(a) $8.5e^{-3} \approx 0.423$
-(b) $16$
-(c) $2.5e^{-5}$
-(d) $e^{-0.5} - e^{-1.5}$
-(e) $10$
-(f) $2$
-(g) $\approx 0.843$
+ℙ(𝑋(0.5) = 0 and 𝑋(1) = 1) = 2.5e^{-5}
+
+**(d) ℙ(0.1 ≤𝑇2 < 0.3)**
+
+1.  **中文思路 / Chinese reasoning:**
+    T2 是第二个逗留时间，即第一个事件发生后到第二个事件发生前的时间间隔。在泊松过程中，逗留时间 T1, T2, ... 是独立同分布的指数随机变量，参数为 λ=5。因此，T2 ~ Exp(5)。我们需要计算 T2 落在区间 [0.1, 0.3) 内的概率。对于指数分布，P(a ≤ X < b) = F(b) - F(a)，其中 F(x) = 1 - e^{-λx} 是累积分布函数 (CDF)。
+
+    **English reasoning:**
+    T2 is the second holding time, which is the time interval between the first and second events. In a Poisson process, the holding times T1, T2, ... are independent and identically distributed exponential random variables with parameter λ=5. Therefore, T2 ~ Exp(5). We need to calculate the probability that T2 falls in the interval [0.1, 0.3). For an exponential distribution, P(a ≤ X < b) = F(b) - F(a), where F(x) = 1 - e^{-λx} is the cumulative distribution function (CDF).
+
+2.  **计算过程 / Working:**
+    T2 ~ Exp(5), λ=5.
+    CDF: F(t) = 1 - e^{-5t} for t ≥ 0.
+    ℙ(0.1 ≤ T2 < 0.3) = F(0.3) - F(0.1)
+    F(0.3) = 1 - e^{-5 * 0.3} = 1 - e^{-1.5}
+    F(0.1) = 1 - e^{-5 * 0.1} = 1 - e^{-0.5}
+    ℙ(0.1 ≤ T2 < 0.3) = (1 - e^{-1.5}) - (1 - e^{-0.5}) = e^{-0.5} - e^{-1.5}
+
+3.  **Explanation of working / 过程解释:**
+    我们首先识别出 T2 服从指数分布。然后，我们应用指数分布的累积分布函数公式来计算区间概率。注意，对于连续随机变量，区间端点的开闭不影响概率值，但为了严谨，我们使用了 CDF 的差值。
+
+    We first identified that T2 follows an exponential distribution. Then, we applied the formula for the cumulative distribution function of the exponential distribution to calculate the interval probability. Note that for continuous random variables, the inclusion or exclusion of the interval endpoints does not affect the probability value, but for rigor, we used the difference of the CDF.
+
+**Final Answer / 最终答案:**
+ℙ(0.1 ≤𝑇2 < 0.3) = e^{-0.5} - e^{-1.5}
+
+**(e) 𝔼𝐽50**
+
+1.  **中文思路 / Chinese reasoning:**
+    J50 是第 50 个事件的到达时间，它等于前 50 个逗留时间的和：J50 = T1 + T2 + ... + T50。由于每个 Ti ~ Exp(5) 且相互独立，J50 服从形状参数为 50，速率参数为 5 的伽马分布 (Gamma(50, 5))。伽马分布的期望是形状参数除以速率参数，即 E[Jn] = n/λ。
+
+    **English reasoning:**
+    J50 is the arrival time of the 50th event, which is the sum of the first 50 holding times: J50 = T1 + T2 + ... + T50. Since each Ti ~ Exp(5) and they are independent, J50 follows a Gamma distribution with shape parameter 50 and rate parameter 5 (Gamma(50, 5)). The expectation of a Gamma distribution is the shape parameter divided by the rate parameter, i.e., E[Jn] = n/λ.
+
+2.  **计算过程 / Working:**
+    𝔼𝐽50 = n / λ = 50 / 5 = 10
+
+3.  **Explanation of working / 过程解释:**
+    这个结果非常直观。平均每 1/5 = 0.2 个单位时间发生一次事件。因此，发生 50 次事件的平均时间是 50 * 0.2 = 10。
+
+    This result is very intuitive. On average, one event occurs every 1/5 = 0.2 time units. Therefore, the average time for 50 events to occur is 50 * 0.2 = 10.
+
+**Final Answer / 最终答案:**
+𝔼𝐽50 = 10
+
+**(f) Var(𝐽50)**
+
+1.  **中文思路 / Chinese reasoning:**
+    同样，J50 ~ Gamma(50, 5)。伽马分布的方差是形状参数除以速率参数的平方，即 Var(Jn) = n/λ^2。
+
+    **English reasoning:**
+    Similarly, J50 ~ Gamma(50, 5). The variance of a Gamma distribution is the shape parameter divided by the square of the rate parameter, i.e., Var(Jn) = n/λ^2.
+
+2.  **计算过程 / Working:**
+    Var(𝐽50) = n / λ^2 = 50 / 5^2 = 50 / 25 = 2
+
+3.  **Explanation of working / 过程解释:**
+    每个指数分布的方差是 1/λ^2 = 1/25。由于它们是独立的，和的方差等于方差的和，所以 Var(J50) = 50 * (1/25) = 2。
+
+    The variance of each exponential distribution is 1/λ^2 = 1/25. Since they are independent, the variance of the sum is the sum of the variances, so Var(J50) = 50 * (1/25) = 2.
+
+**Final Answer / 最终答案:**
+Var(𝐽50) = 2
+
+**(g) Using a normal approximation, approximate ℙ(8 ≤𝐽50 ≤12)**
+
+1.  **中文思路 / Chinese reasoning:**
+    由于 J50 是 50 个独立同分布指数随机变量的和，根据中心极限定理 (CLT)，当 n 很大时，J50 的分布近似于正态分布。J50 的均值为 μ = 10，方差为 σ^2 = 2，标准差为 σ = √2。我们需要计算 P(8 ≤ J50 ≤ 12)。首先，我们将 J50 标准化为 Z = (J50 - μ) / σ。然后，将区间端点也标准化。最后，使用标准正态分布的累积分布函数 Φ(z) 来近似概率。
+
+    **English reasoning:**
+    Since J50 is the sum of 50 i.i.d. exponential random variables, by the Central Limit Theorem (CLT), the distribution of J50 is approximately normal when n is large. The mean of J50 is μ = 10, the variance is σ^2 = 2, and the standard deviation is σ = √2. We need to calculate P(8 ≤ J50 ≤ 12). First, we standardize J50 to Z = (J50 - μ) / σ. Then, we standardize the interval endpoints. Finally, we use the cumulative distribution function Φ(z) of the standard normal distribution to approximate the probability.
+
+2.  **计算过程 / Working:**
+    μ = 10, σ = √2 ≈ 1.4142
+    ℙ(8 ≤ J50 ≤ 12) = ℙ( (8-10)/√2 ≤ (J50-10)/√2 ≤ (12-10)/√2 )
+    = ℙ( -2/√2 ≤ Z ≤ 2/√2 )
+    = ℙ( -√2 ≤ Z ≤ √2 )
+    ≈ ℙ( -1.4142 ≤ Z ≤ 1.4142 )
+    = Φ(1.4142) - Φ(-1.4142)
+    = Φ(1.4142) - (1 - Φ(1.4142))
+    = 2Φ(1.4142) - 1
+    查标准正态分布表，Φ(1.41) ≈ 0.9207, Φ(1.42) ≈ 0.9222。我们可以取平均值或使用更精确的值。Φ(1.4142) ≈ 0.9213。
+    ℙ(8 ≤ J50 ≤ 12) ≈ 2 * 0.9213 - 1 = 1.8426 - 1 = 0.8426
+
+3.  **Explanation of working / 过程解释:**
+    我们应用了中心极限定理。首先计算了均值和标准差。然后，我们将原始概率问题转化为标准正态分布的概率问题。通过标准化，我们得到了 Z 的上下限为 ±√2。然后，我们使用标准正态分布表或计算器来查找 Φ(1.4142) 的值。注意，Φ(-z) = 1 - Φ(z)。最终概率是 Φ(上界) - Φ(下界)。
+
+    We applied the Central Limit Theorem. First, we calculated the mean and standard deviation. Then, we transformed the original probability problem into a standard normal probability problem. Through standardization, we obtained the upper and lower bounds for Z as ±√2. Then, we used a standard normal distribution table or calculator to find the value of Φ(1.4142). Note that Φ(-z) = 1 - Φ(z). The final probability is Φ(upper bound) - Φ(lower bound).
+
+**Final Answer / 最终答案:**
+ℙ(8 ≤𝐽50 ≤12) ≈ 0.8426
 
 **Key Insight / 解题要点:**
-泊松过程的核心是计数过程 $X(t)$ 服从泊松分布，而到达间隔 $T_n$ 服从指数分布，到达时间 $J_n$ 服从伽马分布，利用这些分布的性质和中心极限定理可以解决大部分问题。
+- 泊松过程的核心是事件计数服从泊松分布，而事件间隔时间服从指数分布。
+- 到达时间 Jn 是 n 个独立指数分布的和，服从伽马分布，其均值和方差有简洁公式。
+- 中心极限定理允许我们用正态分布来近似伽马分布，从而计算复杂区间概率。
+- The core of a Poisson process is that event counts follow a Poisson distribution, and inter-event times follow an exponential distribution.
+- The arrival time Jn is the sum of n independent exponential distributions, follows a Gamma distribution, and has simple formulas for its mean and variance.
+- The Central Limit Theorem allows us to approximate the Gamma distribution with a normal distribution to calculate complex interval probabilities.
 
 ---
 
 ### Question 2 / 第2题
 
 **Problem / 题目原文:**
-Suppose that telephone calls arrive at a call centre according to a Poisson process with rate $\lambda = 100$ per hour, and are answered with probability 0.6.
+Suppose that telephone calls arrive at a call centre according to a Poisson process with rate 𝜆= 100 per hour, and are answered with probability 0.6.
 (a) What is the probability that there are no answered calls in the next minute?
 (b) Use a suitable normal approximation, with a continuity correction, to find the probability that there will be at least 25 answered calls in the next 30 minutes.
 
-**中文翻译:**
-假设电话按速率为每小时 $\lambda = 100$ 的泊松过程到达呼叫中心，并且有 0.6 的概率被接听。
-(a) 下一分钟内没有接听电话的概率是多少？
-(b) 使用合适的正态近似，并加上连续性校正，求接下来 30 分钟内至少有 25 个接听电话的概率。
+**中文翻译 / Chinese Translation:**
+假设电话呼叫按照速率为每小时 100 次的泊松过程到达一个呼叫中心，并且每次呼叫被接听的概率为 0.6。
+(a) 在接下来的一分钟内没有接听电话的概率是多少？
+(b) 使用合适的正态近似，并应用连续性校正，求在接下来的 30 分钟内至少有 25 个接听电话的概率。
 
 **Knowledge Points / 考查知识点:**
-- 泊松过程的分解 (Thinning of Poisson process)
-- 泊松分布
-- 正态近似与连续性校正 (Normal approximation with continuity correction)
+- 泊松过程 (Poisson process)
+- 随机稀释/稀疏 (Random thinning/ splitting of Poisson process)
+- 二项分布 (Binomial distribution)
+- 泊松分布 (Poisson distribution)
+- 正态近似 (Normal approximation to Poisson)
+- 连续性校正 (Continuity correction)
 
 **Step-by-Step Solution / 逐步解答:**
 
-**(a) 下一分钟内没有接听电话的概率**
+**(a) What is the probability that there are no answered calls in the next minute?**
 
-**Step 1: 确定接听电话的过程**
-这是一个泊松过程的分解问题。每个到达的电话以概率 $p=0.6$ 被接听，以概率 $1-p=0.4$ 未被接听。被接听电话的过程是一个速率为 $\lambda p$ 的泊松过程。
-接听电话的速率 $\lambda_a = \lambda \times p = 100 \times 0.6 = 60$ 每小时。
+1.  **中文思路 / Chinese reasoning:**
+    首先，我们需要确定在接下来一分钟内到达的呼叫数量。速率是每小时 100 次，所以每分钟的速率是 λ_min = 100/60 = 5/3 次每分钟。因此，在一分钟内到达的呼叫数 N ~ Poisson(5/3)。每个呼叫被接听的概率是 p=0.6，且是否接听是独立的。因此，被接听的呼叫数 A 是在 N 次独立伯努利试验中成功的次数。给定 N=n，A 的条件分布是 Binomial(n, 0.6)。我们需要 P(A=0)。我们可以通过对 N 的所有可能值求和来求这个概率，或者利用泊松过程的一个性质：对泊松过程进行独立稀释后，结果仍然是一个泊松过程，其速率变为 λ * p。因此，被接听的呼叫过程是一个速率为 λ_min * p = (5/3) * 0.6 = 1 的泊松过程。所以，在一分钟内被接听的呼叫数 A ~ Poisson(1)。那么 P(A=0) 就很容易计算了。
 
-**Step 2: 统一时间单位**
-问题问的是“下一分钟”，所以我们需要将速率转换为每分钟。
-$\lambda_a = 60$ 每小时 $= \frac{60}{60} = 1$ 每分钟。
+    **English reasoning:**
+    First, we need to determine the number of calls arriving in the next minute. The rate is 100 per hour, so the rate per minute is λ_min = 100/60 = 5/3 calls per minute. Therefore, the number of calls arriving in one minute, N, follows a Poisson distribution with mean 5/3. Each call is answered with probability p=0.6, and whether it is answered is independent. Thus, the number of answered calls, A, is the number of successes in N independent Bernoulli trials. Given N=n, the conditional distribution of A is Binomial(n, 0.6). We need P(A=0). We could sum over all possible values of N, or use a property of Poisson processes: if you independently thin a Poisson process, the result is still a Poisson process with rate λ * p. Therefore, the process of answered calls is a Poisson process with rate λ_min * p = (5/3) * 0.6 = 1. So, the number of answered calls in one minute, A, follows a Poisson distribution with mean 1. Then P(A=0) is easy to calculate.
 
-**Step 3: 计算概率**
-在 1 分钟内，接听电话的数量 $A(1) \sim \text{Poisson}(\lambda_a \times 1 = 1)$。
-“没有接听电话”即 $A(1) = 0$。
-$P(A(1) = 0) = \frac{e^{-1} \cdot 1^0}{0!} = e^{-1}$
+2.  **计算过程 / Working:**
+    λ_per_minute = 100 / 60 = 5/3
+    p = 0.6
+    λ_answered_per_minute = λ_per_minute * p = (5/3) * 0.6 = (5/3) * (3/5) = 1
+    A ~ Poisson(1)
+    ℙ(A = 0) = e^{-1} * (1^0) / 0! = e^{-1}
 
-**(b) 使用正态近似求 30 分钟内至少有 25 个接听电话的概率**
+3.  **Explanation of working / 过程解释:**
+    我们利用了泊松过程的稀释性质。原始呼叫过程速率为 5/3，每个呼叫以概率 0.6 被接听。稀释后的过程（即被接听的呼叫）的速率是原始速率乘以接听概率，结果为 1。因此，一分钟内接听电话数服从均值为 1 的泊松分布。P(A=0) 就是 e^{-1}。
 
-**Step 1: 确定 30 分钟内接听电话的分布**
-接听电话的速率是每分钟 1 个。在 30 分钟内，接听电话的数量 $A(30) \sim \text{Poisson}(\mu = 1 \times 30 = 30)$。
-
-**Step 2: 应用正态近似**
-由于 $\mu = 30$ 较大，我们可以用正态分布 $N(\mu, \sigma^2)$ 来近似泊松分布，其中 $\mu = 30$，方差 $\sigma^2 = \mu = 30$，标准差 $\sigma = \sqrt{30}$。
-
-**Step 3: 应用连续性校正**
-我们要求 $P(A(30) \ge 25)$。使用连续性校正时，我们将离散的整数点映射到连续的区间上。事件 $\{A \ge 25\}$ 对应于连续区间 $\{A \ge 24.5\}$。
-所以，我们近似计算 $P(A \ge 24.5)$。
-
-**Step 4: 标准化**
-$Z = \frac{A - \mu}{\sigma} = \frac{A - 30}{\sqrt{30}}$。
-$P(A \ge 24.5) = P\left(Z \ge \frac{24.5 - 30}{\sqrt{30}}\right)$
-$= P\left(Z \ge \frac{-5.5}{\sqrt{30}}\right)$
-$\sqrt{30} \approx 5.477$
-$Z$ 值 $= \frac{-5.5}{5.477} \approx -1.004$
-
-**Step 5: 计算概率**
-$P(Z \ge -1.004) = 1 - P(Z < -1.004) = 1 - \Phi(-1.004)$
-由于 $\Phi(-x) = 1 - \Phi(x)$，我们有：
-$P(Z \ge -1.004) = 1 - (1 - \Phi(1.004)) = \Phi(1.004)$
-查标准正态分布表，$\Phi(1.00) = 0.8413$，$\Phi(1.01) = 0.8438$。插值得 $\Phi(1.004) \approx 0.8423$。
+    We used the thinning property of Poisson processes. The original call process has a rate of 5/3, and each call is answered with probability 0.6. The rate of the thinned process (i.e., answered calls) is the original rate multiplied by the answering probability, resulting in 1. Therefore, the number of answered calls in one minute follows a Poisson distribution with mean 1. P(A=0) is e^{-1}.
 
 **Final Answer / 最终答案:**
-(a) $e^{-1}$
-(b) $\approx 0.842$
+The probability is e^{-1}.
 
-**Key Insight / 解题要点:**
-泊松过程的分解（稀疏化）产生一个新的泊松过程，其速率是原速率乘以选择概率。当用正态近似离散分布时，连续性校正（如将 $\ge 25$ 改为 $\ge 24.5$）能显著提高近似精度。
+**(b) Use a suitable normal approximation, with a continuity correction, to find the probability that there will be at least 25 answered calls in the next 30 minutes.**
 
----
+1.  **中文思路 / Chinese reasoning:**
+    首先，我们需要确定 30 分钟内被接听电话数的分布。30 分钟内到达的呼叫数 N_30 ~ Poisson(100/小时 * 0.5 小时) = Poisson(50)。经过稀释后，30 分钟内被接听的呼叫数 A_30 ~ Poisson(50 * 0.6) = Poisson(30)。我们需要 P(A_30 ≥ 25)。由于泊松分布的均值 30 足够大，我们可以用正态分布来近似。正态近似的均值为 μ = 30，方差为 σ^2 = 30，标准差为 σ = √30。因为我们要用连续分布（正态）来近似离散分布（泊松），所以需要应用连续性校正。对于事件 {A ≥ 25}，在离散情况下，它包含 25, 26, 27, ...。在连续近似中，我们使用区间 [24.5, ∞) 来代表这个事件。所以，我们计算 P(A_30 ≥ 24.5) 的正态近似。
 
-### Question 3 / 第3题
-
-**Problem / 题目原文:**
-(a) Let $X \sim Po(\lambda)$ and $Y \sim Po(\mu)$ be two independent Poisson distributions. Show that $X + Y \sim Po(\lambda+\mu)$. One way to start would be to write
-$\mathbb{P}(X + Y = z) = \sum_{x=0}^{z} \mathbb{P}(X = x) \mathbb{P}(Y = z - x)$.
-(b) Let $(X(t))$ and $(Y(t))$ be independent Poisson processes with rate $\lambda$ and $\mu$ respectively. Use part (a) to show that $(X(t)+Y(t))$ is a Poisson process with rate $\lambda+\mu$.
-(c) Number 1 buses arrive at a bus stop at a rate of $\lambda_1=4$ per hour, and Number 6 buses arrive at the rate $\lambda_6=2$ per hour. I have been waiting at the bus stop for 5 minutes for either bus to arrive; how much longer do I have to wait, on average?
-
-**中文翻译:**
-(a) 设 $X \sim Po(\lambda)$ 和 $Y \sim Po(\mu)$ 是两个独立的泊松分布。证明 $X + Y \sim Po(\lambda+\mu)$。一个可行的出发点是写出 $\mathbb{P}(X + Y = z) = \sum_{x=0}^{z} \mathbb{P}(X = x) \mathbb{P}(Y = z - x)$。
-(b) 设 $(X(t))$ 和 $(Y(t))$ 是速率分别为 $\lambda$ 和 $\mu$ 的独立泊松过程。利用 (a) 部分证明 $(X(t)+Y(t))$ 是速率为 $\lambda+\mu$ 的泊松过程。
-(c) 1 路公交车以每小时 $\lambda_1=4$ 辆的速率到达公交站，6 路公交车以每小时 $\lambda_6=2$ 辆的速率到达。我已经在公交站等了 5 分钟，等待其中任意一辆车到来；平均而言，我还需要等多久？
-
-**Knowledge Points / 考查知识点:**
-- 泊松分布的可加性 (Additivity of Poisson distribution)
-- 泊松过程的定义 (Definition of Poisson process)
-- 指数分布的无记忆性 (Memoryless property of exponential distribution)
-- 最小值的分布 (Distribution of minimum of exponentials)
-
-**Step-by-Step Solution / 逐步解答:**
-
-**(a) 证明 $X+Y \sim Po(\lambda+\mu)$**
-
-**Step 1: 写出全概率公式**
-由于 $X$ 和 $Y$ 独立，我们可以通过卷积公式得到 $X+Y$ 的分布。
-$P(X+Y = z) = \sum_{x=0}^{z} P(X = x, Y = z-x)$
-由于独立，$P(X = x, Y = z-x) = P(X=x)P(Y=z-x)$。
-
-**Step 2: 代入泊松分布的概率质量函数**
-$P(X=x) = \frac{e^{-\lambda} \lambda^x}{x!}$
-$P(Y=z-x) = \frac{e^{-\mu} \mu^{z-x}}{(z-x)!}$
-所以，
-$P(X+Y = z) = \sum_{x=0}^{z} \frac{e^{-\lambda} \lambda^x}{x!} \cdot \frac{e^{-\mu} \mu^{z-x}}{(z-x)!}$
-
-**Step 3: 整理求和式**
-$P(X+Y = z) = e^{-(\lambda+\mu)} \sum_{x=0}^{z} \frac{1}{x!(z-x)!} \lambda^x \mu^{z-x}$
-
-**Step 4: 引入二项式系数**
-$\frac{1}{x!(z-x)!} = \frac{z!}{z!} \cdot \frac{1}{x!(z-x)!} = \frac{1}{z!} \binom{z}{x}$
-所以，
-$P(X+Y = z) = \frac{e^{-(\lambda+\mu)}}{z!} \sum_{x=0}^{z} \binom{z}{x} \lambda^x \mu^{z-x}$
-
-**Step 5: 应用二项式定理**
-根据二项式定理，$\sum_{x=0}^{z} \binom{z}{x} \lambda^x \mu^{z-x} = (\lambda + \mu)^z$。
-
-**Step 6: 得到最终形式**
-$P(X+Y = z) = \frac{e^{-(\lambda+\mu)} (\lambda+\mu)^z}{z!}$
-这正是参数为 $\lambda+\mu$ 的泊松分布的概率质量函数。因此，$X+Y \sim Po(\lambda+\mu)$。证毕。
-
-**(b) 证明 $(X(t)+Y(t))$ 是速率为 $\lambda+\mu$ 的泊松过程**
-
-**Step 1: 回顾泊松过程的定义**
-一个计数过程 $\{N(t), t \ge 0\}$ 是速率为 $\nu$ 的泊松过程，如果：
-1. $N(0) = 0$。
-2. 具有独立增量性。
-3. 对于任意 $s, t \ge 0$，增量 $N(t+s) - N(s) \sim Po(\nu t)$。
-
-**Step 2: 验证定义中的条件**
-设 $Z(t) = X(t) + Y(t)$。
-1. $Z(0) = X(0) + Y(0) = 0 + 0 = 0$。条件满足。
-2. **独立增量性**：由于 $X(t)$ 和 $Y(t)$ 都是泊松过程，它们各自具有独立增量性。对于任意不相交的时间区间，$X$ 的增量与 $Y$ 的增量都是独立的。因此，$Z$ 的增量（即 $X$ 和 $Y$ 增量之和）在不相交的时间区间上也是独立的。条件满足。
-3. **增量分布**：对于任意 $s, t \ge 0$，考虑增量 $Z(t+s) - Z(s) = [X(t+s)-X(s)] + [Y(t+s)-Y(s)]$。由于 $X$ 和 $Y$ 是独立的泊松过程，它们的增量是独立的随机变量，且分别服从 $Po(\lambda t)$ 和 $Po(\mu t)$。根据 (a) 部分，两个独立泊松随机变量之和仍服从泊松分布，参数为两者参数之和。因此，$Z(t+s) - Z(s) \sim Po((\lambda+\mu)t)$。条件满足。
-
-**Step 3: 结论**
-由于 $Z(t)$ 满足泊松过程的所有定义条件，且其增量的速率为 $\lambda+\mu$，所以 $Z(t) = X(t)+Y(t)$ 是速率为 $\lambda+\mu$ 的泊松过程。证毕。
-
-**(c) 平均还需等待多久**
-
-**Step 1: 确定合并过程的速率**
-两种公交车的到达过程是独立的泊松过程。合并后的过程（即“任一公交车到达”）也是一个泊松过程，其速率 $\lambda = \lambda_1 + \lambda_6 = 4 + 2 = 6$ 每小时。
-
-**Step 2: 应用指数分布的无记忆性**
-等待时间（即到达间隔时间）服从参数为 $\lambda$ 的指数分布。指数分布具有无记忆性。这意味着，无论我已经等了多久（5分钟），剩余等待时间的分布与初始等待时间的分布相同。
-
-**Step 3: 计算平均剩余等待时间**
-平均等待时间是指数分布的期望，即 $1/\lambda$。
-$\mathbb{E}[\text{等待时间}] = \frac{1}{\lambda} = \frac{1}{6}$ 小时。
-将小时转换为分钟：$\frac{1}{6} \times 60 = 10$ 分钟。
-
-**Final Answer / 最终答案:**
-(a) 证明如上。
-(b) 证明如上。
-(c) 10 分钟。
-
-**Key Insight / 解题要点:**
-独立泊松过程的和仍然是泊松过程，其速率是各速率之和。指数分布的无记忆性意味着“已经等待的时间”不会影响“剩余等待时间”的分布。
-
----
-
-### Question 4 / 第4题
-
-**Problem / 题目原文:**
-Let $T_1 \sim Exp(\lambda_1)$, $T_2 \sim Exp(\lambda_2)$, ..., $T_n \sim Exp(\lambda_n)$ be independent exponential distributions, and let $T$ be the minimum $T = \min\{T_1, T_2, ..., T_n\}$.
-(a) Show that $T \sim Exp(\lambda_1+\lambda_2+\cdots+\lambda_n)$. You may use the fact that
-$\mathbb{P}(T > t) = \mathbb{P}(T_1 > t) \mathbb{P}(T_2 > t) \cdots \mathbb{P}(T_n > t)$,
-provided you explain why it is true.
-(b) Show that the probability that the minimum is $T_j$ is given by
-$\mathbb{P}(T_j = T) = \frac{\lambda_j}{\lambda_1+\lambda_2+\cdots+\lambda_n}$.
-(You could choose to begin by proving the $n=2$ case, if you want.)
-
-**中文翻译:**
-设 $T_1 \sim Exp(\lambda_1)$, $T_2 \sim Exp(\lambda_2)$, ..., $T_n \sim Exp(\lambda_n)$ 是独立的指数分布，并设 $T$ 为最小值 $T = \min\{T_1, T_2, ..., T_n\}$。
-(a) 证明 $T \sim Exp(\lambda_1+\lambda_2+\cdots+\lambda_n)$。你可以使用 $\mathbb{P}(T > t) = \mathbb{P}(T_1 > t) \mathbb{P}(T_2 > t) \cdots \mathbb{P}(T_n > t)$ 这一事实，但需要解释为什么它成立。
-(b) 证明最小值是 $T_j$ 的概率为 $\mathbb{P}(T_j = T) = \frac{\lambda_j}{\lambda_1+\lambda_2+\cdots+\lambda_n}$。（如果你愿意，可以从证明
+    **English reasoning:**
+    First, we need to determine the distribution of the number of answered calls in 30 minutes. The number of calls arriving in 30 minutes, N_30, follows a Poisson distribution with mean 100/hour * 0.5 hour = 50. After thinning, the number of answered calls in 30 minutes, A_30, follows a Poisson distribution with mean 50 * 0.6 = 30. We need P(A_30 ≥ 25). Since the mean of the Poisson distribution is 30, which is large enough, we can approximate it with a normal distribution. The mean of the normal approximation is μ = 30, the variance is

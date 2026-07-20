@@ -1,318 +1,309 @@
 # Problem Sheet 10 - 详细解答 / Detailed Solutions
 
 > MATH2702 Stochastic Processes
-> 生成时间 / Generated: 2026-07-17 15:16
+> 生成时间 / Generated: 2026-07-20 16:07
 > 来源页 / Source Pages: 97-99
 
 ---
 
-好的，作为您的大学随机过程课程导师，我将为您提供这份习题集的完整、详细的逐步解答。
+好的，作为大学数学导师，我将为您提供MATH2702：随机过程习题集10的完整、逐步、双语（中文/英文）解答。
 
 ---
+
 ### Question 1 / 第1题
 
 **Problem / 题目原文:**
-Consider the Markov jump process on 𝒮 = {1,2,3,4} with generator matrix
-Q = ⎛⎜⎜⎜⎝
--1   1/2  1/2  0
-1/4 -1/2  0    1/4
-1/6  0   -1/3  1/6
-0    0    0    0
-⎞⎟⎟⎟⎠.
-
+Consider the Markov jump process on 𝒮= {1, 2, 3, 4} with generator matrix
+Q =
+$$
+\begin{pmatrix}
+−1 & 1 & 2 & 1 & 2 & 0 \\
+1 & 4 & −1 & 2 & 0 & 1 \\
+4 & 1 & 6 & 0 & −1 & 3 \\
+1 & 6 & 0 & 0 & 0 & 0
+\end{pmatrix}
+$$
+.
 (a) Draw a transition rate diagram for this process.
-(b) Write down the communicating classes for this process, and state whether they are recurrent or transient.
-(c) Calculate the hitting probability ℎ₁₃.
-(d) Calculate the expected hitting time 𝜂₁₄.
+(b) Write down the communicating classes for this process, and state whether they are recurrent or
+transient.
+(c) Calculate the hitting probability ℎ13.
+(d) Calculate the expected hitting time 𝜂14.
 
-**中文翻译:**
-考虑一个定义在状态空间 𝒮 = {1,2,3,4} 上的马尔可夫跳跃过程，其生成元矩阵为：
-Q = ⎛⎜⎜⎜⎝
--1   1/2  1/2  0
-1/4 -1/2  0    1/4
-1/6  0   -1/3  1/6
-0    0    0    0
-⎞⎟⎟⎟⎠.
-
+**中文翻译 / Chinese Translation:**
+考虑一个定义在状态空间 𝒮= {1, 2, 3, 4} 上的马尔可夫跳跃过程，其生成元矩阵为
+Q =
+$$
+\begin{pmatrix}
+−1 & 1 & 2 & 1 & 2 & 0 \\
+1 & 4 & −1 & 2 & 0 & 1 \\
+4 & 1 & 6 & 0 & −1 & 3 \\
+1 & 6 & 0 & 0 & 0 & 0
+\end{pmatrix}
+$$
+.
 (a) 画出该过程的转移速率图。
 (b) 写出该过程的通信类，并说明它们是常返的还是瞬时的。
-(c) 计算击中概率 ℎ₁₃。
-(d) 计算期望击中时间 𝜂₁₄。
+(c) 计算击中概率 ℎ13。
+(d) 计算期望击中时间 𝜂14。
 
 **Knowledge Points / 考查知识点:**
-- 马尔可夫跳跃过程的生成元矩阵 (Generator Matrix) 与转移速率图 (Transition Rate Diagram)
-- 通信类 (Communicating Classes) 的分类：常返 (Recurrent) 与瞬时 (Transient)
-- 吸收状态 (Absorbing State)
-- 击中概率 (Hitting Probability) 的求解，通过解线性方程组
-- 期望击中时间 (Expected Hitting Time) 的求解，通过解线性方程组
+- 马尔可夫跳跃过程 (Markov Jump Process, MJP) 的生成元矩阵 (Generator Matrix) 和转移速率图 (Transition Rate Diagram)。
+- 通信类 (Communicating Classes) 的分类：常返 (Recurrent) 与瞬时 (Transient)。
+- 击中概率 (Hitting Probability) 的计算，通过求解线性方程组。
+- 期望击中时间 (Expected Hitting Time) 的计算，通过求解线性方程组。
 
 **Step-by-Step Solution / 逐步解答:**
 
-**(a) Transition Rate Diagram / 转移速率图**
+#### Part (a) / 第(a)部分
 
-**Step 1: Interpret the Generator Matrix / 解读生成元矩阵**
-生成元矩阵 Q 的每个非对角元素 $q_{ij}$ (其中 $i \neq j$) 表示从状态 $i$ 到状态 $j$ 的转移速率。对角元素 $q_{ii}$ 是行和取负，即 $q_{ii} = -\sum_{j \neq i} q_{ij}$，它表示离开状态 $i$ 的总速率。
+**Step 1: 解析生成元矩阵 / Parse the Generator Matrix**
 
-**Step 2: Extract Transition Rates / 提取转移速率**
-从矩阵 Q 中，我们可以提取出所有非零的转移速率：
-- 从状态 1: $q_{12} = 1/2$, $q_{13} = 1/2$。离开速率 $q_1 = -q_{11} = 1$。
-- 从状态 2: $q_{21} = 1/4$, $q_{24} = 1/4$。离开速率 $q_2 = -q_{22} = 1/2$。
-- 从状态 3: $q_{31} = 1/6$, $q_{34} = 1/6$。离开速率 $q_3 = -q_{33} = 1/3$。
-- 从状态 4: 所有 $q_{4j} = 0$ (对于 $j \neq 4$)。这意味着状态 4 是一个吸收状态 (absorbing state)，一旦进入就永远无法离开。
+**中文思路 / Chinese reasoning:**
+首先，我们需要理解生成元矩阵 Q 的结构。Q 是一个 4x4 矩阵，其元素 \( q_{ij} \) 表示从状态 i 到状态 j 的转移速率。对角线元素 \( q_{ii} \) 是负的，并且等于该行所有非对角线元素之和的相反数，即 \( q_{ii} = -\sum_{j \neq i} q_{ij} \)。我们从矩阵中提取出所有非零的转移速率。
 
-**Step 3: Draw the Diagram / 画出速率图**
-根据这些速率，我们可以画出转移速率图。每个状态用一个圆圈表示，箭头表示可能的转移，箭头上的数字表示转移速率。
+**English reasoning:**
+First, we need to understand the structure of the generator matrix Q. Q is a 4x4 matrix, where the element \( q_{ij} \) represents the transition rate from state i to state j. The diagonal elements \( q_{ii} \) are negative and equal to the negative sum of all off-diagonal elements in that row, i.e., \( q_{ii} = -\sum_{j \neq i} q_{ij} \). We extract all non-zero transition rates from the matrix.
+
+**计算过程 / Working:**
+从矩阵 Q 中，我们可以读出非零的转移速率：
+- 从状态 1: \( q_{12} = \frac{1}{2} \), \( q_{13} = \frac{1}{2} \). 对角线 \( q_{11} = -1 \)，验证：\( -(\frac{1}{2} + \frac{1}{2}) = -1 \)，正确。
+- 从状态 2: \( q_{21} = \frac{1}{4} \), \( q_{24} = \frac{1}{4} \). 对角线 \( q_{22} = -\frac{1}{2} \)，验证：\( -(\frac{1}{4} + \frac{1}{4}) = -\frac{1}{2} \)，正确。
+- 从状态 3: \( q_{31} = \frac{1}{6} \), \( q_{34} = \frac{1}{6} \). 对角线 \( q_{33} = -\frac{1}{3} \)，验证：\( -(\frac{1}{6} + \frac{1}{6}) = -\frac{1}{3} \)，正确。
+- 从状态 4: 所有非对角线元素都是 0，所以 \( q_{41} = q_{42} = q_{43} = 0 \). 对角线 \( q_{44} = 0 \)。这意味着状态 4 是一个吸收态 (absorbing state)。
+
+**Explanation of working / 过程解释:**
+我们逐行检查了矩阵 Q。对于每一行 i，非对角线元素 \( q_{ij} \) (i ≠ j) 给出了从状态 i 跳到状态 j 的速率。对角线元素 \( q_{ii} \) 是负的，其绝对值是离开状态 i 的总速率。状态 4 的行全为零，意味着一旦进入状态 4，就永远不会离开，因此它是吸收态。
+
+**Step 2: 绘制转移速率图 / Draw the Transition Rate Diagram**
+
+**中文思路 / Chinese reasoning:**
+根据上一步提取的速率，我们可以画出转移速率图。每个状态用一个圆圈表示，状态之间的箭头表示可能的转移，箭头上标注的是转移速率 \( q_{ij} \)。对于吸收态 4，没有离开它的箭头。
+
+**English reasoning:**
+Based on the rates extracted in the previous step, we can draw the transition rate diagram. Each state is represented by a circle, arrows between states indicate possible transitions, and the arrows are labeled with the transition rates \( q_{ij} \). For the absorbing state 4, there are no arrows leaving it.
+
+**计算过程 / Working:**
+转移速率图如下：
 
 ```mermaid
 graph LR
-    1((1)) -->|1/2| 2((2))
-    1 -->|1/2| 3((3))
-    2 -->|1/4| 1
-    2 -->|1/4| 4((4))
-    3 -->|1/6| 1
-    3 -->|1/6| 4
-    4 -->|0| 4
-    style 4 fill:#f9f,stroke:#333,stroke-width:2px
+    1((1)) -- "1/2" --> 2((2))
+    1 -- "1/2" --> 3((3))
+    2 -- "1/4" --> 1
+    2 -- "1/4" --> 4((4))
+    3 -- "1/6" --> 1
+    3 -- "1/6" --> 4
+    4 -- "0" --> 4
+    style 4 fill:#f9f,stroke:#333,stroke-width:4px
 ```
-*(注：状态4是吸收态，通常用特殊标记表示。)*
 
-**(b) Communicating Classes / 通信类**
+**Explanation of working / 过程解释:**
+图中，状态 1 有两条离开的箭头，分别指向状态 2 和状态 3，速率均为 1/2。状态 2 有两条离开的箭头，分别指向状态 1 和状态 4，速率均为 1/4。状态 3 有两条离开的箭头，分别指向状态 1 和状态 4，速率均为 1/6。状态 4 没有离开的箭头，表示它是一个吸收态。注意，我们通常不画从状态到自身的箭头，因为其速率由对角线元素表示。
 
-**Step 1: Define Communicating Classes / 定义通信类**
-通信类是一组状态，它们之间可以相互到达。我们需要分析状态之间的可达性。
+#### Part (b) / 第(b)部分
 
-**Step 2: Analyze Reachability / 分析可达性**
-- 状态 1, 2, 3 之间可以相互到达：
-  - 1 → 2, 1 → 3
-  - 2 → 1
-  - 3 → 1
-  - 因此，{1, 2, 3} 是一个通信类。
-- 状态 4 只能从状态 2 或 3 进入，但一旦进入就无法离开（因为 $q_{4j}=0$ 对所有 $j \neq 4$）。所以状态 4 自身构成一个通信类 {4}。
+**Step 1: 识别通信类 / Identify Communicating Classes**
 
-**Step 3: Classify as Recurrent or Transient / 分类为常返或瞬时**
-- 对于通信类 {1, 2, 3}：由于存在离开这个类到状态 4 的转移（例如，从 2 到 4，从 3 到 4），一旦离开，就无法返回。因此，这个类中的状态是**瞬时的 (transient)**。
-- 对于通信类 {4}：这是一个吸收状态。一旦进入，就永远停留在该状态。因此，这个类中的状态是**常返的 (recurrent)**，并且是**正常返的 (positive recurrent)**，因为它是吸收态，返回时间确定。
+**中文思路 / Chinese reasoning:**
+通信类是一组可以相互到达的状态集合。我们需要分析状态之间的可达性。从转移速率图可以看出，状态 1、2、3 之间可以相互到达（例如 1→2, 2→1, 1→3, 3→1, 2→4 但 4 不能回到 2，所以 2 和 4 不在同一个类）。状态 4 只能从其他状态进入，但无法离开，所以它自己构成一个通信类。
 
-**Final Answer for (b):**
-- Communicating classes: {1, 2, 3} (transient), {4} (recurrent/absorbing).
+**English reasoning:**
+A communicating class is a set of states that can all reach each other. We need to analyze the reachability between states. From the transition rate diagram, we can see that states 1, 2, and 3 can all reach each other (e.g., 1→2, 2→1, 1→3, 3→1, 2→4 but 4 cannot return to 2, so 2 and 4 are not in the same class). State 4 can only be entered from other states but cannot leave, so it forms a communicating class by itself.
 
-**(c) Hitting Probability ℎ₁₃ / 击中概率 ℎ₁₃**
+**计算过程 / Working:**
+- 类 1: {1, 2, 3}。因为 1↔2, 1↔3, 2→1, 3→1, 2→3? 没有直接箭头，但可以通过 1 到达：2→1→3。同样，3→1→2。所以它们相互可达。
+- 类 2: {4}。从 4 不能到达任何其他状态，所以它自己是一个类。
 
-**Step 1: Define the Hitting Probability / 定义击中概率**
-$h_{13}$ 表示从状态 1 出发，最终击中（到达）状态 3 的概率。注意，这里我们关心的是在到达吸收状态 4 之前击中状态 3 的概率。
+**Explanation of working / 过程解释:**
+我们检查了每对状态之间的路径。对于状态 1、2、3，尽管没有直接的相互箭头，但可以通过中间状态（如状态 1）实现相互到达。状态 4 是一个吸收态，一旦进入就无法离开，因此它自己构成一个封闭的通信类。
 
-**Step 2: Set Up Equations / 建立方程**
-对于任何状态 $i$，击中概率 $h_i$ 满足以下方程：
-$$h_i = \sum_{j \in \mathcal{S}} \frac{q_{ij}}{q_i} h_j$$
-其中 $q_i = -q_{ii}$ 是离开状态 $i$ 的总速率。这个方程的含义是：从状态 $i$ 出发，第一次跳跃后到达状态 $j$ 的概率是 $q_{ij}/q_i$，然后从状态 $j$ 出发击中目标状态的概率是 $h_j$。
+**Step 2: 判断常返性与瞬变性 / Determine Recurrence and Transience**
 
-对于我们的问题，目标状态是 3，吸收状态是 4。我们有边界条件：
-- $h_3 = 1$ (从目标状态出发，击中自身的概率为 1)
-- $h_4 = 0$ (从吸收状态出发，无法击中其他状态)
+**中文思路 / Chinese reasoning:**
+在一个有限状态空间的马尔可夫跳跃过程中，一个通信类是常返的当且仅当它是闭集 (closed set)，即从该类中的任何状态出发，都无法到达该类之外的状态。否则，该类是瞬时的。对于类 {1, 2, 3}，从这些状态可以跳到状态 4（例如 2→4, 3→4），这意味着该类不是闭集，因此是瞬时的。对于类 {4}，它是一个吸收态，从它出发无法到达任何其他状态，因此它是一个闭集，并且是常返的（实际上是正常返的，因为状态有限）。
 
-**Step 3: Write Equations for Each State / 为每个状态写出方程**
-- 状态 1: $q_1 = 1$。方程：$h_1 = \frac{1/2}{1} h_2 + \frac{1/2}{1} h_3 = \frac{1}{2}h_2 + \frac{1}{2}(1)$
-- 状态 2: $q_2 = 1/2$。方程：$h_2 = \frac{1/4}{1/2} h_1 + \frac{1/4}{1/2} h_4 = \frac{1}{2}h_1 + \frac{1}{2}(0) = \frac{1}{2}h_1$
-- 状态 3: $h_3 = 1$ (边界条件)
-- 状态 4: $h_4 = 0$ (边界条件)
+**English reasoning:**
+In a Markov jump process with a finite state space, a communicating class is recurrent if and only if it is a closed set, meaning that from any state in the class, it is impossible to reach a state outside the class. Otherwise, the class is transient. For class {1, 2, 3}, from these states, it is possible to jump to state 4 (e.g., 2→4, 3→4), meaning the class is not closed, and therefore it is transient. For class {4}, it is an absorbing state, and from it, no other state can be reached, so it is a closed set and is recurrent (in fact, positive recurrent because the state space is finite).
 
-**Step 4: Solve the System of Equations / 解方程组**
+**计算过程 / Working:**
+- 类 {1, 2, 3}: 不是闭集 (因为存在离开的箭头指向状态 4) → **瞬时 (Transient)**。
+- 类 {4}: 是闭集 (没有离开的箭头) → **常返 (Recurrent)**。
+
+**Explanation of working / 过程解释:**
+判断的关键在于该类是否“封闭”。类 {1, 2, 3} 有离开的箭头指向状态 4，所以不是封闭的，因此是瞬时的。这意味着从该类出发，过程最终会以概率 1 离开并进入状态 4。类 {4} 是封闭的，因此是常返的。
+
+#### Part (c) / 第(c)部分
+
+**Step 1: 建立击中概率方程 / Set up the Hitting Probability Equations**
+
+**中文思路 / Chinese reasoning:**
+\( h_{13} \) 表示从状态 1 出发，最终击中（到达）状态 3 的概率。注意，状态 3 是目标状态，状态 4 是吸收态。我们需要求解一个线性方程组。对于任何非吸收态的状态 i，击中概率 \( h_{i3} \) 满足一个方程，该方程基于“第一次跳跃后的状态”进行条件期望。对于吸收态，击中概率是确定的。
+
+**English reasoning:**
+\( h_{13} \) represents the probability, starting from state 1, of eventually hitting (reaching) state 3. Note that state 3 is the target state, and state 4 is an absorbing state. We need to solve a system of linear equations. For any non-absorbing state i, the hitting probability \( h_{i3} \) satisfies an equation based on conditioning on the state after the first jump. For absorbing states, the hitting probability is deterministic.
+
+**计算过程 / Working:**
+设 \( h_i = \mathbb{P}(\text{hit state 3 starting from state } i) \)。对于状态 3，\( h_3 = 1 \)。对于状态 4，\( h_4 = 0 \)（因为从 4 出发无法到达 3）。
+对于状态 i (i ≠ 3, 4)，我们有：
+\[
+h_i = \sum_{j \neq i} \frac{q_{ij}}{-q_{ii}} h_j
+\]
+其中 \( \frac{q_{ij}}{-q_{ii}} \) 是从状态 i 出发，下一次跳跃跳到状态 j 的概率。
+
+对于状态 1:
+\( -q_{11} = 1 \), \( q_{12} = 1/2 \), \( q_{13} = 1/2 \).
+所以 \( h_1 = \frac{1/2}{1} h_2 + \frac{1/2}{1} h_3 = \frac{1}{2} h_2 + \frac{1}{2} \cdot 1 = \frac{1}{2} h_2 + \frac{1}{2} \).
+
+对于状态 2:
+\( -q_{22} = 1/2 \), \( q_{21} = 1/4 \), \( q_{24} = 1/4 \).
+所以 \( h_2 = \frac{1/4}{1/2} h_1 + \frac{1/4}{1/2} h_4 = \frac{1/2}{1} h_1 + \frac{1/2}{1} \cdot 0 = \frac{1}{2} h_1 \).
+
+**Explanation of working / 过程解释:**
+我们为每个非吸收态（1 和 2）建立了方程。方程的核心思想是：从状态 i 出发，第一次跳跃会以概率 \( q_{ij}/-q_{ii} \) 跳到状态 j，之后从状态 j 出发击中状态 3 的概率是 \( h_j \)。因此，\( h_i \) 是所有这些可能性的加权平均。对于状态 3，我们直接知道 \( h_3 = 1 \)；对于吸收态 4，\( h_4 = 0 \)。
+
+**Step 2: 求解方程组 / Solve the System of Equations**
+
+**中文思路 / Chinese reasoning:**
+现在我们有两个方程和两个未知数 \( h_1 \) 和 \( h_2 \)。我们可以通过代入法求解。
+
+**English reasoning:**
+We now have two equations with two unknowns \( h_1 \) and \( h_2 \). We can solve them by substitution.
+
+**计算过程 / Working:**
 我们有：
-(1) $h_1 = \frac{1}{2}h_2 + \frac{1}{2}$
-(2) $h_2 = \frac{1}{2}h_1$
+(1) \( h_1 = \frac{1}{2} h_2 + \frac{1}{2} \)
+(2) \( h_2 = \frac{1}{2} h_1 \)
 
-将方程 (2) 代入方程 (1)：
-$h_1 = \frac{1}{2}(\frac{1}{2}h_1) + \frac{1}{2} = \frac{1}{4}h_1 + \frac{1}{2}$
-移项得：$h_1 - \frac{1}{4}h_1 = \frac{1}{2}$
-$\frac{3}{4}h_1 = \frac{1}{2}$
-$h_1 = \frac{1}{2} \times \frac{4}{3} = \frac{2}{3}$
+将 (2) 代入 (1):
+\( h_1 = \frac{1}{2} (\frac{1}{2} h_1) + \frac{1}{2} \)
+\( h_1 = \frac{1}{4} h_1 + \frac{1}{2} \)
+\( h_1 - \frac{1}{4} h_1 = \frac{1}{2} \)
+\( \frac{3}{4} h_1 = \frac{1}{2} \)
+\( h_1 = \frac{1}{2} \times \frac{4}{3} = \frac{2}{3} \).
 
-**Final Answer for (c):**
-$$h_{13} = \frac{2}{3}$$
+**Explanation of working / 过程解释:**
+我们通过代入法解这个简单的线性方程组。首先将方程 (2) 代入方程 (1)，得到关于 \( h_1 \) 的一元一次方程。然后移项、合并同类项，最后解出 \( h_1 = 2/3 \)。
 
-**(d) Expected Hitting Time 𝜂₁₄ / 期望击中时间 𝜂₁₄**
+**Final Answer / 最终答案:**
+\[
+\boxed{h_{13} = \frac{2}{3}}
+\]
+从状态 1 出发，最终击中状态 3 的概率是 2/3。
+The probability of hitting state 3 starting from state 1 is 2/3.
 
-**Step 1: Define the Expected Hitting Time / 定义期望击中时间**
-$\eta_{14}$ 表示从状态 1 出发，最终被吸收到状态 4 的期望时间。注意，状态 4 是唯一的吸收状态，所以最终一定会被吸收。
+#### Part (d) / 第(d)部分
 
-**Step 2: Set Up Equations / 建立方程**
-对于任何状态 $i$，期望击中时间 $\eta_i$ 满足以下方程：
-$$\eta_i = \frac{1}{q_i} + \sum_{j \neq i} \frac{q_{ij}}{q_i} \eta_j$$
-这个方程的含义是：从状态 $i$ 出发，在第一次跳跃之前，平均停留时间是 $1/q_i$。然后，以概率 $q_{ij}/q_i$ 跳到状态 $j$，并从状态 $j$ 出发，剩余的平均击中时间是 $\eta_j$。
+**Step 1: 建立期望击中时间方程 / Set up the Expected Hitting Time Equations**
 
-对于吸收状态，我们有边界条件：
-- $\eta_4 = 0$ (从吸收状态出发，被吸收的时间为 0)
+**中文思路 / Chinese reasoning:**
+\( \eta_{14} \) 表示从状态 1 出发，最终击中（到达）状态 4 的期望时间。状态 4 是吸收态。我们需要为所有非吸收态（1, 2, 3）建立方程。方程基于“第一次跳跃的时间”和“第一次跳跃后的状态”进行条件期望。
 
-**Step 3: Write Equations for Each State / 为每个状态写出方程**
-- 状态 1: $q_1 = 1$。方程：$\eta_1 = \frac{1}{1} + \frac{1/2}{1} \eta_2 + \frac{1/2}{1} \eta_3 = 1 + \frac{1}{2}\eta_2 + \frac{1}{2}\eta_3$
-- 状态 2: $q_2 = 1/2$。方程：$\eta_2 = \frac{1}{1/2} + \frac{1/4}{1/2} \eta_1 + \frac{1/4}{1/2} \eta_4 = 2 + \frac{1}{2}\eta_1 + \frac{1}{2}(0) = 2 + \frac{1}{2}\eta_1$
-- 状态 3: $q_3 = 1/3$。方程：$\eta_3 = \frac{1}{1/3} + \frac{1/6}{1/3} \eta_1 + \frac{1/6}{1/3} \eta_4 = 3 + \frac{1}{2}\eta_1 + \frac{1}{2}(0) = 3 + \frac{1}{2}\eta_1$
-- 状态 4: $\eta_4 = 0$ (边界条件)
+**English reasoning:**
+\( \eta_{14} \) represents the expected time, starting from state 1, to eventually hit (reach) state 4. State 4 is an absorbing state. We need to set up equations for all non-absorbing states (1, 2, 3). The equations are based on conditioning on the time of the first jump and the state after the first jump.
 
-**Step 4: Solve the System of Equations / 解方程组**
+**计算过程 / Working:**
+设 \( \eta_i = \mathbb{E}[\text{time to hit state 4 starting from state } i] \)。对于状态 4，\( \eta_4 = 0 \)。
+
+对于状态 i (i ≠ 4)，我们有：
+\[
+\eta_i = \frac{1}{-q_{ii}} + \sum_{j \neq i} \frac{q_{ij}}{-q_{ii}} \eta_j
+\]
+其中 \( \frac{1}{-q_{ii}} \) 是在状态 i 的期望逗留时间，\( \frac{q_{ij}}{-q_{ii}} \) 是下一次跳跃跳到状态 j 的概率。
+
+对于状态 1:
+\( -q_{11} = 1 \), \( q_{12} = 1/2 \), \( q_{13} = 1/2 \).
+\( \eta_1 = \frac{1}{1} + \frac{1/2}{1} \eta_2 + \frac{1/2}{1} \eta_3 = 1 + \frac{1}{2} \eta_2 + \frac{1}{2} \eta_3 \).
+
+对于状态 2:
+\( -q_{22} = 1/2 \), \( q_{21} = 1/4 \), \( q_{24} = 1/4 \).
+\( \eta_2 = \frac{1}{1/2} + \frac{1/4}{1/2} \eta_1 + \frac{1/4}{1/2} \eta_4 = 2 + \frac{1/2}{1} \eta_1 + \frac{1/2}{1} \cdot 0 = 2 + \frac{1}{2} \eta_1 \).
+
+对于状态 3:
+\( -q_{33} = 1/3 \), \( q_{31} = 1/6 \), \( q_{34} = 1/6 \).
+\( \eta_3 = \frac{1}{1/3} + \frac{1/6}{1/3} \eta_1 + \frac{1/6}{1/3} \eta_4 = 3 + \frac{1/2}{1} \eta_1 + \frac{1/2}{1} \cdot 0 = 3 + \frac{1}{2} \eta_1 \).
+
+**Explanation of working / 过程解释:**
+我们为每个非吸收态建立了方程。方程的核心思想是：从状态 i 出发，首先会在该状态停留一段期望时间为 \( 1/(-q_{ii}) \) 的时间，然后以概率 \( q_{ij}/-q_{ii} \) 跳到状态 j，之后从状态 j 出发击中状态 4 的期望时间是 \( \eta_j \)。因此，总的期望时间是停留时间加上后续期望时间的加权平均。
+
+**Step 2: 求解方程组 / Solve the System of Equations**
+
+**中文思路 / Chinese reasoning:**
+现在我们有一个包含三个方程和三个未知数 \( \eta_1, \eta_2, \eta_3 \) 的线性方程组。我们可以通过代入法逐步求解。
+
+**English reasoning:**
+We now have a system of three equations with three unknowns \( \eta_1, \eta_2, \eta_3 \). We can solve them step by step using substitution.
+
+**计算过程 / Working:**
 我们有：
-(1) $\eta_1 = 1 + \frac{1}{2}\eta_2 + \frac{1}{2}\eta_3$
-(2) $\eta_2 = 2 + \frac{1}{2}\eta_1$
-(3) $\eta_3 = 3 + \frac{1}{2}\eta_1$
+(1) \( \eta_1 = 1 + \frac{1}{2} \eta_2 + \frac{1}{2} \eta_3 \)
+(2) \( \eta_2 = 2 + \frac{1}{2} \eta_1 \)
+(3) \( \eta_3 = 3 + \frac{1}{2} \eta_1 \)
 
-将方程 (2) 和 (3) 代入方程 (1)：
-$\eta_1 = 1 + \frac{1}{2}(2 + \frac{1}{2}\eta_1) + \frac{1}{2}(3 + \frac{1}{2}\eta_1)$
-$\eta_1 = 1 + (1 + \frac{1}{4}\eta_1) + (\frac{3}{2} + \frac{1}{4}\eta_1)$
-$\eta_1 = 1 + 1 + \frac{3}{2} + \frac{1}{4}\eta_1 + \frac{1}{4}\eta_1$
-$\eta_1 = \frac{7}{2} + \frac{1}{2}\eta_1$
-移项得：$\eta_1 - \frac{1}{2}\eta_1 = \frac{7}{2}$
-$\frac{1}{2}\eta_1 = \frac{7}{2}$
-$\eta_1 = 7$
+将 (2) 和 (3) 代入 (1):
+\( \eta_1 = 1 + \frac{1}{2} (2 + \frac{1}{2} \eta_1) + \frac{1}{2} (3 + \frac{1}{2} \eta_1) \)
+\( \eta_1 = 1 + 1 + \frac{1}{4} \eta_1 + \frac{3}{2} + \frac{1}{4} \eta_1 \)
+\( \eta_1 = (1 + 1 + 1.5) + (\frac{1}{4} + \frac{1}{4}) \eta_1 \)
+\( \eta_1 = 3.5 + \frac{1}{2} \eta_1 \)
+\( \eta_1 - \frac{1}{2} \eta_1 = 3.5 \)
+\( \frac{1}{2} \eta_1 = \frac{7}{2} \)
+\( \eta_1 = 7 \).
 
-**Final Answer for (d):**
-$$\eta_{14} = 7$$
+**Explanation of working / 过程解释:**
+我们首先将方程 (2) 和 (3) 代入方程 (1)，消去 \( \eta_2 \) 和 \( \eta_3 \)。然后合并常数项和 \( \eta_1 \) 的系数项，得到一个关于 \( \eta_1 \) 的一元一次方程。最后解出 \( \eta_1 = 7 \)。
+
+**Final Answer / 最终答案:**
+\[
+\boxed{\eta_{14} = 7}
+\]
+从状态 1 出发，最终击中状态 4 的期望时间是 7 个单位时间。
+The expected time to hit state 4 starting from state 1 is 7 time units.
 
 **Key Insight / 解题要点:**
-对于有吸收态的马尔可夫链，击中概率和期望击中时间可以通过解一组线性方程来求得，这些方程基于“第一次跳跃”后的状态进行条件化。
+- 对于击中概率和期望击中时间，关键在于为每个非吸收态建立基于“第一次跳跃”的条件期望方程。The key for hitting probabilities and expected hitting times is to set up conditional expectation equations based on the "first jump" for each non-absorbing state.
+- 吸收态是边界条件，其值为 0（对于概率和时间）。Absorbing states provide boundary conditions, with values of 0 (for both probability and time).
 
 ---
+
 ### Question 2 / 第2题
 
 **Problem / 题目原文:**
-Consider a Markov jump process $(X(t))$ on a triangle, with the vertices labelled 1, 2, 3 going clockwise. In a short time period $\tau$, we move one step clockwise with probability $\alpha\tau + o(\tau)$, one step anticlockwise with probability $\beta\tau + o(\tau)$, or stay where we are.
+Consider a Markov jump process (𝑋(𝑡)) on a triangle, with the vertices labelled 1, 2, 3 going clockwise.
+In a short time period 𝜏, we move one step clockwise with probability 𝛼𝜏+ 𝑜(𝜏), one step anticlockwise
+with probability 𝛽𝜏+ 𝑜(𝜏), or stay where we are.
 (a) Write down a generator matrix for this Markov jump process, and draw a transition rate diagram.
 (b) What is the probability, starting from state 1, that we hit state 3 before state 2?
-(c) What is the expected time $\eta_{13}$ to hit state 3 starting from state 1.
-(d) Write down the transition matrix R for the jump chain $(Y_n)$.
-(e) What is the probability in the jump chain $(Y_n)$ that, starting from state 1, that we hit state 3 before state 2?
-(f) What is the expected number of steps in the jump chain $(Y_n)$ to hit state 3 starting from state 1.
+(c) What is the expected time 𝜂13 to hit state 3 starting from state 1.
+(d) Write down the transition matrix R for the jump chain (𝑌𝑛).
+(e) What is the probability in the jump chain (𝑌𝑛) that, starting from state 1, that we hit state 3 before
+state 2?
+(f) What is the expected number of steps in the jump chain (𝑌𝑛) to hit state 3 starting from state 1.
 
-**中文翻译:**
-考虑一个定义在三角形上的马尔可夫跳跃过程 $(X(t))$，顶点按顺时针方向标记为 1, 2, 3。在一个短时间间隔 $\tau$ 内，我们以概率 $\alpha\tau + o(\tau)$ 顺时针移动一步，以概率 $\beta\tau + o(\tau)$ 逆时针移动一步，或者停留在原地。
+**中文翻译 / Chinese Translation:**
+考虑一个定义在三角形上的马尔可夫跳跃过程 (𝑋(𝑡))，顶点按顺时针方向标记为 1, 2, 3。
+在一个短时间间隔 𝜏 内，我们以概率 𝛼𝜏+ 𝑜(𝜏) 顺时针移动一步，以概率 𝛽𝜏+ 𝑜(𝜏) 逆时针移动一步，或者停留在原地。
 (a) 写出这个马尔可夫跳跃过程的生成元矩阵，并画出转移速率图。
-(b) 从状态 1 出发，我们在到达状态 2 之前到达状态 3 的概率是多少？
-(c) 从状态 1 出发，到达状态 3 的期望时间 $\eta_{13}$ 是多少？
-(d) 写出跳跃链 $(Y_n)$ 的转移矩阵 R。
-(e) 在跳跃链 $(Y_n)$ 中，从状态 1 出发，我们在到达状态 2 之前到达状态 3 的概率是多少？
-(f) 在跳跃链 $(Y_n)$ 中，从状态 1 出发，到达状态 3 的期望步数是多少？
+(b) 从状态 1 出发，我们在击中状态 3 之前先击中状态 2 的概率是多少？
+(c) 从状态 1 出发，击中状态 3 的期望时间 𝜂13 是多少？
+(d) 写出跳跃链 (𝑌𝑛) 的转移矩阵 R。
+(e) 在跳跃链 (𝑌𝑛) 中，从状态 1 出发，我们在击中状态 3 之前先击中状态 2 的概率是多少？
+(f) 在跳跃链 (𝑌𝑛) 中，从状态 1 出发，击中状态 3 的期望步数是多少？
 
 **Knowledge Points / 考查知识点:**
-- 从转移速率构建生成元矩阵 (Generator Matrix)
-- 连续时间马尔可夫链 (CTMC) 的击中概率与期望时间
-- 跳跃链 (Jump Chain) 的概念与转移矩阵
-- 离散时间马尔可夫链 (DTMC) 的击中概率与期望步数
-- 三角对称性在简化问题中的应用
+- 从跳跃过程的无穷小定义推导生成元矩阵 (Deriving the generator matrix from infinitesimal definitions)。
+- 马尔可夫跳跃过程中的击中概率 (Hitting probabilities in MJP)。
+- 马尔可夫跳跃过程中的期望击中时间 (Expected hitting times in MJP)。
+- 跳跃链 (Jump Chain) 及其转移矩阵 (Transition Matrix)。
+- 离散时间马尔可夫链中的击中概率和期望步数 (Hitting probabilities and expected steps in DTMC)。
 
 **Step-by-Step Solution / 逐步解答:**
 
-**(a) Generator Matrix and Transition Rate Diagram / 生成元矩阵与转移速率图**
+#### Part (a) / 第(a)部分
 
-**Step 1: Determine Transition Rates / 确定转移速率**
-题目给出了在短时间 $\tau$ 内的转移概率：
-- 顺时针移动一步（例如 1→2, 2→3, 3→1）的概率为 $\alpha\tau + o(\tau)$。这意味着转移速率 $q_{i, i+1} = \alpha$。
-- 逆时针移动一步（例如 1→3, 3→2, 2→1）的概率为 $\beta\tau + o(\tau)$。这意味着转移速率 $q_{i, i-1} = \beta$。
-- 停留在原地的概率为 $1 - (\alpha+\beta)\tau + o(\tau)$。
+**Step 1: 推导生成元矩阵 / Derive the Generator Matrix**
 
-**Step 2: Construct the Generator Matrix / 构建生成元矩阵**
-生成元矩阵 Q 是一个 $3 \times 3$ 矩阵。对于 $i \neq j$，$q_{ij}$ 是转移速率。对角元素 $q_{ii}$ 是行和取负。
-- 状态 1: 可以以速率 $\alpha$ 到状态 2，以速率 $\beta$ 到状态 3。所以 $q_{12} = \alpha$, $q_{13} = \beta$。离开速率 $q_1 = \alpha + \beta$，所以 $q_{11} = -(\alpha+\beta)$。
-- 状态 2: 可以以速率 $\alpha$ 到状态 3，以速率 $\beta$ 到状态 1。所以 $q_{23} = \alpha$, $q_{21} = \beta$。离开速率 $q_2 = \alpha + \beta$，所以 $q_{22} = -(\alpha+\beta)$。
-- 状态 3: 可以以速率 $\alpha$ 到状态 1，以速率 $\beta$ 到状态 2。所以 $q_{31} = \alpha$, $q_{32} = \beta$。离开速率 $q_3 = \alpha + \beta$，所以 $q_{33} = -(\alpha+\beta)$。
+**中文思路 / Chinese reasoning:**
+生成元矩阵 Q 的元素 \( q_{ij} \) 定义为从状态 i 到状态 j 的瞬时转移速率。根据定义，对于 i ≠ j，\( q_{ij} = \lim_{\tau \to 0} \frac{\mathbb{P}(X(\tau) = j | X(0) = i)}{\tau} \)。题目给出了在短时间 τ 内的转移概率，我们可以从中提取出速率。对角线元素 \( q_{ii} = -\sum_{j \neq i} q_{ij} \)。
 
-因此，生成元矩阵为：
-$$Q = \begin{pmatrix} -(\alpha+\beta) & \alpha & \beta \\ \beta & -(\alpha+\beta) & \alpha \\ \alpha & \beta & -(\alpha+\beta) \end{pmatrix}$$
-
-**Step 3: Draw the Transition Rate Diagram / 画出转移速率图**
-```mermaid
-graph LR
-    1((1)) -->|α| 2((2))
-    2 -->|α| 3((3))
-    3 -->|α| 1
-    1 -->|β| 3
-    3 -->|β| 2
-    2 -->|β| 1
-```
-
-**(b) Hitting Probability (CTMC) / 击中概率 (连续时间)**
-
-**Step 1: Define the Problem / 定义问题**
-我们需要计算从状态 1 出发，在到达状态 2 之前到达状态 3 的概率。这是一个典型的“赌徒破产”问题，但状态空间是三角形的。
-
-**Step 2: Use the Jump Chain / 使用跳跃链**
-对于连续时间马尔可夫链，击中概率只取决于跳跃链，而与在每个状态停留的时间无关。因此，我们可以先分析跳跃链。
-
-**Step 3: Analyze the Jump Chain / 分析跳跃链**
-从状态 1 出发，在跳跃链中，下一次跳跃的目的地只有两个可能：状态 2 或状态 3。
-- 跳到状态 2 的概率：$P_{12} = \frac{q_{12}}{q_1} = \frac{\alpha}{\alpha+\beta}$
-- 跳到状态 3 的概率：$P_{13} = \frac{q_{13}}{q_1} = \frac{\beta}{\alpha+\beta}$
-
-**Step 4: Calculate the Probability / 计算概率**
-如果我们从状态 1 出发，第一次跳跃就直接决定了我们是否在到达状态 2 之前到达状态 3。
-- 如果第一次跳到状态 3，我们就成功了（在到达状态 2 之前到达了状态 3）。
-- 如果第一次跳到状态 2，我们就失败了（先到达了状态 2）。
-
-因此，所求概率就是第一次跳跃跳到状态 3 的概率。
-$$h_{13}^{(2)} = \frac{\beta}{\alpha+\beta}$$
-
-**Final Answer for (b):**
-$$\frac{\beta}{\alpha+\beta}$$
-
-**(c) Expected Hitting Time $\eta_{13}$ (CTMC) / 期望击中时间 (连续时间)**
-
-**Step 1: Set Up Equations / 建立方程**
-我们需要计算从状态 1 出发，到达状态 3 的期望时间。设 $\eta_i$ 为从状态 $i$ 出发到达状态 3 的期望时间。我们有边界条件 $\eta_3 = 0$。
-
-对于状态 $i \neq 3$，期望时间方程是：
-$$\eta_i = \frac{1}{q_i} + \sum_{j \neq i} \frac{q_{ij}}{q_i} \eta_j$$
-
-**Step 2: Write Equations for States 1 and 2 / 为状态 1 和 2 写出方程**
-- 状态 1: $q_1 = \alpha+\beta$。方程：$\eta_1 = \frac{1}{\alpha+\beta} + \frac{\alpha}{\alpha+\beta} \eta_2 + \frac{\beta}{\alpha+\beta} \eta_3 = \frac{1}{\alpha+\beta} + \frac{\alpha}{\alpha+\beta} \eta_2$
-- 状态 2: $q_2 = \alpha+\beta$。方程：$\eta_2 = \frac{1}{\alpha+\beta} + \frac{\beta}{\alpha+\beta} \eta_1 + \frac{\alpha}{\alpha+\beta} \eta_3 = \frac{1}{\alpha+\beta} + \frac{\beta}{\alpha+\beta} \eta_1$
-
-**Step 3: Solve the System / 解方程组**
-将 $\eta_2$ 的表达式代入 $\eta_1$ 的方程：
-$\eta_1 = \frac{1}{\alpha+\beta} + \frac{\alpha}{\alpha+\beta} \left( \frac{1}{\alpha+\beta} + \frac{\beta}{\alpha+\beta} \eta_1 \right)$
-$\eta_1 = \frac{1}{\alpha+\beta} + \frac{\alpha}{(\alpha+\beta)^2} + \frac{\alpha\beta}{(\alpha+\beta)^2} \eta_1$
-移项，将包含 $\eta_1$ 的项移到左边：
-$\eta_1 - \frac{\alpha\beta}{(\alpha+\beta)^2} \eta_1 = \frac{1}{\alpha+\beta} + \frac{\alpha}{(\alpha+\beta)^2}$
-$\eta_1 \left(1 - \frac{\alpha\beta}{(\alpha+\beta)^2}\right) = \frac{\alpha+\beta}{(\alpha+\beta)^2} + \frac{\alpha}{(\alpha+\beta)^2}$
-$\eta_1 \left(\frac{(\alpha+\beta)^2 - \alpha\beta}{(\alpha+\beta)^2}\right) = \frac{2\alpha+\beta}{(\alpha+\beta)^2}$
-$\eta_1 \left(\frac{\alpha^2 + 2\alpha\beta + \beta^2 - \alpha\beta}{(\alpha+\beta)^2}\right) = \frac{2\alpha+\beta}{(\alpha+\beta)^2}$
-$\eta_1 \left(\frac{\alpha^2 + \alpha\beta + \beta^2}{(\alpha+\beta)^2}\right) = \frac{2\alpha+\beta}{(\alpha+\beta)^2}$
-两边同时乘以 $(\alpha+\beta)^2$ 并除以 $(\alpha^2 + \alpha\beta + \beta^2)$：
-$$\eta_1 = \frac{2\alpha+\beta}{\alpha^2 + \alpha\beta + \beta^2}$$
-
-**Final Answer for (c):**
-$$\eta_{13} = \frac{2\alpha+\beta}{\alpha^2 + \alpha\beta + \beta^2}$$
-
-**(d) Transition Matrix R for the Jump Chain / 跳跃链的转移矩阵 R**
-
-**Step 1: Define the Jump Chain / 定义跳跃链**
-跳跃链 $(Y_n)$ 记录了连续时间过程 $(X(t))$ 在每次跳跃后的状态。它的转移概率由下式给出：
-$$R_{ij} = \frac{q_{ij}}{q_i} \quad \text{for } i \neq j$$
-并且 $R_{ii} = 0$，因为跳跃链在每一步都必须改变状态。
-
-**Step 2: Calculate Transition Probabilities / 计算转移概率**
-- 从状态 1: $R_{12} = \frac{\alpha}{\alpha+\beta}$, $R_{13} = \frac{\beta}{\alpha+\beta}$, $R_{11} = 0$。
-- 从状态 2: $R_{23} = \frac{\alpha}{\alpha+\beta}$, $R_{21} = \frac{\beta}{\alpha+\beta}$, $R_{22} = 0$。
-- 从状态 3: $R_{31} = \frac{\alpha}{\alpha+\beta}$, $R_{32} = \frac{\beta}{\alpha+\beta}$, $R_{33} = 0$。
-
-**Step 3: Write the Matrix / 写出矩阵**
-$$R = \begin{pmatrix} 0 & \frac{\alpha}{\alpha+\beta} & \frac{\beta}{\alpha+\beta} \\ \frac{\beta}{\alpha+\beta} & 0 & \frac{\alpha}{\alpha+\beta} \\ \frac{\alpha}{\alpha+\beta} & \frac{\beta}{\alpha+\beta} & 0 \end{pmatrix}$$
-
-**(e) Hitting Probability in the Jump Chain / 跳跃链中的击中概率**
-
-**Step 1: Relate to Part (b) / 联系 (b) 部分**
-如 (b) 部分所述，连续时间过程的击中概率完全由跳跃链决定。因此，这个问题的答案与 (b) 部分完全相同。
-
-**Step 2: State the Answer / 给出答案**
-从状态 1 出发，在跳跃链中，在到达状态 2 之前到达状态 3 的概率，就是第一次跳跃直接跳到状态 3 的概率。
-
-**Final Answer for (e):**
-$$\frac{\beta}{\alpha+\beta}$$
-
-**(f) Expected Number of Steps in the Jump Chain / 跳跃链中的期望步数**
-
-**Step 1: Set Up Equations / 建立方程**
-设 $m_i$ 为从状态 $i$ 出发，在跳跃链中到达状态 3 的期望步数。我们有边界条件 $m_3 = 0$。
-对于 $i \neq 3$，方程是：
-$$m_i = 1 + \sum_{j \neq i} R_{ij} m_j$$
-这里的 1 代表我们迈出了一步。
-
-**Step 2: Write Equations for States 1 and 2 / 为状态 1 和 2 写出方程**
-- 状态 1
+**English reasoning:**
+The elements of the generator matrix Q, \( q_{ij} \), are defined as the instantaneous transition rates from state i to state j. By definition, for i ≠ j, \( q_{ij} = \lim_{\tau \to 0} \frac{\mathbb{P}(X(\tau) = j | X(0) = i

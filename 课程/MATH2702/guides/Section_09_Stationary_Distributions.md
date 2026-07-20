@@ -1,448 +1,338 @@
-# Section 9: Stationary Distributions
+# Section 9: Stationary distributions
 
-> MATH2702 Stochastic Processes - 自学教材
-> 生成时间: 2026-07-17 14:49
+> MATH2702 - 自学教材 / Self-Study Guide
+> 生成时间: 2026-07-20 15:40
 > 来源页: 51-56
 
 ---
 
-# 📘 MATH2702: Markov Chains - Section 9 Study Guide
-## Stationary Distributions (平稳分布)
-
----
+# 📚 Section 9: Stationary Distributions / 平稳分布
 
 ## 📋 Section Overview / 章节概览
 
-This section introduces the concept of **stationary distributions (平稳分布)** for Markov chains - probability distributions that remain unchanged as the chain evolves over time. Understanding stationary distributions is crucial because they describe the long-term behavior of Markov chains and answer questions like: "If I run this chain for a very long time, what proportion of time will I spend in each state?"
+**中文解释：** 本章节是马尔可夫链理论中最重要的部分之一。我们将学习什么是"平稳分布"——这是一种特殊的概率分布，当我们从该分布出发时，马尔可夫链在所有时间步上都保持相同的分布。这就像是一个"平衡状态"，系统一旦达到这个状态，就会一直保持下去。我们将学习如何求解平稳分布，以及判断平稳分布存在性和唯一性的条件。
 
-**Why this matters (为什么重要)**:
-- Stationary distributions are the Markov chain equivalent of equilibrium in physics
-- They allow us to compute long-run average behavior without simulating the chain
-- They are essential for applications in queueing theory, population genetics, and Google's PageRank algorithm
+**English explanation:** This section is one of the most important parts of Markov chain theory. We will learn what a "stationary distribution" is — a special probability distribution such that if we start the Markov chain from this distribution, it remains the same distribution at all time steps. This is like an "equilibrium state" — once the system reaches this state, it stays there forever. We will learn how to find stationary distributions and the conditions for their existence and uniqueness.
 
----
+**Why this matters / 为什么重要：**
+- Stationary distributions describe the long-term behavior of Markov chains / 平稳分布描述了马尔可夫链的长期行为
+- They are used in Google's PageRank algorithm, queueing theory, and many other applications / 它们被用于谷歌的PageRank算法、排队论等众多应用中
+- Understanding stationary distributions is essential for analyzing real-world stochastic systems / 理解平稳分布对于分析现实世界中的随机系统至关重要
 
 ## 🎯 Learning Objectives / 学习目标
 
-By the end of this section, you will be able to:
+By the end of this section, you will be able to / 学完本节后，你将能够：
 
-1. **Define** a stationary distribution and explain its meaning in both mathematical and intuitive terms
-2. **Find** stationary distributions for finite-state Markov chains using the system of equations π = πP
-3. **Apply** the three-step method for solving stationary distribution problems
-4. **State** Theorem 9.1 on existence and uniqueness conditions
-5. **Determine** whether a stationary distribution exists based on chain classification (irreducible, positive recurrent, null recurrent, transient)
-6. **Analyze** chains with multiple communicating classes and describe the resulting stationary distributions
-
----
+1. **Define** a stationary distribution and explain its meaning / **定义**平稳分布并解释其含义
+2. **Solve** for stationary distributions using the equation π = πP / **求解**平稳分布，使用方程 π = πP
+3. **Apply** the three-step method to find stationary distributions / **应用**三步法求解平稳分布
+4. **State** the conditions for existence and uniqueness of stationary distributions / **陈述**平稳分布存在性和唯一性的条件
+5. **Determine** the number of stationary distributions for reducible chains / **确定**可约链的平稳分布数量
+6. **Compute** expected return times from stationary distributions / **计算**从平稳分布得到的期望返回时间
 
 ## 📚 Prerequisites / 前置知识
 
-Before studying this section, you should be comfortable with:
+Before studying this section, you should know / 在学习本节之前，你应该掌握：
 
-| Concept | Details |
-|---------|---------|
-| **Markov chains basics** | States, transition probabilities, transition matrix P |
-| **Matrix-vector multiplication** | Row vector × matrix multiplication |
-| **Irreducibility (不可约性)** | All states communicate with each other |
-| **Recurrence and transience (常返性与瞬时性)** | From Section 7 |
-| **Positive recurrence (正常返)** | Expected return time is finite |
-| **Expected return time μᵢ** | Average time to return to state i |
-| **Solving linear equations** | Basic algebra, substitution method |
-
----
+- **Markov chains basics / 马尔可夫链基础**: States, transition probabilities, transition matrix P / 状态、转移概率、转移矩阵P
+- **Matrix multiplication / 矩阵乘法**: How to multiply a row vector by a matrix / 如何将行向量与矩阵相乘
+- **Probability distributions / 概率分布**: What a probability distribution is, ∑πᵢ = 1 / 什么是概率分布，∑πᵢ = 1
+- **Irreducibility / 不可约性**: What it means for a Markov chain to be irreducible / 马尔可夫链不可约的含义
+- **Recurrence and transience / 常返性和瞬时性**: Positive recurrence, null recurrence, transience / 正常返、零常返、瞬时性
+- **Expected return times / 期望返回时间**: μᵢ = expected time to return to state i / 返回状态i的期望时间
 
 ## 📖 Core Content / 核心内容
 
----
-
-### Topic 1: Definition of Stationary Distribution (平稳分布的定义)
+### Topic 1: Definition of Stationary Distribution / 平稳分布的定义
 
 #### Intuition / 直觉理解
 
-Imagine you have a large population of independent Markov chains, all running simultaneously. You start them according to some initial distribution - for example, 30% start in state 0, 70% start in state 1. After one step, you check what proportion of chains are in each state. If those proportions are exactly the same as when you started, then you have found a **stationary distribution**.
+**中文解释：** 让我们从一个具体的例子开始。回顾"坏打印机"马尔可夫链，它有两个状态：0（打印机正常工作）和1（打印机坏了）。转移概率如图11所示。假设我们从一个特殊的初始分布开始：
+- ℙ(X₀ = 0) = β/(α+β)
+- ℙ(X₀ = 1) = α/(α+β)
 
-**Analogy (类比)**: Think of a well-shuffled deck of cards. No matter how many times you shuffle, the probability of drawing any specific card remains 1/52. The uniform distribution is "stationary" under shuffling.
+经过一步后，我们计算ℙ(X₁ = 0)和ℙ(X₁ = 1)。令人惊讶的是，我们得到完全相同的结果！这意味着这个分布是"平稳的"——如果我们从这个分布开始，它在所有时间步上都保持不变。
 
-The key insight: **The chain itself keeps moving** - individual chains jump between states - but the **overall distribution** of where chains are located stays constant.
+**English explanation:** Let's start with a concrete example. Consider the "broken printer" Markov chain with two states: 0 (printer working) and 1 (printer broken). The transition probabilities are shown in Figure 11. Suppose we start from a special initial distribution:
+- ℙ(X₀ = 0) = β/(α+β)
+- ℙ(X₀ = 1) = α/(α+β)
+
+After one step, we compute ℙ(X₁ = 0) and ℙ(X₁ = 1). Surprisingly, we get exactly the same result! This means this distribution is "stationary" — if we start from this distribution, it stays the same at all time steps.
+
+**Analogy / 类比：** 想象一个水池，水不断流入和流出。如果流入速率等于流出速率，水位保持不变。类似地，在马尔可夫链中，如果"概率流"在状态之间达到平衡，分布就保持不变。
+
+Imagine a water tank with water flowing in and out. If the inflow rate equals the outflow rate, the water level stays constant. Similarly, in a Markov chain, if the "probability flow" between states reaches equilibrium, the distribution stays constant.
 
 #### Formal Definition / 形式化定义
 
-**Definition 9.1 (Stationary Distribution)**:
-Let $(X_n)$ be a Markov chain on a state space $\mathcal{S}$ with transition matrix $\mathbf{P}$. Let $\pi = (\pi_i)$ be a distribution on $\mathcal{S}$, meaning:
-- $\pi_i \geq 0$ for all $i \in \mathcal{S}$ (non-negative probabilities)
-- $\sum_{i \in \mathcal{S}} \pi_i = 1$ (total probability equals 1)
+**Definition 9.1 (Stationary Distribution / 平稳分布).** Let (Xₙ) be a Markov chain on a state space 𝒮 with transition matrix P. Let π = (πᵢ) be a distribution on 𝒮, meaning πᵢ ≥ 0 for all i ∈ 𝒮 and ∑ᵢ∈𝒮 πᵢ = 1. We call π a **stationary distribution** if
 
-We call $\pi$ a **stationary distribution (平稳分布)** if:
+$$ \pi_j = \sum_{i \in \mathcal{S}} \pi_i p_{ij} \quad \text{for all } j \in \mathcal{S} $$
 
-$$\pi_j = \sum_{i \in \mathcal{S}} \pi_i p_{ij} \quad \text{for all } j \in \mathcal{S}$$
+or, equivalently, if π = πP (where π is a row vector).
 
-Or equivalently, in matrix notation:
+**Symbol explanation / 符号说明：**
 
-$$\pi = \pi \mathbf{P}$$
+| Symbol | Meaning (English) | 含义（中文） |
+|--------|-------------------|--------------|
+| π | Stationary distribution vector | 平稳分布向量 |
+| πᵢ | Probability of being in state i under stationary distribution | 平稳分布下处于状态i的概率 |
+| pᵢⱼ | Transition probability from state i to state j | 从状态i到状态j的转移概率 |
+| 𝒮 | State space | 状态空间 |
+| πP | Row vector times transition matrix | 行向量乘以转移矩阵 |
 
-where $\pi$ is a **row vector (行向量)**.
+**Key insight / 关键洞察：** The equation π = πP means that if we apply one step of the Markov chain starting from distribution π, we get back the same distribution π. This is a **fixed point** of the transition operator.
 
-**Symbol Explanation (符号说明)**:
-- $\pi_j$: probability of being in state $j$ under the stationary distribution
-- $\pi_i$: probability of being in state $i$ under the stationary distribution
-- $p_{ij}$: transition probability from state $i$ to state $j$
-- $\sum_{i \in \mathcal{S}}$: sum over all states $i$ in the state space
-- $\pi = \pi \mathbf{P}$: row vector $\pi$ multiplied by matrix $\mathbf{P}$ equals $\pi$ itself
+方程 π = πP 意味着如果我们从分布π出发，应用马尔可夫链的一步转移，我们得到相同的分布π。这是转移算子的一个**不动点**。
 
-**Important Note**: The condition $\pi = \pi \mathbf{P}$ means $\pi$ is a **left eigenvector (左特征向量)** of $\mathbf{P}$ with eigenvalue 1.
+**Important note / 重要说明：** The Markov chain (Xₙ) itself keeps moving — individual trajectories change. But the **distribution** of where the chain is at any time remains the same. Think of it this way: if we started a thousand Markov chains, choosing each starting position to be i with probability πᵢ, then (roughly) 1000πⱼ of them would be in state j at any time in the future — but not necessarily the same ones each time.
 
-#### Motivating Example: Two-State Broken Printer (双态故障打印机)
+马尔可夫链(Xₙ)本身一直在移动——单个轨迹在变化。但链在任何时刻所处位置的**分布**保持不变。可以这样理解：如果我们启动一千条马尔可夫链，每条链的起始位置以概率πᵢ选择为i，那么在未来任何时刻，大约有1000πⱼ条链处于状态j——但不一定是同一些链。
 
-Consider the two-state Markov chain from Lecture 4 with transition diagram:
+#### Verification of the Two-State Example / 验证两状态例子
 
-```
-        α
-    0 ←----→ 1
-    ↑       ↑
-    |       |
-    1-α    1-β
-    |       |
-    +-------+
-```
+Let's verify that the distribution π₀ = β/(α+β), π₁ = α/(α+β) is indeed stationary for the broken printer chain.
 
-**Transition Matrix**:
-$$\mathbf{P} = \begin{pmatrix} 1-\alpha & \alpha \\ \beta & 1-\beta \end{pmatrix}$$
+**Step 1: Compute ℙ(X₁ = 0) / 计算ℙ(X₁ = 0)**
 
-**Initial Distribution** (from Problem Sheet 3, Question 3):
-$$\lambda_0 = \mathbb{P}(X_0 = 0) = \frac{\beta}{\alpha + \beta}, \quad \lambda_1 = \mathbb{P}(X_0 = 1) = \frac{\alpha}{\alpha + \beta}$$
+$$ \mathbb{P}(X_1 = 0) = \lambda_0 p_{00} + \lambda_1 p_{10} = \frac{\beta}{\alpha+\beta}(1-\alpha) + \frac{\alpha}{\alpha+\beta}\beta = \frac{\beta}{\alpha+\beta} $$
 
-**Check after one step**:
-By conditioning on the initial state:
-$$\mathbb{P}(X_1 = 0) = \lambda_0 p_{00} + \lambda_1 p_{10} = \frac{\beta}{\alpha+\beta}(1-\alpha) + \frac{\alpha}{\alpha+\beta}\beta = \frac{\beta}{\alpha+\beta}$$
+**Step 2: Compute ℙ(X₁ = 1) / 计算ℙ(X₁ = 1)**
 
-$$\mathbb{P}(X_1 = 1) = \lambda_0 p_{01} + \lambda_1 p_{11} = \frac{\beta}{\alpha+\beta}\alpha + \frac{\alpha}{\alpha+\beta}(1-\beta) = \frac{\alpha}{\alpha+\beta}$$
+$$ \mathbb{P}(X_1 = 1) = \lambda_0 p_{01} + \lambda_1 p_{11} = \frac{\beta}{\alpha+\beta}\alpha + \frac{\alpha}{\alpha+\beta}(1-\beta) = \frac{\alpha}{\alpha+\beta} $$
 
-**Result**: The distribution after step 1 is exactly the same as the initial distribution! By repeating the calculation, it stays the same after step 2, step 3, and forever.
-
-**Interpretation**: If we start 1000 chains with $\frac{\beta}{\alpha+\beta} \times 1000$ in state 0 and $\frac{\alpha}{\alpha+\beta} \times 1000$ in state 1, then at any future time, approximately $\frac{\beta}{\alpha+\beta} \times 1000$ chains will be in state 0 and $\frac{\alpha}{\alpha+\beta} \times 1000$ in state 1 - but **not necessarily the same individual chains** each time.
+The distribution after step 1 is exactly the same as the initial distribution. By repeating the same calculation, it stays the same forever.
 
 ---
 
-### Topic 2: Finding a Stationary Distribution (寻找平稳分布)
+### Topic 2: Finding a Stationary Distribution / 求解平稳分布
 
-#### Intuition / 直觉理解
+#### The Three-Step Method / 三步法
 
-Finding a stationary distribution means solving the system of equations $\pi = \pi \mathbf{P}$. This is a system of linear equations where the unknowns are the $\pi_i$ values. However, because $\pi$ must sum to 1, we have one extra equation (the normalizing condition) that helps us determine the exact values.
+**中文解释：** 求解平稳分布的核心是解方程 π = πP，同时满足归一化条件 ∑πᵢ = 1。我们使用一个系统化的三步法。
 
-**Key Observation**: The equation $\pi = \pi \mathbf{P}$ always gives one **redundant equation (冗余方程)** - meaning there are only $|\mathcal{S}| - 1$ independent equations from the matrix equation, plus the normalizing condition gives the $|\mathcal{S}|$-th equation.
+**English explanation:** The core of finding a stationary distribution is solving the equation π = πP while satisfying the normalization condition ∑πᵢ = 1. We use a systematic three-step method.
 
-#### The Three-Step Method (三步法)
+**Method Summary / 方法总结：**
 
-**Step 1**: Write out $\pi = \pi \mathbf{P}$ coordinate by coordinate. Discard one of the equations.
+1. **Write out equations / 写出方程**: Write π = πP coordinate by coordinate. Discard one equation (since π = πP always gives one more equation than needed).
+2. **Solve in terms of working variable / 用工作变量求解**: Select one πᵢ as a working variable (parameter). Solve the remaining equations in terms of this variable.
+3. **Normalize / 归一化**: Substitute the solution into the normalization condition ∑πᵢ = 1 to find the working variable, and hence the full solution.
 
-**Step 2**: Select one of the $\pi_i$ as a **working variable (工作变量)** and treat it as a parameter. Solve the remaining equations in terms of this working variable.
+**Optional check / 可选检查**: Use the discarded equation to verify the solution.
 
-**Step 3**: Substitute the solution into the normalizing condition $\sum_i \pi_i = 1$ to find the working variable, and hence the full solution.
+#### Worked Example 1: No-Claims Discount Chain / 例题1：无索赔折扣链
 
-**Optional Check**: Use the discarded equation to verify your answer.
+Consider the no-claims discount Markov chain with state space 𝒮 = {1, 2, 3} and transition matrix:
 
-#### Worked Example 1: No-Claims Discount Chain (无索赔折扣链)
+$$ P = $$
+\begin{pmatrix} \frac{1}{4} & \frac{3}{4} & 0 \\ \frac{1}{4} & 0 & \frac{3}{4} \\ 0 & \frac{1}{4} & \frac{3}{4} \end{pmatrix}
+$$ $$
 
-Consider the no-claims discount Markov chain from Lecture 5 with state space $\mathcal{S} = \{1, 2, 3\}$ and transition matrix:
+**Step 1: Write out equations / 写出方程**
 
-$$\mathbf{P} = \begin{pmatrix}
-\frac{1}{4} & \frac{3}{4} & 0 \\
-\frac{1}{4} & 0 & \frac{3}{4} \\
-0 & \frac{1}{4} & \frac{3}{4}
-\end{pmatrix}$$
+$$ \pi = \pi P \implies (\pi_1, \pi_2, \pi_3) = (\pi_1, \pi_2, \pi_3) $$
+\begin{pmatrix} \frac{1}{4} & \frac{3}{4} & 0 \\ \frac{1}{4} & 0 & \frac{3}{4} \\ 0 & \frac{1}{4} & \frac{3}{4} \end{pmatrix}
+$$ $$
 
-**Step 1**: Write $\pi = \pi \mathbf{P}$ coordinate-wise:
+Coordinate-wise / 按坐标写出：
 
-$$\pi_1 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_2$$
-$$\pi_2 = \frac{3}{4}\pi_1 + \frac{1}{4}\pi_3$$
-$$\pi_3 = \frac{3}{4}\pi_2 + \frac{3}{4}\pi_3$$
+$$ \pi_1 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_2 $$
+$$ \pi_2 = \frac{3}{4}\pi_1 + \frac{1}{4}\pi_3 $$
+$$ \pi_3 = \frac{3}{4}\pi_2 + \frac{3}{4}\pi_3 $$
 
-We also have the normalizing condition:
-$$\pi_1 + \pi_2 + \pi_3 = 1$$
+We also have the normalization condition / 还有归一化条件：
+$$ \pi_1 + \pi_2 + \pi_3 = 1 $$
 
-**Step 2**: Choose $\pi_2$ as our working variable. Discard the second equation (we can discard any one).
+**Step 2: Solve in terms of working variable / 用工作变量求解**
 
-From the first equation:
-$$\pi_1 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_2$$
-$$\pi_1 - \frac{1}{4}\pi_1 = \frac{1}{4}\pi_2$$
-$$\frac{3}{4}\pi_1 = \frac{1}{4}\pi_2$$
-$$\pi_1 = \frac{1}{3}\pi_2$$
+Choose π₂ as the working variable. Discard the second equation (we have one too many).
 
-From the third equation:
-$$\pi_3 = \frac{3}{4}\pi_2 + \frac{3}{4}\pi_3$$
-$$\pi_3 - \frac{3}{4}\pi_3 = \frac{3}{4}\pi_2$$
-$$\frac{1}{4}\pi_3 = \frac{3}{4}\pi_2$$
-$$\pi_3 = 3\pi_2$$
+From the first equation / 从第一个方程：
+$$ \pi_1 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_2 \implies \frac{3}{4}\pi_1 = \frac{1}{4}\pi_2 \implies \pi_1 = \frac{1}{3}\pi_2 $$
 
-So we have:
-$$\pi_1 = \frac{1}{3}\pi_2, \quad \pi_3 = 3\pi_2$$
+From the third equation / 从第三个方程：
+$$ \pi_3 = \frac{3}{4}\pi_2 + \frac{3}{4}\pi_3 \implies \frac{1}{4}\pi_3 = \frac{3}{4}\pi_2 \implies \pi_3 = 3\pi_2 $$
 
-**Step 3**: Substitute into the normalizing condition:
-$$\pi_1 + \pi_2 + \pi_3 = \frac{1}{3}\pi_2 + \pi_2 + 3\pi_2 = \frac{13}{3}\pi_2 = 1$$
+So we have / 所以我们得到：
+$$ \pi_1 = \frac{1}{3}\pi_2, \quad \pi_3 = 3\pi_2 $$
 
-Therefore:
-$$\pi_2 = \frac{3}{13}$$
+**Step 3: Normalize / 归一化**
 
-Substituting back:
-$$\pi_1 = \frac{1}{3} \times \frac{3}{13} = \frac{1}{13}$$
-$$\pi_3 = 3 \times \frac{3}{13} = \frac{9}{13}$$
+$$ \pi_1 + \pi_2 + \pi_3 = \frac{1}{3}\pi_2 + \pi_2 + 3\pi_2 = \frac{13}{3}\pi_2 = 1 $$
 
-**Solution**:
-$$\pi = \left(\frac{1}{13}, \frac{3}{13}, \frac{9}{13}\right)$$
+Therefore / 因此：
+$$ \pi_2 = \frac{3}{13} $$
 
-**Check using discarded second equation**:
-$$\pi_2 = \frac{3}{4}\pi_1 + \frac{1}{4}\pi_3 = \frac{3}{4} \times \frac{1}{13} + \frac{1}{4} \times \frac{9}{13} = \frac{3}{52} + \frac{9}{52} = \frac{12}{52} = \frac{3}{13}$$
-✓ Correct!
+Substituting back / 代回：
+$$ \pi_1 = \frac{1}{3} \cdot \frac{3}{13} = \frac{1}{13}, \quad \pi_3 = 3 \cdot \frac{3}{13} = \frac{9}{13} $$
 
-#### Worked Example 2 (Example 9.1 from text)
+**Solution / 解：**
+$$ \pi = \left(\frac{1}{13}, \frac{3}{13}, \frac{9}{13}\right) $$
 
-Consider a Markov chain on state space $\mathcal{S} = \{1, 2, 3\}$ with transition matrix:
+**Check / 验证：** Using the discarded second equation / 使用被丢弃的第二个方程：
+$$ \pi_2 = \frac{3}{4}\pi_1 + \frac{1}{4}\pi_3 = \frac{3}{4} \cdot \frac{1}{13} + \frac{1}{4} \cdot \frac{9}{13} = \frac{3}{52} + \frac{9}{52} = \frac{12}{52} = \frac{3}{13} $$
+✓ Correct / 正确！
 
-$$\mathbf{P} = \begin{pmatrix}
-\frac{1}{2} & \frac{1}{4} & \frac{1}{4} \\
-\frac{1}{4} & \frac{1}{2} & \frac{1}{4} \\
-0 & \frac{1}{4} & \frac{3}{4}
-\end{pmatrix}$$
+#### Worked Example 2 (Example 9.1) / 例题2（例9.1）
 
-**Step 1**: Write $\pi = \pi \mathbf{P}$ coordinate-wise:
+Consider a Markov chain on state space 𝒮 = {1, 2, 3} with transition matrix:
 
-$$\pi_1 = \frac{1}{2}\pi_1 + \frac{1}{4}\pi_2$$
-$$\pi_2 = \frac{1}{4}\pi_1 + \frac{1}{2}\pi_2 + \frac{1}{4}\pi_3$$
-$$\pi_3 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_2 + \frac{3}{4}\pi_3$$
+$$ P = $$
+\begin{pmatrix} \frac{1}{2} & \frac{1}{4} & \frac{1}{4} \\ \frac{1}{4} & \frac{1}{2} & \frac{1}{4} \\ 0 & \frac{1}{4} & \frac{3}{4} \end{pmatrix}
+$$ $$
 
-We choose to discard the third equation.
+**Step 1: Write out equations / 写出方程**
 
-**Step 2**: Choose $\pi_1$ as our working variable.
+$$ \pi_1 = \frac{1}{2}\pi_1 + \frac{1}{4}\pi_2 $$
+$$ \pi_2 = \frac{1}{4}\pi_1 + \frac{1}{2}\pi_2 + \frac{1}{4}\pi_3 $$
+$$ \pi_3 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_2 + \frac{3}{4}\pi_3 $$
 
-From the first equation:
-$$\pi_1 = \frac{1}{2}\pi_1 + \frac{1}{4}\pi_2$$
-$$\pi_1 - \frac{1}{2}\pi_1 = \frac{1}{4}\pi_2$$
-$$\frac{1}{2}\pi_1 = \frac{1}{4}\pi_2$$
-$$\pi_2 = 2\pi_1$$
+We choose to discard the third equation / 我们选择丢弃第三个方程。
 
-From the second equation:
-$$\pi_2 = \frac{1}{4}\pi_1 + \frac{1}{2}\pi_2 + \frac{1}{4}\pi_3$$
-Substitute $\pi_2 = 2\pi_1$:
-$$2\pi_1 = \frac{1}{4}\pi_1 + \frac{1}{2}(2\pi_1) + \frac{1}{4}\pi_3$$
-$$2\pi_1 = \frac{1}{4}\pi_1 + \pi_1 + \frac{1}{4}\pi_3$$
-$$2\pi_1 = \frac{5}{4}\pi_1 + \frac{1}{4}\pi_3$$
-$$2\pi_1 - \frac{5}{4}\pi_1 = \frac{1}{4}\pi_3$$
-$$\frac{3}{4}\pi_1 = \frac{1}{4}\pi_3$$
-$$\pi_3 = 3\pi_1$$
+**Step 2: Solve in terms of working variable / 用工作变量求解**
 
-So we have:
-$$\pi_2 = 2\pi_1, \quad \pi_3 = 3\pi_1$$
+Choose π₁ as the working variable / 选择π₁作为工作变量。
 
-**Step 3**: Normalizing condition:
-$$\pi_1 + \pi_2 + \pi_3 = \pi_1 + 2\pi_1 + 3\pi_1 = 6\pi_1 = 1$$
+From the first equation / 从第一个方程：
+$$ \pi_1 = \frac{1}{2}\pi_1 + \frac{1}{4}\pi_2 \implies \frac{1}{2}\pi_1 = \frac{1}{4}\pi_2 \implies \pi_2 = 2\pi_1 $$
 
-Therefore:
-$$\pi_1 = \frac{1}{6}$$
+From the second equation / 从第二个方程：
+$$ \pi_2 = \frac{1}{4}\pi_1 + \frac{1}{2}\pi_2 + \frac{1}{4}\pi_3 $$
+$$ \implies \pi_2 - \frac{1}{2}\pi_2 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_3 $$
+$$ \implies \frac{1}{2}\pi_2 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_3 $$
+$$ \implies 2\pi_2 = \pi_1 + \pi_3 $$
+$$ \implies \pi_3 = 2\pi_2 - \pi_1 $$
 
-Substituting back:
-$$\pi_2 = 2 \times \frac{1}{6} = \frac{1}{3}$$
-$$\pi_3 = 3 \times \frac{1}{6} = \frac{1}{2}$$
+Substituting π₂ = 2π₁ / 代入π₂ = 2π₁：
+$$ \pi_3 = 2(2\pi_1) - \pi_1 = 4\pi_1 - \pi_1 = 3\pi_1 $$
 
-**Solution**:
-$$\pi = \left(\frac{1}{6}, \frac{1}{3}, \frac{1}{2}\right)$$
+So we have / 所以我们得到：
+$$ \pi_2 = 2\pi_1, \quad \pi_3 = 3\pi_1 $$
 
-**Check using discarded third equation**:
-$$\pi_3 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_2 + \frac{3}{4}\pi_3 = \frac{1}{4} \times \frac{1}{6} + \frac{1}{4} \times \frac{1}{3} + \frac{3}{4} \times \frac{1}{2}$$
-$$= \frac{1}{24} + \frac{2}{24} + \frac{9}{24} = \frac{12}{24} = \frac{1}{2}$$
-✓ Correct!
+**Step 3: Normalize / 归一化**
+
+$$ \pi_1 + \pi_2 + \pi_3 = \pi_1 + 2\pi_1 + 3\pi_1 = 6\pi_1 = 1 $$
+
+Therefore / 因此：
+$$ \pi_1 = \frac{1}{6} $$
+
+Substituting back / 代回：
+$$ \pi_2 = 2 \cdot \frac{1}{6} = \frac{1}{3}, \quad \pi_3 = 3 \cdot \frac{1}{6} = \frac{1}{2} $$
+
+**Solution / 解：**
+$$ \pi = \left(\frac{1}{6}, \frac{1}{3}, \frac{1}{2}\right) $$
+
+**Check / 验证：** Using the discarded third equation / 使用被丢弃的第三个方程：
+$$ \pi_3 = \frac{1}{4}\pi_1 + \frac{1}{4}\pi_2 + \frac{3}{4}\pi_3 = \frac{1}{4} \cdot \frac{1}{6} + \frac{1}{4} \cdot \frac{1}{3} + \frac{3}{4} \cdot \frac{1}{2} = \frac{1}{24} + \frac{2}{24} + \frac{9}{24} = \frac{12}{24} = \frac{1}{2} $$
+✓ Correct / 正确！
 
 ---
 
-### Topic 3: Existence and Uniqueness (存在性与唯一性)
+### Topic 3: Existence and Uniqueness / 存在性和唯一性
 
-#### Intuition / 直觉理解
+#### Theorem 9.1: The Fundamental Theorem / 基本定理
 
-Not every Markov chain has a stationary distribution, and some have many. The key factors are:
+**中文解释：** 这个定理是本章的核心。它告诉我们什么时候平稳分布存在，以及是否唯一。关键在于链的不可约性和正常返性。
 
-1. **Irreducibility (不可约性)**: Can we reach any state from any other state?
-2. **Positive recurrence (正常返性)**: Is the expected return time to each state finite?
+**English explanation:** This theorem is the core of this chapter. It tells us when a stationary distribution exists and whether it is unique. The key lies in the chain's irreducibility and positive recurrence.
 
-**Analogy**: Think of a stationary distribution as the "equilibrium" of a physical system. Some systems reach a unique equilibrium (irreducible, positive recurrent), some never settle down (transient/null recurrent), and some have multiple possible equilibria depending on initial conditions (multiple closed classes).
+**Theorem 9.1.** Consider an irreducible Markov chain.
 
-#### Theorem 9.1: Existence and Uniqueness Theorem
+- **If the Markov chain is positive recurrent**, then a stationary distribution π exists, is unique, and is given by πᵢ = 1/μᵢ, where μᵢ is the expected return time to state i.
+  
+  **如果马尔可夫链是正常返的**，那么平稳分布π存在、唯一，且由πᵢ = 1/μᵢ给出，其中μᵢ是返回状态i的期望时间。
 
-**Theorem 9.1**: Consider an **irreducible (不可约)** Markov chain.
+- **If the Markov chain is null recurrent or transient**, then no stationary distribution exists.
+  
+  **如果马尔可夫链是零常返或瞬时性的**，那么不存在平稳分布。
 
-- **If the Markov chain is positive recurrent (正常返)**: Then a stationary distribution $\pi$ exists, is **unique**, and is given by:
-  $$\pi_i = \frac{1}{\mu_i}$$
-  where $\mu_i$ is the **expected return time (期望返回时间)** to state $i$.
+**Symbol explanation / 符号说明：**
 
-- **If the Markov chain is null recurrent (零常返) or transient (瞬时)**: Then **no stationary distribution** exists.
+| Symbol | Meaning (English) | 含义（中文） |
+|--------|-------------------|--------------|
+| πᵢ | Stationary probability of state i | 状态i的平稳概率 |
+| μᵢ | Expected return time to state i | 返回状态i的期望时间 |
+| 1/μᵢ | Reciprocal of expected return time | 期望返回时间的倒数 |
 
-**Symbol Explanation**:
-- $\pi_i$: stationary probability of state $i$
-- $\mu_i = \mathbb{E}[\text{return time to state } i \mid X_0 = i]$: expected number of steps to return to state $i$
+**Key implications / 关键含义：**
 
-#### Application to No-Claims Discount Example
+1. **For finite irreducible chains / 对于有限不可约链**: All finite irreducible Markov chains are positive recurrent, so they always have a unique stationary distribution. / 所有有限不可约马尔可夫链都是正常返的，所以它们总是有唯一的平稳分布。
 
-The no-claims discount chain is:
-- **Irreducible**: All states communicate (you can go from any discount level to any other)
-- **Finite state space**: All finite irreducible chains are positive recurrent
+2. **For infinite irreducible chains / 对于无限不可约链**: The stationary distribution may or may not exist, depending on whether the chain is positive recurrent. / 平稳分布可能存在也可能不存在，取决于链是否正常返。
 
-Therefore, the stationary distribution $\pi = (\frac{1}{13}, \frac{3}{13}, \frac{9}{13})$ is **unique**.
+3. **Relationship with expected return times / 与期望返回时间的关系**: Once we have π, we get μᵢ = 1/πᵢ for free. / 一旦我们得到π，就可以直接得到μᵢ = 1/πᵢ。
 
-From $\pi_i = 1/\mu_i$, we get the expected return times:
-- $\mu_1 = 1/\pi_1 = 13$ steps
-- $\mu_2 = 1/\pi_2 = 13/3 \approx 4.33$ steps
-- $\mu_3 = 1/\pi_3 = 13/9 \approx 1.44$ steps
+#### Example: No-Claims Discount Chain / 例子：无索赔折扣链
 
-#### What If the Chain Is Not Irreducible?
+**中文解释：** 在我们的无索赔折扣链例子中，链是有限的且不可约的，因此它是正常返的。根据定理，存在唯一的平稳分布，我们已求出为π = (1/13, 3/13, 9/13)。由此我们可以直接得到期望返回时间：
+- μ₁ = 1/π₁ = 13
+- μ₂ = 1/π₂ = 13/3 ≈ 4.33
+- μ₃ = 1/π₃ = 13/9 ≈ 1.44
 
-If the Markov chain has **more than one communicating class (通信类)**:
+**English explanation:** In our no-claims discount chain example, the chain is finite and irreducible, so it is positive recurrent. By the theorem, a unique stationary distribution exists, which we found to be π = (1/13, 3/13, 9/13). From this we can directly obtain the expected return times:
+- μ₁ = 1/π₁ = 13
+- μ₂ = 1/π₂ = 13/3 ≈ 4.33
+- μ₃ = 1/π₃ = 13/9 ≈ 1.44
 
-| Scenario | Result |
-|----------|--------|
-| **No positive recurrent classes** | No stationary distribution exists |
-| **Exactly one positive recurrent class** | Unique stationary distribution, supported only on that closed class |
-| **Multiple positive recurrent classes** | Infinitely many stationary distributions exist |
+#### Example 9.2: Simple Random Walk / 例9.2：简单随机游走
 
-#### Example 9.2: Simple Random Walk (简单随机游走)
+**中文解释：** 考虑简单随机游走，其中p ≠ 0, 1。这个链是不可约的。当p = 1/2时，它是零常返的；当p ≠ 1/2时，它是瞬时性的。无论哪种情况，定理告诉我们：不存在平稳分布。
 
-Consider the simple random walk with $p \neq 0, 1$:
-- This chain is **irreducible**
-- For $p = \frac{1}{2}$: **null recurrent** (expected return time is infinite)
-- For $p \neq \frac{1}{2}$: **transient** (probability of return is less than 1)
+**English explanation:** Consider the simple random walk with p ≠ 0, 1. This chain is irreducible. When p = 1/2, it is null recurrent; when p ≠ 1/2, it is transient. In either case, the theorem tells us: no stationary distribution exists.
 
-**Conclusion**: No stationary distribution exists for any $p \neq 0, 1$.
-
-#### Example 9.3: Chain with Two Closed Classes
+#### Example 9.3: Reducible Chain with Multiple Closed Classes / 例9.3：具有多个闭类的可约链
 
 Consider the Markov chain with transition matrix:
 
-$$\mathbf{P} = \begin{pmatrix}
-\frac{1}{2} & \frac{1}{2} & 0 & 0 \\
-\frac{1}{2} & \frac{1}{2} & 0 & 0 \\
-0 & 0 & \frac{1}{4} & \frac{3}{4} \\
-0 & 0 & \frac{1}{2} & \frac{1}{2}
-\end{pmatrix}$$
+$$ P = $$
+\begin{pmatrix} \frac{1}{2} & \frac{1}{2} & 0 & 0 \\ \frac{1}{2} & \frac{1}{2} & 0 & 0 \\ 0 & 0 & \frac{1}{4} & \frac{3}{4} \\ 0 & 0 & \frac{1}{2} & \frac{1}{2} \end{pmatrix}
+$$ $$
 
-This chain has **two closed positive recurrent classes**: $\{1, 2\}$ and $\{3, 4\}$.
+**中文解释：** 这个链有两个闭的正常返类：{1, 2}和{3, 4}。由于链不是不可约的，定理9.1不直接适用。我们需要分析这种情况。
 
-**Solving $\pi = \pi \mathbf{P}$**:
+**English explanation:** This chain has two closed positive recurrent classes: {1, 2} and {3, 4}. Since the chain is not irreducible, Theorem 9.1 does not directly apply. We need to analyze this situation.
 
-For states 1 and 2:
-$$\pi_1 = \frac{1}{2}\pi_1 + \frac{1}{2}\pi_2 \Rightarrow \pi_1 = \pi_2$$
-$$\pi_2 = \frac{1}{2}\pi_1 + \frac{1}{2}\pi_2 \Rightarrow \pi_1 = \pi_2$$
+**Solving π = πP / 求解π = πP：**
 
-For states 3 and 4:
-$$\pi_3 = \frac{1}{4}\pi_3 + \frac{1}{2}\pi_4 \Rightarrow 3\pi_3 = 2\pi_4$$
-$$\pi_4 = \frac{3}{4}\pi_3 + \frac{1}{2}\pi_4 \Rightarrow 3\pi_3 = 2\pi_4$$
+$$ \pi_1 = \frac{1}{2}\pi_1 + \frac{1}{2}\pi_2 \implies \pi_1 = \pi_2 $$
+$$ \pi_2 = \frac{1}{2}\pi_1 + \frac{1}{2}\pi_2 \implies \pi_1 = \pi_2 $$
+$$ \pi_3 = \frac{1}{4}\pi_3 + \frac{1}{2}\pi_4 \implies 3\pi_3 = 2\pi_4 $$
+$$ \pi_4 = \frac{3}{4}\pi_3 + \frac{1}{2}\pi_4 \implies 3\pi_3 = 2\pi_4 $$
 
-Normalizing condition:
-$$\pi_1 + \pi_2 + \pi_3 + \pi_4 = 1$$
+We also have the normalization condition / 还有归一化条件：
+$$ \pi_1 + \pi_2 + \pi_3 + \pi_4 = 1 $$
 
-Let $\pi_1 + \pi_2 = \alpha$ and $\pi_3 + \pi_4 = 1 - \alpha$, where $0 \leq \alpha \leq 1$.
+**中文解释：** 注意我们得到了相同的约束条件两次。设π₁ + π₂ = α和π₃ + π₄ = 1 - α，其中α ∈ [0, 1]是一个自由参数。那么：
 
-From $\pi_1 = \pi_2$: $\pi_1 = \pi_2 = \frac{\alpha}{2}$
-From $3\pi_3 = 2\pi_4$ and $\pi_3 + \pi_4 = 1 - \alpha$:
-$$\pi_3 = \frac{2}{5}(1-\alpha), \quad \pi_4 = \frac{3}{5}(1-\alpha)$$
+**English explanation:** Notice we get the same constraints twice. Let π₁ + π₂ = α and π₃ + π₄ = 1 - α, where α ∈ [0, 1] is a free parameter. Then:
 
-**General solution**:
-$$\pi = \left(\frac{\alpha}{2}, \frac{\alpha}{2}, \frac{2}{5}(1-\alpha), \frac{3}{5}(1-\alpha)\right)$$
+$$ \pi = \left(\frac{1}{2}\alpha, \frac{1}{2}\alpha, \frac{2}{5}(1-\alpha), \frac{3}{5}(1-\alpha)\right) $$
 
-for **any** $0 \leq \alpha \leq 1$.
+is a stationary distribution for any 0 ≤ α ≤ 1. So we have **infinitely many** stationary distributions!
 
-**Conclusion**: There are **infinitely many stationary distributions**, parameterized by $\alpha$.
+**中文解释：** 这意味着当链有多个正常返类时，我们可以将概率质量以任意比例分配到不同的类上，每个类内部再按照该类自身的平稳分布分配。这产生了无穷多个平稳分布。
+
+**English explanation:** This means that when the chain has multiple positive recurrent classes, we can distribute the probability mass in any proportion among the different classes, and within each class distribute according to that class's own stationary distribution. This yields infinitely many stationary distributions.
+
+#### Summary: Reducible Chains / 可约链总结
+
+**中文解释：** 对于非不可约（可约）的马尔可夫链，平稳分布的存在性和数量取决于正常返类的数量：
+
+**English explanation:** For non-irreducible (reducible) Markov chains, the existence and number of stationary distributions depend on the number of positive recurrent classes:
+
+| Scenario / 情况 | Result / 结果 |
+|-----------------|---------------|
+| No positive recurrent classes / 没有正常返类 | No stationary distribution / 无平稳分布 |
+| Exactly one positive recurrent class / 恰好一个正常返类 | Unique stationary distribution, supported only on that closed class / 唯一平稳分布，仅支撑在该闭类上 |
+| Multiple positive recurrent classes / 多个正常返类 | Infinitely many stationary distributions / 无穷多个平稳分布 |
 
 ---
 
-### Topic 4: Proof of Existence and Uniqueness (Optional, Non-Examinable)
+### Topic 4: Proof of Existence and Uniqueness (Optional) / 存在性和唯一性的证明（可选）
 
-#### Intuition / 直觉理解
+**中文解释：** 这一小节是可选且不考试的。但为了完整性，我们提供证明。证明分为两部分：存在性和唯一性。
 
-This proof shows why positive recurrent irreducible Markov chains have a unique stationary distribution. The key idea is to construct a **stationary vector** by counting expected visits to states before returning to a fixed starting state, then normalize by the expected return time.
+**English explanation:** This subsection is optional and not examinable. But for completeness, we provide the proof. The proof has two parts: existence and uniqueness.
 
-#### Existence Proof: Every Positive Recurrent Markov Chain Has a Stationary Distribution
-
-**Definition**: A **stationary vector (平稳向量)** $\nu$ satisfies $\nu \mathbf{P} = \nu$ but may not sum to 1.
-
-**Proof**:
-
-**Step 1**: Construct a stationary vector.
-
-Fix an initial state $k$. Let $\nu_i$ be the **expected number of visits to state $i$ before returning to state $k$**:
-
-$$\nu_i = \mathbb{E}\left[\sum_{n=1}^{M_k} \mathbb{1}_{\{X_n = i\}} \mid X_0 = k\right]$$
-
-where $M_k$ is the return time to state $k$ (from Section 7).
-
-This can be written as:
-$$\nu_i = \sum_{n=1}^{\infty} \mathbb{P}(X_n = i \text{ and } n \leq M_k \mid X_0 = k)$$
-
-**Note**: $\nu_k = 1$ because the only visit to $k$ is the return itself.
-
-**Step 2**: Show $\nu$ is a stationary vector.
-
-We need to show $\sum_i \nu_i p_{ij} = \nu_j$:
-
-$$\sum_{i \in \mathcal{S}} \nu_i p_{ij} = \sum_{i \in \mathcal{S}} \sum_{n=1}^{\infty} \mathbb{P}(X_n = i \text{ and } n \leq M_k \mid X_0 = k) p_{ij}$$
-
-$$= \sum_{n=1}^{\infty} \sum_{i \in \mathcal{S}} \mathbb{P}(X_n = i \text{ and } X_{n+1} = j \text{ and } n \leq M_k \mid X_0 = k)$$
-
-$$= \sum_{n=1}^{\infty} \mathbb{P}(X_{n+1} = j \text{ and } n \leq M_k \mid X_0 = k)$$
-
-(The exchange of sums is valid because recurrence means $M_k$ is finite with probability 1.)
-
-**Step 3**: Shift the time index.
-
-Instead of counting visits from time 1 to $M_k$, count from time 0 to $M_k - 1$:
-
-$$= \sum_{n=0}^{\infty} \mathbb{P}(X_{n+1} = j \text{ and } n \leq M_k - 1 \mid X_0 = k)$$
-
-$$= \sum_{n+1=1}^{\infty} \mathbb{P}(X_{n+1} = j \text{ and } n+1 \leq M_k \mid X_0 = k)$$
-
-$$= \sum_{n=1}^{\infty} \mathbb{P}(X_n = j \text{ and } n \leq M_k \mid X_0 = k) = \nu_j$$
-
-Therefore, $\nu$ is a stationary vector.
-
-**Step 4**: Normalize to get a stationary distribution.
-
-We need $\sum_i \nu_i$ to be finite. But $\sum_i \nu_i$ is the expected total number of visits to all states before return to $k$, which is exactly the expected return time $\mu_k$.
-
-Since the chain is **positive recurrent**, $\mu_k$ is finite. Therefore:
-
-$$\pi = \frac{1}{\mu_k} \nu$$
-
-is a stationary distribution (it sums to 1).
-
-#### Uniqueness Proof: For Irreducible, Positive Recurrent Chains, $\pi_i = 1/\mu_i$
-
-**Proof** (from Stirzaker, *Elementary Probability*, Section 9.5):
-
-**Step 1**: Recall equations from Section 7.
-
-For expected return time:
-$$\mu_k = 1 + \sum_j p_{kj} \eta_{jk} \quad \text{(Equation 6)}$$
-
-For expected hitting times (for $i \neq k$):
-$$\eta_{ik} = 1 + \sum_j p_{ij} \eta_{jk} \quad \text{(Equation 7)}$$
-
-where $\eta_{ik}$ is the expected time to hit state $k$ starting from state $i$.
-
-**Step 2**: Multiply Equation 7 by $\pi_i$ and sum over all $i \neq k$:
-
-$$\sum_{i \neq k} \pi_i \eta_{ik} = \sum_{i \neq k} \pi_i + \sum_j \sum_{i \neq k} \pi_i p_{ij} \eta_{jk}$$
-
-Note: $\eta_{kk} = 0$, so the left sum can be over all $i$.
-
-**Step 3**: Multiply Equation 6 by $\pi_k$:
-
-$$\pi_k \mu_k = \pi_k + \sum_j \pi_k p_{kj} \eta_{jk}$$
-
-**Step 4**: Add the two equations:
-
-$$\sum_i \pi_i \eta_{ik} + \pi_k \mu_k = \sum_i \pi_i + \sum_j \sum_i \pi_i p_{ij} \eta_{jk}$$
-
-**Step 5**: Use $\sum_i \pi_i p_{ij} = \pi_j$ (stationarity) and $\sum_i \pi_i = 1$:
-
-$$\sum_i \pi_i \eta_{ik} + \pi_k \mu_k = 1 + \sum_j \pi_j \eta_{jk}$$
-
-**Step 6**: The first term on the left and the last term on the right are equal:
-$$\sum_i \pi_i \eta_{ik} = \sum_j \pi_j \eta_{jk}$$
-
-Since the chain is irreducible and positive recurrent, these sums are finite (from
+#### Existence: Every Positive Recurrent Markov Chain Has a Stationary Distribution / 存在性：每个正常返马尔可夫链都有平稳

@@ -7,18 +7,25 @@ RAG 引擎 - 课程知识库的检索与生成核心
 import os
 import json
 import hashlib
+import re
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from openai import OpenAI
-from dotenv import load_dotenv
+from llm_client import get_client, call_llm, call_llm_with_prompts, call_llm_stream, call_llm_stream_with_prompts
 
 from config import (
     API_KEY, BASE_URL, MODEL_NAME,
     TOP_K, TEMPERATURE, MAX_TOKENS
 )
 
-load_dotenv()
+# 允许从项目根目录导入 prompts 模块
+import sys as _sys
+import os as _os
+_project_root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+if _project_root not in _sys.path:
+    _sys.path.insert(0, _project_root)
+
+from prompts.study_modes import get_study_prompt
 
 # 存储路径
 INDEX_FILE = "knowledge_index.json"
@@ -28,21 +35,26 @@ class CourseRAG:
     """基于课程课件的RAG问答系统（TF-IDF版）"""
 
     def __init__(self, index_path: str = INDEX_FILE):
-        # LLM客户端
-        self.client = OpenAI(
-            api_key=os.getenv("DEEPSEEK_API_KEY", API_KEY),
-            base_url=BASE_URL
-        )
-
         self.index_path = index_path
         self.courses = {}           # {course_code: {"name": ..., "chunks": [...]}}
         self.vectorizer = None      # TfidfVectorizer实例
         self.tfidf_matrix = None    # TF-IDF矩阵
         self.all_chunks = []        # 所有chunk的扁平列表
+        self.semantic = None        # SemanticSearch 实例（按需加载）
 
         # 如果已有索引文件，加载
         if os.path.exists(index_path):
             self._load_index()
+
+    def _init_semantic(self):
+        """按需加载语义搜索引擎（避免启动时强制依赖 chromadb）。"""
+        if self.semantic is None:
+            try:
+                from semantic_search import SemanticSearch
+                self.semantic = SemanticSearch()
+            except ImportError:
+                self.semantic = False  # 标记为不可用
+        return self.semantic if self.semantic else None
 
     # ================================================================
     # 索引持久化
@@ -95,7 +107,8 @@ class CourseRAG:
     # 索引管理
     # ================================================================
 
-    def add_chunks(self, course_code: str, course_name: str, chunks: list[dict]) -> int:
+    def add_chunks(self, course_code: str, course_name: str, chunks: list[dict],
+                   semantic: bool = False) -> int:
         """将分块后的文档添加到课程知识库。"""
         if course_code not in self.courses:
             self.courses[course_code] = {
@@ -111,9 +124,16 @@ class CourseRAG:
 
         print(f"[{course_code}] 已添加 {len(chunks)} 个文档块")
 
-        # 重建索引
+        # 重建 TF-IDF 索引
         self._rebuild_tfidf()
         self._save_index()
+
+        # 语义索引（如果可用）
+        if semantic:
+            sem = self._init_semantic()
+            if sem and sem.is_ready:
+                sem.add_chunks(course_code, chunks)
+
         return len(chunks)
 
     def list_courses(self) -> list[str]:
@@ -134,12 +154,26 @@ class CourseRAG:
     # ================================================================
 
     def search(self, query: str, course_code: str = None,
-               top_k: int = TOP_K) -> list[dict]:
+               top_k: int = TOP_K, use_semantic: bool = False) -> list[dict]:
         """
-        检索最相关的课程内容（TF-IDF + 余弦相似度）。
+        检索最相关的课程内容。
+
+        参数:
+            use_semantic: True 时使用 ChromaDB 语义搜索（需安装依赖），
+                          False 时使用 TF-IDF（零依赖，即时可用）
 
         返回: [{"content": "...", "metadata": {...}, "score": 0.95}, ...]
         """
+        # 尝试语义搜索
+        if use_semantic:
+            sem = self._init_semantic()
+            if sem and sem.is_ready:
+                results = sem.search(query, course_code=course_code, top_k=top_k)
+                if results:
+                    return results
+            # Fallback: 语义搜索不可用或结果为空
+
+        # TF-IDF 搜索（默认，零依赖）
         if not self.vectorizer or not self.all_chunks:
             return []
 
@@ -167,6 +201,8 @@ class CourseRAG:
                         "metadata": self.all_chunks[orig_idx]["metadata"],
                         "score": round(float(similarities[idx]), 4)
                     })
+            # 按页码排序，保持课件原始顺序
+            results.sort(key=lambda r: r["metadata"].get("page_start", r["metadata"].get("section", 999)))
             return results
         else:
             # 搜索全部课程
@@ -180,6 +216,8 @@ class CourseRAG:
                         "metadata": self.all_chunks[idx]["metadata"],
                         "score": round(float(similarities[idx]), 4)
                     })
+            # 按页码排序，保持课件原始顺序
+            results.sort(key=lambda r: r["metadata"].get("page_start", r["metadata"].get("section", 999)))
             return results
 
     # ================================================================
@@ -187,46 +225,44 @@ class CourseRAG:
     # ================================================================
 
     def ask(self, question: str, course_code: str = None,
-            mode: str = "concept", top_k: int = TOP_K) -> dict:
+            mode: str = "concept", top_k: int = TOP_K,
+            history: list[dict] = None) -> dict:
         """
         基于课程内容回答问题。
 
         参数:
             question: 用户问题
             course_code: 课程代码（可选）
-            mode: 回答模式 - "concept"概念解释 | "homework"作业引导 | "review"考前复习
+            mode: 回答模式 - "teach"|"concept"|"homework"|"review"|"coursework"
+            history: 对话历史 [{"role": "user/assistant", "content": "..."}]
 
         返回: {"answer": "...", "sources": [...], "mode": "..."}
         """
         # 1. 检索
         relevant_docs = self.search(question, course_code, top_k)
 
-        if not relevant_docs:
-            return {
-                "answer": "在课程资料中没有找到相关内容。请确认课程代码是否正确，或尝试换一种问法。",
-                "sources": [],
-                "mode": mode
-            }
-
-        # 2. 构建上下文
-        context_parts = []
-        for i, doc in enumerate(relevant_docs):
-            meta = doc["metadata"]
-            src_info = f"[来源{i+1}] "
-            if "course_name" in meta:
-                src_info += f"课程: {meta['course_name']}, "
-            if "section_title" in meta:
-                src_info += f"Section {meta['section']}: {meta['section_title']}"
-            elif "section" in meta:
-                src_info += f"Section {meta['section']}"
-            context_parts.append(f"{src_info}\n{doc['content']}")
-        context = "\n\n---\n\n".join(context_parts)
+        # 2. 构建上下文（即使检索为空也继续，让 LLM 自行判断）
+        if relevant_docs:
+            context_parts = []
+            for i, doc in enumerate(relevant_docs):
+                meta = doc["metadata"]
+                src_info = f"[来源{i+1}] "
+                if "course_name" in meta:
+                    src_info += f"课程: {meta['course_name']}, "
+                if "section_title" in meta:
+                    src_info += f"Section {meta.get('section', '?')}: {meta['section_title']}"
+                elif "section" in meta:
+                    src_info += f"Section {meta['section']}"
+                context_parts.append(f"{src_info}\n{doc['content']}")
+            context = "\n\n---\n\n".join(context_parts)
+        else:
+            context = "[未在课件中找到直接相关内容 / No directly relevant content found in course materials]"
 
         # 3. 根据模式选择System Prompt
         system_prompt = get_study_prompt(mode, context)
 
         # 4. 调用LLM
-        answer = self._call_llm(system_prompt, question)
+        answer = self._call_llm(system_prompt, question, history=history)
 
         # 5. 整理来源
         sources = []
@@ -245,124 +281,134 @@ class CourseRAG:
             "mode": mode
         }
 
-    def _call_llm(self, system_prompt: str, question: str) -> str:
-        """调用LLM生成回答。"""
-        try:
-            response = self.client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": question}
-                ],
-                temperature=TEMPERATURE,
-                max_tokens=MAX_TOKENS
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            return f"API调用失败: {e}"
+    def ask_stream(self, question: str, course_code: str = None,
+                   mode: str = "concept", top_k: int = TOP_K,
+                   history: list[dict] = None):
+        """
+        流式版本 ask() — 逐个 token yield。
+
+        先 yield ("meta", dict) 元数据，然后逐 ("token", str) yield 回答文本。
+        Yields:
+            ("meta", {"sources": [...], "mode": "..."})  — 元数据
+            ("token", str)                                 — 逐个 delta 文本
+        """
+        # 1. 检索
+        relevant_docs = self.search(question, course_code, top_k)
+
+        # 2. 构建上下文（即使检索为空也继续，让 LLM 自行判断）
+        if relevant_docs:
+            context_parts = []
+            for i, doc in enumerate(relevant_docs):
+                meta = doc["metadata"]
+                src_info = f"[来源{i+1}] "
+                if "course_name" in meta:
+                    src_info += f"课程: {meta['course_name']}, "
+                if "section_title" in meta:
+                    src_info += f"Section {meta.get('section', '?')}: {meta['section_title']}"
+                elif "section" in meta:
+                    src_info += f"Section {meta['section']}"
+                context_parts.append(f"{src_info}\n{doc['content']}")
+            context = "\n\n---\n\n".join(context_parts)
+        else:
+            context = "[未在课件中找到直接相关内容 / No directly relevant content found in course materials]"
+
+        # 3. 来源 metadata（用 tuple 区分，避免被前端当文本显示）
+        sources = []
+        for doc in relevant_docs:
+            meta = doc["metadata"]
+            sources.append({
+                "course": meta.get("course_name", ""),
+                "section": meta.get("section", ""),
+                "section_title": meta.get("section_title", ""),
+                "preview": doc["content"][:200]
+            })
+        yield ("meta", {"sources": sources, "mode": mode})
+
+        # 4. System prompt
+        system_prompt = get_study_prompt(mode, context)
+        messages = [{"role": "system", "content": system_prompt}]
+        if history:
+            for turn in history[-12:]:
+                messages.append({"role": turn["role"], "content": turn["content"]})
+        messages.append({"role": "user", "content": question})
+
+        # 5. 流式生成
+        for delta in call_llm_stream(
+            messages=messages,
+            temperature=TEMPERATURE,
+            max_tokens=MAX_TOKENS,
+        ):
+            yield ("token", delta)
 
 
-def get_study_prompt(mode: str, context: str) -> str:
-    """根据学习模式生成不同的System Prompt。"""
-    base = f"""You are a bilingual university tutor. You teach Chinese-speaking students who study abroad.
-Always provide BOTH Chinese explanation AND English terminology.
+def normalize_math_answer(answer: str) -> str:
+    """Clean up common raw TeX patterns before the browser renders Markdown."""
+    if not answer:
+        return answer
 
-Course materials for this question:
-{context}
+    answer = _convert_bare_bracket_math(answer)
+    answer = _wrap_standalone_math_lines(answer)
+    return answer
 
-Rules:
-1. Base your teaching on the provided course materials
-2. Cite sources (e.g. "In Section X of the lecture notes...")
-3. Always provide English technical terms alongside their Chinese translations
-4. Format: Key terms in "English (中文)" format
-"""
 
-    prompts = {
-        "teach": base + """
-【Self-Study Teaching Mode / 自学教学模式】
-You are a personal tutor teaching a self-studying student. They learn primarily from textbooks,
-not lectures. Your job is to TEACH, not just explain.
+def _convert_bare_bracket_math(text: str) -> str:
+    """Convert equation blocks written as bare [ ... ] into MathJax blocks."""
+    pattern = re.compile(r'(^|\n)\s*\[\s*\n([\s\S]*?)\n\s*\]\s*(?=\n|$)')
 
-Teaching structure:
-1. Learning Objectives (学习目标) - What will the student understand after this lesson?
-2. Prerequisites (前置知识) - What should they already know? Quick refresher.
-3. Core Teaching (核心内容):
-   a. INTUITION FIRST (先建立直觉) - Plain language, analogies, real-world motivation
-   b. Formal Definition (形式化定义) - The precise math, with every symbol explained
-   c. Key Properties/Results (关键性质/结论) - What follows from the definition?
-   d. Worked Example (详细例题) - Step-by-step, showing every calculation
-4. Common Pitfalls (常见误区) - What do students usually get wrong?
-5. Connection to Big Picture (知识关联) - How does this connect to other topics in the course?
-6. Self-Check Questions (自测题) - 2-3 small questions to verify understanding (with hints, not full answers)
-7. Key Takeaways (要点总结) - 3-5 bullet points in both languages
+    def repl(match):
+        prefix, body = match.group(1), match.group(2).strip()
+        if _looks_like_math(body):
+            return f"{prefix}\\[\n{body}\n\\]\n"
+        return match.group(0)
 
-Teaching principles:
-- Assume the student is seeing this for the first time
-- Build from concrete to abstract
-- Every formula must have each symbol explained
-- Use the course's own notation and terminology
-- Be encouraging and patient
-""",
+    return pattern.sub(repl, text)
 
-        "concept": base + """
-【Concept Explanation / 概念解释】
-- Give the core definition in one sentence, then elaborate
-- Provide the formal definition from the course with symbol explanations
-- Give concrete examples from the course materials
-- Connect to related concepts
-- English terms with Chinese explanations throughout
-""",
 
-        "homework": base + """
-【Assignment Guidance / 作业辅导】
-- DO NOT give the final answer directly
-- First identify which knowledge points the question tests
-- Review relevant theory and methods from the course
-- Give a solution framework with steps (not the final computation)
-- Warn about common mistakes and tricky points
-- If the student needs more hints, offer to go deeper step by step
-- English terms with Chinese explanations
-""",
+def _wrap_standalone_math_lines(text: str) -> str:
+    r"""Wrap raw equation lines such as X_n = X_0 + \sum... in display math."""
+    lines = text.splitlines()
+    output = []
+    in_fence = False
+    in_display_math = False
 
-        "review": base + """
-【Exam Review / 考前复习】
-- Summarize the knowledge framework (知识框架) of the relevant chapter
-- List all important definitions, theorems, and formulas
-- Explain logical connections between concepts
-- Point out common exam question types
-- Generate 2-3 self-test questions
-- Highlight what's most likely to appear on the exam
-- English terms with Chinese explanations
-""",
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            output.append(line)
+            continue
 
-        "coursework": base + """
-【Coursework Assistance / 课程作业辅助】
-You are helping a student with an open-ended coursework assignment.
-This is NOT a short homework problem — it's a multi-step project (data analysis + code + report).
+        if stripped in {"\\[", "$$"}:
+            in_display_math = True
+            output.append(line)
+            continue
+        if stripped in {"\\]", "$$"}:
+            in_display_math = False
+            output.append(line)
+            continue
 
-Guiding principles:
-- DO NOT write the complete report or full code for the student
-- DO break down the task into manageable steps
-- DO explain the reasoning behind methodological choices
-- DO provide code frameworks/templates (pseudocode or commented skeleton code)
-- DO suggest report structure and what to include in each section
-- DO point out which course sections are relevant for each step
+        if not in_fence and not in_display_math and _is_raw_equation_line(stripped):
+            output.append("\\[")
+            output.append(stripped)
+            output.append("\\]")
+        else:
+            output.append(line)
 
-When the student asks about:
-- "What does this requirement mean?" → Clarify and break it down
-- "How should I approach this?" → Give a step-by-step analysis plan
-- "How do I code X?" → Provide code framework with comments, explain each step
-- "How to structure my report?" → Give a detailed section-by-section outline
-- "How to interpret this result?" → Explain what to look for, common interpretations
-- "Is my approach correct?" → Evaluate and suggest improvements if needed
-- "I'm stuck on X" → Diagnose the issue, provide targeted hints
+    return "\n".join(output)
 
-Format: Give specific, actionable guidance. Reference course materials.
-English terms with Chinese explanations throughout.
-""",
-    }
 
-    return prompts.get(mode, prompts["teach"])
+def _is_raw_equation_line(line: str) -> bool:
+    if not line or line.startswith(("#", "-", "*", "|", ">", "\\(", "\\[")):
+        return False
+    if len(line) > 140:
+        return False
+    if re.search(r'\\(sum|prod|frac|sqrt|mathbb|mathbf|alpha|beta|gamma|lambda|pi|infty)', line):
+        return True
+    return bool(re.search(r'[A-Za-z]_\{?[A-Za-z0-9]+\}?\s*=', line))
+
+
+def _looks_like_math(text: str) -> bool:
+    return bool(re.search(r'\\[A-Za-z]+|[_^{}=+\-*/]|[A-Z]_\w', text))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+venv/
+env/
+
+# Course source PDFs may be copyrighted; keep generated notes/guides in Git.
+课程/**/*.pdf
+
+# Local generated stores/caches
+chroma_db/
+knowledge_index.json

@@ -1,353 +1,335 @@
 # Problem Sheet 3 - 详细解答 / Detailed Solutions
 
 > MATH2702 Stochastic Processes
-> 生成时间 / Generated: 2026-07-17 15:11
+> 生成时间 / Generated: 2026-07-20 16:02
 > 来源页 / Source Pages: 38-39
 
 ---
 
-好的，作为您的大学随机过程课程导师，我将为您提供这份习题集的完整、详细的逐步解答。
+好的，作为一名大学数学导师，我将为您提供MATH2702: 随机过程 习题集3的完整双语解答。
 
 ---
 
 ### Question 1 / 第1题
 
 **Problem / 题目原文:**
-Consider the two-state “broken printer” Markov chain, with state space 𝑆 = {0,1} , transition matrix
-P= (1−𝛼 𝛼
-𝛽 1−𝛽)
-with0 < 𝛼,𝛽 < 1 , and initial distribution 𝜆 = (𝜆0,𝜆1). W rite𝜇𝑛= ℙ(𝑋𝑛= 0) .
-(a) By writing 𝜇𝑛+1 in terms of 𝜇𝑛, show that we have
-𝜇𝑛+1−(1−(𝛼+𝛽))𝜇𝑛= 𝛽.
-(b) By solving this linear difference equation using the initial condition 𝜇0= 𝜆0, or otherwise, show that
-𝜇𝑛=𝛽
-𝛼+𝛽+(𝜆0−𝛽
-𝛼+𝛽)(1−(𝛼+𝛽))𝑛.
-Hint: Y ou have an expression for 𝜇𝑗+1 in terms of 𝜇𝑗that hold for any 𝑗 ≥ 1 which you can iterate (use
-over and over).
-(c) What, therefore, are lim𝑛→∞ℙ(𝑋𝑛= 0) and lim𝑛→∞ℙ(𝑋𝑛= 1) ?
-(d) Explain what happens if the Markov chain is started in the distribution
-𝜆0=𝛽
-𝛼+𝛽, 𝜆1=𝛼
-𝛼+𝛽.
+Consider the two-state “broken printer” Markov chain, with state space 𝑆= {0, 1}, transition matrix
+P = (1 −𝛼 𝛼; 𝛽 1 −𝛽) with 0 < 𝛼, 𝛽< 1, and initial distribution 𝜆= (𝜆0, 𝜆1). Write 𝜇𝑛= ℙ(𝑋𝑛= 0).
+(a) By writing 𝜇𝑛+1 in terms of 𝜇𝑛, show that we have 𝜇𝑛+1 −(1 −(𝛼+ 𝛽))𝜇𝑛= 𝛽.
+(b) By solving this linear difference equation using the initial condition 𝜇0 = 𝜆0, or otherwise, show that
+𝜇𝑛= 𝛽/(𝛼+ 𝛽) + (𝜆0 − 𝛽/(𝛼+ 𝛽)) (1 −(𝛼+ 𝛽))^𝑛.
+(c) What, therefore, are lim𝑛→∞ℙ(𝑋𝑛= 0) and lim𝑛→∞ℙ(𝑋𝑛= 1)?
+(d) Explain what happens if the Markov chain is started in the distribution 𝜆0 = 𝛽/(𝛼+ 𝛽), 𝜆1 = 𝛼/(𝛼+ 𝛽).
 
-**中文翻译:**
-考虑一个两状态的“坏打印机”马尔可夫链，其状态空间为 𝑆 = {0,1}，转移矩阵为
-P= (1−𝛼 𝛼
-𝛽 1−𝛽)
-其中 0 < 𝛼,𝛽 < 1，初始分布为 𝜆 = (𝜆0,𝜆1)。定义 𝜇𝑛= ℙ(𝑋𝑛= 0)。
-(a) 通过写出用 𝜇𝑛 表示的 𝜇𝑛+1 的表达式，证明我们有
-𝜇𝑛+1−(1−(𝛼+𝛽))𝜇𝑛= 𝛽。
-(b) 通过使用初始条件 𝜇0= 𝜆0 求解这个线性差分方程，或以其他方式，证明
-𝜇𝑛=𝛽/(𝛼+𝛽)+(𝜆0−𝛽/(𝛼+𝛽))(1−(𝛼+𝛽))^𝑛。
-提示：你有一个用 𝜇𝑗 表示 𝜇𝑗+1 的表达式，该表达式对任何 𝑗 ≥ 1 都成立，你可以对其进行迭代（反复使用）。
+**中文翻译 / Chinese Translation:**
+考虑一个两状态的“坏打印机”马尔可夫链，其状态空间为 𝑆 = {0, 1}，转移矩阵为
+P = (1 −𝛼 𝛼; 𝛽 1 −𝛽)，其中 0 < 𝛼, 𝛽< 1，初始分布为 𝜆= (𝜆0, 𝜆1)。定义 𝜇𝑛= ℙ(𝑋𝑛= 0)。
+(a) 通过写出 𝜇𝑛+1 关于 𝜇𝑛 的表达式，证明我们有 𝜇𝑛+1 −(1 −(𝛼+ 𝛽))𝜇𝑛= 𝛽。
+(b) 通过使用初始条件 𝜇0 = 𝜆0 求解这个线性差分方程，或以其他方式，证明
+𝜇𝑛= 𝛽/(𝛼+ 𝛽) + (𝜆0 − 𝛽/(𝛼+ 𝛽)) (1 −(𝛼+ 𝛽))^𝑛。
 (c) 因此，lim𝑛→∞ℙ(𝑋𝑛= 0) 和 lim𝑛→∞ℙ(𝑋𝑛= 1) 是什么？
-(d) 解释如果马尔可夫链以分布
-𝜆0=𝛽/(𝛼+𝛽), 𝜆1=𝛼/(𝛼+𝛽)
-开始时会发生什么。
+(d) 解释如果马尔可夫链以分布 𝜆0 = 𝛽/(𝛼+ 𝛽), 𝜆1 = 𝛼/(𝛼+ 𝛽) 启动，会发生什么。
 
 **Knowledge Points / 考查知识点:**
-- 马尔可夫链的定义和性质
-- 全概率公式 (Law of Total Probability)
-- 一阶线性差分方程的求解
-- 平稳分布的概念
-- 极限分布
+- 马尔可夫链的边际分布 / Marginal distribution of a Markov chain
+- 全概率公式 / Law of total probability
+- 一阶线性差分方程 / First-order linear difference equation
+- 平稳分布 / Stationary distribution
 
 **Step-by-Step Solution / 逐步解答:**
 
 **(a)**
 
-**Step 1: 建立 𝜇𝑛+1 的表达式。**
-我们想用 𝜇𝑛 = ℙ(𝑋𝑛 = 0) 来表示 𝜇𝑛+1 = ℙ(𝑋𝑛+1 = 0)。根据全概率公式，我们可以根据 𝑋𝑛 的状态来分解概率。
-**解释：** 为了找到在时间 n+1 处于状态 0 的概率，我们考虑所有可能从时间 n 到达该状态的路径。
-**数学推导：**
-𝜇𝑛+1 = ℙ(𝑋𝑛+1 = 0)
-     = ℙ(𝑋𝑛+1 = 0 | 𝑋𝑛 = 0)ℙ(𝑋𝑛 = 0) + ℙ(𝑋𝑛+1 = 0 | 𝑋𝑛 = 1)ℙ(𝑋𝑛 = 1)
-     = P_{00} * 𝜇𝑛 + P_{10} * (1 - 𝜇𝑛)
+**Step 1: 建立 𝜇𝑛+1 的表达式 / Establish the expression for 𝜇𝑛+1**
 
-**Step 2: 代入转移概率。**
-从转移矩阵 P 中，我们知道 P_{00} = 1 - 𝛼，P_{10} = 𝛽。
-**解释：** 这些是条件概率。P_{00} 是从状态 0 到状态 0 的概率，P_{10} 是从状态 1 到状态 0 的概率。
-**数学推导：**
-𝜇𝑛+1 = (1 - 𝛼)𝜇𝑛 + 𝛽(1 - 𝜇𝑛)
-     = (1 - 𝛼)𝜇𝑛 + 𝛽 - 𝛽𝜇𝑛
-     = (1 - 𝛼 - 𝛽)𝜇𝑛 + 𝛽
+**中文思路 / Chinese reasoning:**
+我们想找到 𝜇𝑛+1 = ℙ(𝑋𝑛+1 = 0) 与 𝜇𝑛 = ℙ(𝑋𝑛 = 0) 之间的关系。这可以通过在给定 𝑋𝑛 的状态下，对 𝑋𝑛+1 的状态应用全概率公式来实现。因为马尔可夫链的性质，𝑋𝑛+1 的概率只依赖于 𝑋𝑛。
 
-**Step 3: 整理方程。**
-将方程重新排列，使其与题目要求的形式一致。
-**解释：** 我们只需将项移到等式的另一边。
-**数学推导：**
-𝜇𝑛+1 = (1 - (𝛼 + 𝛽))𝜇𝑛 + 𝛽
-⇒ 𝜇𝑛+1 - (1 - (𝛼 + 𝛽))𝜇𝑛 = 𝛽
+**English reasoning:**
+We want to find a relationship between 𝜇𝑛+1 = ℙ(𝑋𝑛+1 = 0) and 𝜇𝑛 = ℙ(𝑋𝑛 = 0). This is done by applying the law of total probability to the state of 𝑋𝑛+1, conditioning on the state of 𝑋𝑛. Due to the Markov property, the probability of 𝑋𝑛+1 depends only on 𝑋𝑛.
 
-**中间结果：**
-我们已经证明了所需的关系。
+**计算过程 / Working:**
+根据全概率公式，我们有：
+𝜇𝑛+1 = ℙ(𝑋𝑛+1 = 0) = ℙ(𝑋𝑛+1 = 0 | 𝑋𝑛 = 0)ℙ(𝑋𝑛 = 0) + ℙ(𝑋𝑛+1 = 0 | 𝑋𝑛 = 1)ℙ(𝑋𝑛 = 1)
+
+**Explanation of working / 过程解释:**
+这里我们使用了全概率公式，将事件 {𝑋𝑛+1 = 0} 的概率分解为基于 𝑋𝑛 所有可能状态的加权和。权重是条件概率 ℙ(𝑋𝑛+1 = 0 | 𝑋𝑛 = i) 和边际概率 ℙ(𝑋𝑛 = i) 的乘积。ℙ(𝑋𝑛 = 1) 可以表示为 1 − 𝜇𝑛。
+
+**Step 2: 代入转移概率 / Substitute transition probabilities**
+
+**中文思路 / Chinese reasoning:**
+现在我们从转移矩阵 P 中读取条件概率。P 的第一行第一列元素是 ℙ(𝑋𝑛+1 = 0 | 𝑋𝑛 = 0) = 1 − 𝛼。P 的第二行第一列元素是 ℙ(𝑋𝑛+1 = 0 | 𝑋𝑛 = 1) = 𝛽。将这些值和 ℙ(𝑋𝑛 = 1) = 1 − 𝜇𝑛 代入方程。
+
+**English reasoning:**
+Now we read the conditional probabilities from the transition matrix P. The (1,1) entry is ℙ(𝑋𝑛+1 = 0 | 𝑋𝑛 = 0) = 1 − 𝛼. The (2,1) entry is ℙ(𝑋𝑛+1 = 0 | 𝑋𝑛 = 1) = 𝛽. Substitute these values and ℙ(𝑋𝑛 = 1) = 1 − 𝜇𝑛 into the equation.
+
+**计算过程 / Working:**
+代入后得到：
+𝜇𝑛+1 = (1 − 𝛼)𝜇𝑛 + 𝛽(1 − 𝜇𝑛)
+
+**Explanation of working / 过程解释:**
+这个方程直接来自于上一步的全概率公式。它表达了 𝜇𝑛+1 是 𝜇𝑛 的一个线性函数。
+
+**Step 3: 化简方程 / Simplify the equation**
+
+**中文思路 / Chinese reasoning:**
+我们展开并合并 𝜇𝑛 的项，以得到一个更简洁的线性差分方程形式。
+
+**English reasoning:**
+We expand and combine the terms involving 𝜇𝑛 to get a cleaner form of the linear difference equation.
+
+**计算过程 / Working:**
+𝜇𝑛+1 = (1 − 𝛼)𝜇𝑛 + 𝛽 − 𝛽𝜇𝑛
+𝜇𝑛+1 = 𝛽 + (1 − 𝛼 − 𝛽)𝜇𝑛
+𝜇𝑛+1 = 𝛽 + (1 − (𝛼 + 𝛽))𝜇𝑛
+
+**Explanation of working / 过程解释:**
+展开括号得到 (1−𝛼)𝜇𝑛 + 𝛽 − 𝛽𝜇𝑛。合并 𝜇𝑛 的系数：1−𝛼−𝛽 = 1−(𝛼+𝛽)。最后，将常数项 𝛽 移到左边，𝜇𝑛 项移到右边，得到所需的形式。
+
+**Step 4: 重写为所需形式 / Rewrite to the required form**
+
+**中文思路 / Chinese reasoning:**
+将上一步得到的方程稍作整理，将 𝜇𝑛+1 项和 𝜇𝑛 项放在等号左边，常数项放在右边。
+
+**English reasoning:**
+Rearrange the equation from the previous step to put the terms involving 𝜇𝑛+1 and 𝜇𝑛 on the left-hand side and the constant term on the right.
+
+**计算过程 / Working:**
+将 𝜇𝑛+1 = 𝛽 + (1 − (𝛼 + 𝛽))𝜇𝑛 移项，得到：
+𝜇𝑛+1 − (1 − (𝛼 + 𝛽))𝜇𝑛 = 𝛽
+
+**Explanation of working / 过程解释:**
+这完成了 (a) 部分的证明。我们展示了 𝜇𝑛+1 和 𝜇𝑛 满足这个一阶线性非齐次差分方程。
 
 **(b)**
 
-**Step 1: 识别差分方程。**
-我们有一个一阶线性非齐次差分方程：
-𝜇𝑛+1 - (1 - (𝛼 + 𝛽))𝜇𝑛 = 𝛽
-令 𝑎 = 1 - (𝛼 + 𝛽)，则方程为 𝜇𝑛+1 - 𝑎𝜇𝑛 = 𝛽。
+**Step 1: 识别差分方程类型 / Identify the type of difference equation**
 
-**Step 2: 求解齐次解 (Homogeneous Solution)。**
-齐次方程是 𝜇_{n+1}^{(h)} - 𝑎𝜇_n^{(h)} = 0。
-**解释：** 我们首先求解方程去掉常数项 𝛽 后的部分。
-**数学推导：**
-𝜇_{n+1}^{(h)} = 𝑎𝜇_n^{(h)}
-这是一个几何级数，其解为 𝜇_n^{(h)} = 𝐶 * 𝑎^n，其中 C 是待定常数。
+**中文思路 / Chinese reasoning:**
+我们有一个一阶线性非齐次差分方程：𝜇𝑛+1 − (1 − (𝛼 + 𝛽))𝜇𝑛 = 𝛽。解这个方程的标准方法是先找到齐次解，再找到一个特解，然后应用初始条件。
 
-**Step 3: 求解特解 (Particular Solution)。**
-由于非齐次项是常数 𝛽，我们尝试一个常数特解 𝜇_n^{(p)} = 𝐾。
-**解释：** 我们寻找一个满足完整方程的特定解。
-**数学推导：**
-将 𝜇_n^{(p)} = 𝐾 代入完整方程：
-𝐾 - 𝑎𝐾 = 𝛽
-𝐾(1 - 𝑎) = 𝛽
-𝐾 = 𝛽 / (1 - 𝑎)
-由于 𝑎 = 1 - (𝛼 + 𝛽)，所以 1 - 𝑎 = 𝛼 + 𝛽。
-因此，特解为 𝜇_n^{(p)} = 𝛽 / (𝛼 + 𝛽)。
+**English reasoning:**
+We have a first-order linear non-homogeneous difference equation: 𝜇𝑛+1 − (1 − (𝛼 + 𝛽))𝜇𝑛 = 𝛽. The standard method to solve this is to find the homogeneous solution, then a particular solution, and then apply the initial condition.
 
-**Step 4: 写出通解 (General Solution)。**
-通解是齐次解和特解的和。
-**解释：** 这是线性差分方程的标准解法。
-**数学推导：**
-𝜇𝑛 = 𝜇_n^{(h)} + 𝜇_n^{(p)}
-𝜇𝑛 = 𝐶 * 𝑎^n + 𝛽 / (𝛼 + 𝛽)
-𝜇𝑛 = 𝐶 * (1 - (𝛼 + 𝛽))^n + 𝛽 / (𝛼 + 𝛽)
+**Step 2: 求齐次解 / Find the homogeneous solution**
 
-**Step 5: 使用初始条件确定常数 C。**
-初始条件是 𝜇0 = ℙ(𝑋0 = 0) = 𝜆0。
-**解释：** 我们利用 n=0 时的已知概率来求解未知常数 C。
-**数学推导：**
-当 n = 0 时，𝜇0 = 𝐶 * (1 - (𝛼 + 𝛽))^0 + 𝛽 / (𝛼 + 𝛽)
-𝜆0 = 𝐶 * 1 + 𝛽 / (𝛼 + 𝛽)
-𝐶 = 𝜆0 - 𝛽 / (𝛼 + 𝛽)
+**中文思路 / Chinese reasoning:**
+首先考虑齐次方程：𝜇𝑛+1 − (1 − (𝛼 + 𝛽))𝜇𝑛 = 0。这是一个几何级数形式，其解为 𝜇𝑛^(h) = 𝐶(1 − (𝛼 + 𝛽))^𝑛，其中 𝐶 是常数。
 
-**Step 6: 写出最终解。**
-将 C 代回通解。
-**解释：** 这就得到了题目中给出的表达式。
-**数学推导：**
-𝜇𝑛 = (𝜆0 - 𝛽 / (𝛼 + 𝛽)) * (1 - (𝛼 + 𝛽))^n + 𝛽 / (𝛼 + 𝛽)
-重新排列项：
-𝜇𝑛 = 𝛽 / (𝛼 + 𝛽) + (𝜆0 - 𝛽 / (𝛼 + 𝛽)) * (1 - (𝛼 + 𝛽))^n
+**English reasoning:**
+First, consider the homogeneous equation: 𝜇𝑛+1 − (1 − (𝛼 + 𝛽))𝜇𝑛 = 0. This is a geometric progression, and its solution is of the form 𝜇𝑛^(h) = 𝐶(1 − (𝛼 + 𝛽))^𝑛, where 𝐶 is a constant.
 
-**中间结果：**
-我们已经证明了所需的表达式。
+**计算过程 / Working:**
+齐次方程：𝜇𝑛+1 = (1 − (𝛼 + 𝛽))𝜇𝑛
+解的形式：𝜇𝑛^(h) = 𝐶(1 − (𝛼 + 𝛽))^𝑛
+
+**Explanation of working / 过程解释:**
+齐次解描述了系统的“自然”动态，即没有外部“驱动”项 𝛽 时的行为。
+
+**Step 3: 求特解 / Find a particular solution**
+
+**中文思路 / Chinese reasoning:**
+由于非齐次项是常数 𝛽，我们尝试一个常数特解，设 𝜇𝑛^(p) = 𝐾。将其代入原非齐次方程，解出 𝐾。
+
+**English reasoning:**
+Since the non-homogeneous term is a constant 𝛽, we try a constant particular solution, let 𝜇𝑛^(p) = 𝐾. Substitute this into the original non-homogeneous equation to solve for 𝐾.
+
+**计算过程 / Working:**
+设 𝜇𝑛^(p) = 𝐾。代入 𝜇𝑛+1 − (1 − (𝛼 + 𝛽))𝜇𝑛 = 𝛽：
+𝐾 − (1 − (𝛼 + 𝛽))𝐾 = 𝛽
+𝐾(1 − 1 + (𝛼 + 𝛽)) = 𝛽
+𝐾(𝛼 + 𝛽) = 𝛽
+𝐾 = 𝛽/(𝛼 + 𝛽)
+
+**Explanation of working / 过程解释:**
+常数特解对应于系统的长期平衡或稳态行为，前提是它存在。
+
+**Step 4: 写出通解 / Write the general solution**
+
+**中文思路 / Chinese reasoning:**
+通解是齐次解和特解之和：𝜇𝑛 = 𝜇𝑛^(h) + 𝜇𝑛^(p)。
+
+**English reasoning:**
+The general solution is the sum of the homogeneous solution and the particular solution: 𝜇𝑛 = 𝜇𝑛^(h) + 𝜇𝑛^(p).
+
+**计算过程 / Working:**
+𝜇𝑛 = 𝐶(1 − (𝛼 + 𝛽))^𝑛 + 𝛽/(𝛼 + 𝛽)
+
+**Explanation of working / 过程解释:**
+这个通解包含了任意常数 𝐶，它由初始条件确定。
+
+**Step 5: 应用初始条件 / Apply the initial condition**
+
+**中文思路 / Chinese reasoning:**
+我们已知初始条件 𝜇0 = ℙ(𝑋0 = 0) = 𝜆0。将 𝑛 = 0 代入通解，解出常数 𝐶。
+
+**English reasoning:**
+We are given the initial condition 𝜇0 = ℙ(𝑋0 = 0) = 𝜆0. Substitute 𝑛 = 0 into the general solution to solve for the constant 𝐶.
+
+**计算过程 / Working:**
+当 𝑛 = 0 时：
+𝜇0 = 𝐶(1 − (𝛼 + 𝛽))^0 + 𝛽/(𝛼 + 𝛽)
+𝜆0 = 𝐶 + 𝛽/(𝛼 + 𝛽)
+𝐶 = 𝜆0 − 𝛽/(𝛼 + 𝛽)
+
+**Explanation of working / 过程解释:**
+因为 (1 − (𝛼 + 𝛽))^0 = 1，所以方程简化为 𝜆0 = 𝐶 + 𝛽/(𝛼 + 𝛽)。移项即可得到 𝐶 的值。
+
+**Step 6: 写出最终解 / Write the final solution**
+
+**中文思路 / Chinese reasoning:**
+将求得的常数 𝐶 代回通解，得到满足初始条件的特解。
+
+**English reasoning:**
+Substitute the found constant 𝐶 back into the general solution to obtain the particular solution that satisfies the initial condition.
+
+**计算过程 / Working:**
+𝜇𝑛 = (𝜆0 − 𝛽/(𝛼 + 𝛽)) (1 − (𝛼 + 𝛽))^𝑛 + 𝛽/(𝛼 + 𝛽)
+
+**Explanation of working / 过程解释:**
+这完成了 (b) 部分的证明。这个公式给出了在任意时间步 𝑛，链处于状态 0 的概率。
 
 **(c)**
 
-**Step 1: 计算 ℙ(𝑋𝑛=0) 的极限。**
-由于 0 < 𝛼, 𝛽 < 1，我们有 0 < 𝛼 + 𝛽 < 2。因此，|1 - (𝛼 + 𝛽)| < 1（除非 𝛼+𝛽=2，但这是不可能的，因为每个都小于1）。
-**解释：** 当 n 趋于无穷大时，任何绝对值小于 1 的数的 n 次幂都趋于 0。
-**数学推导：**
-lim_{n→∞} (1 - (𝛼 + 𝛽))^n = 0
-因此，
-lim_{n→∞} ℙ(𝑋𝑛 = 0) = lim_{n→∞} [𝛽 / (𝛼 + 𝛽) + (𝜆0 - 𝛽 / (𝛼 + 𝛽)) * (1 - (𝛼 + 𝛽))^n]
-                         = 𝛽 / (𝛼 + 𝛽) + (𝜆0 - 𝛽 / (𝛼 + 𝛽)) * 0
-                         = 𝛽 / (𝛼 + 𝛽)
+**Step 1: 求极限 / Find the limit**
 
-**Step 2: 计算 ℙ(𝑋𝑛=1) 的极限。**
-由于状态空间只有两个状态，概率之和为 1。
-**解释：** ℙ(𝑋𝑛 = 1) = 1 - ℙ(𝑋𝑛 = 0)。
-**数学推导：**
-lim_{n→∞} ℙ(𝑋𝑛 = 1) = 1 - lim_{n→∞} ℙ(𝑋𝑛 = 0)
-                         = 1 - 𝛽 / (𝛼 + 𝛽)
-                         = (𝛼 + 𝛽 - 𝛽) / (𝛼 + 𝛽)
-                         = 𝛼 / (𝛼 + 𝛽)
+**中文思路 / Chinese reasoning:**
+因为 0 < 𝛼, 𝛽 < 1，所以 0 < 𝛼 + 𝛽 < 2。因此，|1 − (𝛼 + 𝛽)| < 1 当且仅当 0 < 𝛼 + 𝛽 < 2。由于 𝛼, 𝛽 是正数且小于 1，它们的和可能小于 2，但我们需要检查是否可能大于 1。如果 𝛼 + 𝛽 > 1，那么 1 − (𝛼 + 𝛽) 是负数，但其绝对值仍小于 1。所以，当 𝑛 → ∞ 时，(1 − (𝛼 + 𝛽))^𝑛 → 0。
 
-**中间结果：**
-极限分布是 (𝛽/(𝛼+𝛽), 𝛼/(𝛼+𝛽))。
+**English reasoning:**
+Since 0 < 𝛼, 𝛽 < 1, we have 0 < 𝛼 + 𝛽 < 2. Therefore, |1 − (𝛼 + 𝛽)| < 1 if and only if 0 < 𝛼 + 𝛽 < 2. Since 𝛼, 𝛽 are positive and less than 1, their sum could be less than 2, but we need to check if it can be greater than 1. If 𝛼 + 𝛽 > 1, then 1 − (𝛼 + 𝛽) is negative, but its absolute value is still less than 1. So, as 𝑛 → ∞, (1 − (𝛼 + 𝛽))^𝑛 → 0.
+
+**计算过程 / Working:**
+lim_{𝑛→∞} 𝜇𝑛 = lim_{𝑛→∞} [𝛽/(𝛼 + 𝛽) + (𝜆0 − 𝛽/(𝛼 + 𝛽)) (1 − (𝛼 + 𝛽))^𝑛]
+由于 |1 − (𝛼 + 𝛽)| < 1，lim_{𝑛→∞} (1 − (𝛼 + 𝛽))^𝑛 = 0。
+因此，lim_{𝑛→∞} 𝜇𝑛 = 𝛽/(𝛼 + 𝛽)。
+
+**Explanation of working / 过程解释:**
+当 𝑛 趋于无穷大时，包含 (1 − (𝛼 + 𝛽))^𝑛 的项衰减到零。因此，ℙ(𝑋𝑛 = 0) 的极限是 𝛽/(𝛼 + 𝛽)，它与初始分布 𝜆0 无关。
+
+**Step 2: 求另一个极限 / Find the other limit**
+
+**中文思路 / Chinese reasoning:**
+由于链必须处于状态 0 或状态 1，所以 ℙ(𝑋𝑛 = 1) = 1 − ℙ(𝑋𝑛 = 0)。因此，我们可以直接计算其极限。
+
+**English reasoning:**
+Since the chain must be in either state 0 or state 1, ℙ(𝑋𝑛 = 1) = 1 − ℙ(𝑋𝑛 = 0). Therefore, we can directly compute its limit.
+
+**计算过程 / Working:**
+lim_{𝑛→∞} ℙ(𝑋𝑛 = 1) = 1 − lim_{𝑛→∞} ℙ(𝑋𝑛 = 0) = 1 − 𝛽/(𝛼 + 𝛽) = (𝛼 + 𝛽 − 𝛽)/(𝛼 + 𝛽) = 𝛼/(𝛼 + 𝛽)
+
+**Explanation of working / 过程解释:**
+这个极限分布 (𝛽/(𝛼+𝛽), 𝛼/(𝛼+𝛽)) 是马尔可夫链的平稳分布。
 
 **(d)**
 
-**Step 1: 代入初始分布。**
-如果初始分布是 𝜆0 = 𝛽/(𝛼+𝛽)，𝜆1 = 𝛼/(𝛼+𝛽)。
-**解释：** 这个初始分布恰好等于我们在 (c) 部分找到的极限分布。
+**Step 1: 分析初始分布 / Analyze the initial distribution**
 
-**Step 2: 分析 𝜇𝑛 的表达式。**
-将 𝜆0 代入 (b) 部分得到的解中。
-**数学推导：**
-𝜇𝑛 = 𝛽 / (𝛼 + 𝛽) + (𝜆0 - 𝛽 / (𝛼 + 𝛽)) * (1 - (𝛼 + 𝛽))^n
-    = 𝛽 / (𝛼 + 𝛽) + (𝛽/(𝛼+𝛽) - 𝛽/(𝛼+𝛽)) * (1 - (𝛼 + 𝛽))^n
-    = 𝛽 / (𝛼 + 𝛽) + 0 * (1 - (𝛼 + 𝛽))^n
-    = 𝛽 / (𝛼 + 𝛽)
+**中文思路 / Chinese reasoning:**
+如果链以分布 (𝜆0, 𝜆1) = (𝛽/(𝛼+𝛽), 𝛼/(𝛼+𝛽)) 启动，那么这个分布正是我们在 (c) 部分找到的极限分布（平稳分布）。
 
-**Step 3: 解释结果。**
-对于所有的 n，ℙ(𝑋𝑛 = 0) = 𝛽/(𝛼+𝛽)，因此 ℙ(𝑋𝑛 = 1) = 1 - 𝛽/(𝛼+𝛽) = 𝛼/(𝛼+β)。
-**解释：** 这意味着如果链从这个特定的分布开始，那么它在所有时间点上的分布都保持不变。这个分布被称为**平稳分布 (stationary distribution)**。链从一开始就处于统计平衡状态。
+**English reasoning:**
+If the chain is started with the distribution (𝜆0, 𝜆1) = (𝛽/(𝛼+𝛽), 𝛼/(𝛼+𝛽)), this distribution is exactly the limiting distribution (stationary distribution) we found in part (c).
+
+**Step 2: 解释结果 / Explain the result**
+
+**中文思路 / Chinese reasoning:**
+当链从平稳分布开始时，它在所有未来时间步都保持这个分布。这意味着对于所有 𝑛，ℙ(𝑋𝑛 = 0) = 𝛽/(𝛼+𝛽) 且 ℙ(𝑋𝑛 = 1) = 𝛼/(𝛼+𝛽)。链是平稳的。
+
+**English reasoning:**
+When the chain starts from the stationary distribution, it remains in this distribution for all future time steps. This means that for all 𝑛, ℙ(𝑋𝑛 = 0) = 𝛽/(𝛼+𝛽) and ℙ(𝑋𝑛 = 1) = 𝛼/(𝛼+𝛽). The chain is stationary.
+
+**计算过程 / Working:**
+将 𝜆0 = 𝛽/(𝛼+𝛽) 代入 (b) 部分的公式：
+𝜇𝑛 = 𝛽/(𝛼+𝛽) + (𝛽/(𝛼+𝛽) − 𝛽/(𝛼+𝛽)) (1 − (𝛼+𝛽))^𝑛 = 𝛽/(𝛼+𝛽)
+因此，对于所有 𝑛，𝜇𝑛 = 𝛽/(𝛼+𝛽)，并且 ℙ(𝑋𝑛 = 1) = 1 − 𝛽/(𝛼+𝛽) = 𝛼/(𝛼+𝛽)。
+
+**Explanation of working / 过程解释:**
+因为初始条件等于特解，所以齐次部分的系数为零。因此，概率不随时间变化，链立即进入稳态。
 
 **Final Answer / 最终答案:**
-(a) 证明如上所示。
-(b) 证明如上所示。
-(c) lim_{n→∞} ℙ(𝑋𝑛 = 0) = 𝛽/(𝛼+𝛽)，lim_{n→∞} ℙ(𝑋𝑛 = 1) = 𝛼/(𝛼+𝛽)。
-(d) 如果链从分布 (𝛽/(𝛼+𝛽), 𝛼/(𝛼+𝛽)) 开始，那么对于所有 n，ℙ(𝑋𝑛 = 0) = 𝛽/(𝛼+𝛽) 且 ℙ(𝑋𝑛 = 1) = 𝛼/(𝛼+𝛽)。该分布是平稳的，链从一开始就处于统计平衡状态。
+(a) 证明完成 / Proof complete.
+(b) 证明完成 / Proof complete.
+(c) lim_{𝑛→∞} ℙ(𝑋𝑛 = 0) = 𝛽/(𝛼+𝛽), lim_{𝑛→∞} ℙ(𝑋𝑛 = 1) = 𝛼/(𝛼+𝛽)
+(d) 如果链从分布 (𝛽/(𝛼+𝛽), 𝛼/(𝛼+𝛽)) 启动，那么对于所有 𝑛，ℙ(𝑋𝑛 = 0) = 𝛽/(𝛼+𝛽) 且 ℙ(𝑋𝑛 = 1) = 𝛼/(𝛼+𝛽)。链是平稳的。 / If the chain is started from the distribution (𝛽/(𝛼+𝛽), 𝛼/(𝛼+𝛽)), then for all 𝑛, ℙ(𝑋𝑛 = 0) = 𝛽/(𝛼+𝛽) and ℙ(𝑋𝑛 = 1) = 𝛼/(𝛼+𝛽). The chain is stationary.
 
 **Key Insight / 解题要点:**
-这个两状态链的极限分布是唯一的平稳分布，并且可以通过求解线性差分方程或直接找到满足 𝜋 = 𝜋P 的向量 𝜋 来得到。
+这个问题的核心是理解如何通过全概率公式推导出边际概率的递推关系，然后将其作为差分方程求解。关键概念是，对于不可约且非周期的有限状态马尔可夫链，边际分布收敛到一个唯一的平稳分布，该分布与初始分布无关。如果链从该平稳分布启动，则它立即处于稳态。 / The core of this problem is understanding how to derive a recurrence relation for marginal probabilities using the law of total probability, and then solving it as a difference equation. The key concept is that for an irreducible, aperiodic finite-state Markov chain, the marginal distribution converges to a unique stationary distribution independent of the initial distribution. If the chain starts in this stationary distribution, it is immediately in steady state.
 
 ---
 
 ### Question 2 / 第2题
 
 **Problem / 题目原文:**
-Let (𝑋𝑛) be a Markov chain. Show that, for any 𝑚 ≥ 1, we have
-ℙ(𝑋𝑛+𝑚 = 𝑥𝑛+𝑚 ∣ 𝑋𝑛 = 𝑥𝑛, 𝑋𝑛−1 = 𝑥𝑛−1, …, 𝑋0 = 𝑥0) = ℙ(𝑋𝑛+𝑚 = 𝑥𝑛+𝑚 ∣ 𝑋𝑛 = 𝑥𝑛).
-Hint: The case 𝑚 = 1 is the usual Markov property. Using the Markov property you can proceed via induction on 𝑚.
+Let (𝑋𝑛) be a Markov chain. Show that, for any 𝑚≥1, we have
+ℙ(𝑋𝑛+𝑚= 𝑥𝑛+𝑚∣𝑋𝑛= 𝑥𝑛, 𝑋𝑛−1 = 𝑥𝑛−1, … , 𝑋0 = 𝑥0) = ℙ(𝑋𝑛+𝑚= 𝑥𝑛+𝑚∣𝑋𝑛= 𝑥𝑛).
+Hint: The case 𝑚= 1 is the usual Markov property. Using the Markov property you can proceed via induction on 𝑚.
 
-**中文翻译:**
-设 (𝑋𝑛) 是一个马尔可夫链。证明对于任意 𝑚 ≥ 1，我们有
-ℙ(𝑋𝑛+𝑚 = 𝑥𝑛+𝑚 ∣ 𝑋𝑛 = 𝑥𝑛, 𝑋𝑛−1 = 𝑥𝑛−1, …, 𝑋0 = 𝑥0) = ℙ(𝑋𝑛+𝑚 = 𝑥𝑛+𝑚 ∣ 𝑋𝑛 = 𝑥𝑛)。
-提示：𝑚 = 1 的情况就是通常的马尔可夫性。你可以使用马尔可夫性通过对 𝑚 进行归纳来证明。
+**中文翻译 / Chinese Translation:**
+设 (𝑋𝑛) 是一个马尔可夫链。证明对于任意 𝑚≥1，我们有
+ℙ(𝑋𝑛+𝑚= 𝑥𝑛+𝑚∣𝑋𝑛= 𝑥𝑛, 𝑋𝑛−1 = 𝑥𝑛−1, … , 𝑋0 = 𝑥0) = ℙ(𝑋𝑛+𝑚= 𝑥𝑛+𝑚∣𝑋𝑛= 𝑥𝑛)。
+提示：𝑚= 1 的情况就是通常的马尔可夫性质。利用马尔可夫性质，你可以通过对 𝑚 进行归纳来证明。
 
 **Knowledge Points / 考查知识点:**
-- 马尔可夫性质 (Markov Property)
-- 数学归纳法 (Mathematical Induction)
-- 条件概率 (Conditional Probability)
+- 马尔可夫性质 / Markov property
+- 数学归纳法 / Mathematical induction
+- 条件概率 / Conditional probability
 
 **Step-by-Step Solution / 逐步解答:**
 
-**Step 1: 基础情况 (Base Case): m = 1。**
-当 m = 1 时，我们需要证明的等式变为：
-ℙ(𝑋_{n+1} = 𝑥_{n+1} ∣ 𝑋_n = 𝑥_n, …, 𝑋_0 = 𝑥_0) = ℙ(𝑋_{n+1} = 𝑥_{n+1} ∣ 𝑋_n = 𝑥_n)
-**解释：** 这正是马尔可夫性质的定义。它说明给定当前状态，未来状态与过去状态条件独立。
-**结论：** 基础情况成立。
+**Step 1: 基础情况 (𝑚 = 1) / Base Case (𝑚 = 1)**
 
-**Step 2: 归纳假设 (Inductive Hypothesis)。**
-假设对于某个 m = k (k ≥ 1)，该性质成立。即：
-ℙ(𝑋_{n+k} = 𝑥_{n+k} ∣ 𝑋_n = 𝑥_n, …, 𝑋_0 = 𝑥_0) = ℙ(𝑋_{n+k} = 𝑥_{n+k} ∣ 𝑋_n = 𝑥_n)
+**中文思路 / Chinese reasoning:**
+题目提示我们，𝑚=1 的情况就是标准的马尔可夫性质。这是马尔可夫链的定义的一部分，所以我们直接陈述它作为归纳的基础。
 
-**Step 3: 归纳步骤 (Inductive Step): 证明对于 m = k+1 也成立。**
-我们需要证明：
-ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1} ∣ 𝑋_n = 𝑥_n, …, 𝑋_0 = 𝑥_0) = ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1} ∣ 𝑋_n = 𝑥_n)
+**English reasoning:**
+The problem hints that the case 𝑚=1 is the standard Markov property. This is part of the definition of a Markov chain, so we state it directly as the base of our induction.
 
-**Step 4: 引入中间状态。**
-我们使用全概率公式，以 𝑋_{n+k} 的状态为条件，将左边的概率展开。
-**解释：** 为了连接过去和更远的未来，我们通过中间状态 𝑋_{n+k} 来分解概率。
-**数学推导：**
-令事件 A = {𝑋_n = 𝑥_n, …, 𝑋_0 = 𝑥_0}。
-ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1} ∣ A)
-= Σ_{y} ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1}, 𝑋_{n+k} = y ∣ A)  (对所有可能的状态 y 求和)
-= Σ_{y} ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1} ∣ 𝑋_{n+k} = y, A) * ℙ(𝑋_{n+k} = y ∣ A)
+**计算过程 / Working:**
+对于 𝑚=1，根据马尔可夫性质的定义，我们有：
+ℙ(𝑋𝑛+1 = 𝑥𝑛+1 | 𝑋𝑛 = 𝑥𝑛, 𝑋𝑛−1 = 𝑥𝑛−1, …, 𝑋0 = 𝑥0) = ℙ(𝑋𝑛+1 = 𝑥𝑛+1 | 𝑋𝑛 = 𝑥𝑛)
 
-**Step 5: 应用马尔可夫性质。**
-根据基础情况 (m=1) 的马尔可夫性质，给定 𝑋_{n+k} = y，未来状态 𝑋_{n+k+1} 与过去 A 条件独立。
-**解释：** 这允许我们简化第一个条件概率。
-**数学推导：**
-ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1} ∣ 𝑋_{n+k} = y, A) = ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1} ∣ 𝑋_{n+k} = y)
+**Explanation of working / 过程解释:**
+这直接来自马尔可夫链的定义：给定当前状态，未来状态与过去状态条件独立。
 
-**Step 6: 应用归纳假设。**
-根据归纳假设 (m=k)，给定 𝑋_n = 𝑥_n，过去 A 中的信息对于预测 𝑋_{n+k} 是多余的。
-**解释：** 这允许我们简化第二个条件概率。
-**数学推导：**
-ℙ(𝑋_{n+k} = y ∣ A) = ℙ(𝑋_{n+k} = y ∣ 𝑋_n = 𝑥_n)
+**Step 2: 归纳假设 / Inductive Hypothesis**
 
-**Step 7: 合并结果。**
-将简化后的表达式代回求和公式。
-**数学推导：**
-ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1} ∣ A)
-= Σ_{y} ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1} ∣ 𝑋_{n+k} = y) * ℙ(𝑋_{n+k} = y ∣ 𝑋_n = 𝑥_n)
-= ℙ(𝑋_{n+k+1} = 𝑥_{n+k+1} ∣ 𝑋_n = 𝑥_n)  (根据全概率公式，这是正确的，因为 Σ_y ℙ(𝑋_{n+k+1}=x | 𝑋_{n+k}=y)ℙ(𝑋_{n+k}=y | 𝑋_n=x_n) = ℙ(𝑋_{n+k+1}=x | 𝑋_n=x_n))
+**中文思路 / Chinese reasoning:**
+我们假设对于某个 𝑚 = 𝑘 (𝑘 ≥ 1)，该性质成立。也就是说，给定 𝑋𝑛，未来 𝑘 步后的状态 𝑋𝑛+𝑘 与过去的状态 𝑋0, …, 𝑋𝑛−1 条件独立。
 
-**Step 8: 结论。**
-我们已经证明，如果该性质对 m = k 成立，那么它对 m = k+1 也成立。由于它对 m = 1 成立，根据数学归纳法，它对所有 m ≥ 1 都成立。
+**English reasoning:**
+We assume the property holds for some 𝑚 = 𝑘 (𝑘 ≥ 1). That is, given 𝑋𝑛, the state 𝑋𝑛+𝑘 after 𝑘 steps is conditionally independent of the past states 𝑋0, …, 𝑋𝑛−1.
 
-**Final Answer / 最终答案:**
-通过数学归纳法证明，对于所有 m ≥ 1，ℙ(𝑋_{n+m} = 𝑥_{n+m} ∣ 𝑋_n = 𝑥_n, …, 𝑋_0 = 𝑥_0) = ℙ(𝑋_{n+m} = 𝑥_{n+m} ∣ 𝑋_n = 𝑥_n) 成立。
+**计算过程 / Working:**
+归纳假设：对于某个 𝑘 ≥ 1，
+ℙ(𝑋𝑛+𝑘 = 𝑥𝑛+𝑘 | 𝑋𝑛 = 𝑥𝑛, 𝑋𝑛−1 = 𝑥𝑛−1, …, 𝑋0 = 𝑥0) = ℙ(𝑋𝑛+𝑘 = 𝑥𝑛+𝑘 | 𝑋𝑛 = 𝑥𝑛)
 
-**Key Insight / 解题要点:**
-这个性质被称为“马尔可夫性质的多步推广”，它表明给定当前状态，不仅下一步，而且所有未来步骤都与过去条件独立。证明的核心是巧妙地使用全概率公式引入中间状态，然后反复应用基本的马尔可夫性质。
+**Explanation of working / 过程解释:**
+这是我们在归纳步骤中要使用的假设。
 
----
+**Step 3: 归纳步骤 (证明 𝑚 = 𝑘+1 成立) / Inductive Step (Prove for 𝑚 = 𝑘+1)**
 
-### Question 3 / 第3题
+**中文思路 / Chinese reasoning:**
+我们需要证明该性质对 𝑚 = 𝑘+1 也成立。我们从条件概率 ℙ(𝑋𝑛+𝑘+1 = 𝑥𝑛+𝑘+1 | 𝑋𝑛 = 𝑥𝑛, …, 𝑋0 = 𝑥0) 开始。我们的策略是引入中间状态 𝑋𝑛+𝑘，并使用全概率公式和马尔可夫性质。
 
-**Problem / 题目原文:**
-A car insurance company operates a no-claims discount system for existing policy holders. The possible discounts on premiums are {0%, 25%, 40%, 50%}. Following a claim-free year, a policyholder’s discount level increases by one level (or remains at 50% discount). If the policyholder makes one or more claims in a year, the discount level decreases by one level (or remains at 0% discount).
-The insurer believes that the probability of making at least one claim in a year is 0.1 if the previous year was claim-free and 0.25 if the previous year was not claim-free.
-Assume that new customers start in the 50% discount state (this is an unusually generous insurance company).
-(a) Explain why we cannot use {0%, 25%, 40%, 50%} as the state space of a Markov chain to model discount levels for policyholders.
-(b) By considering additional states, show that a Markov chain can be used to model the discount level.
-(c) Draw the transition diagram and write down the transition matrix of your Markov Chain from (b).
+**English reasoning:**
+We need to prove the property holds for 𝑚 = 𝑘+1. We start with the conditional probability ℙ(𝑋𝑛+𝑘+1 = 𝑥𝑛+𝑘+1 | 𝑋𝑛 = 𝑥𝑛, …, 𝑋0 = 𝑥0). Our strategy is to introduce the intermediate state 𝑋𝑛+𝑘 and use the law of total probability and the Markov property.
 
-**中文翻译:**
-一家汽车保险公司为其现有保单持有人运营一个无索赔折扣系统。保费的可能的折扣为 {0%, 25%, 40%, 50%}。在无索赔的一年之后，保单持有人的折扣水平增加一级（或保持在 50% 折扣）。如果保单持有人在一年内提出一次或多次索赔，则折扣水平降低一级（或保持在 0% 折扣）。
-保险公司认为，如果前一年无索赔，则一年内至少提出一次索赔的概率为 0.1；如果前一年有索赔，则此概率为 0.25。
-假设新客户从 50% 折扣状态开始（这是一家异常慷慨的保险公司）。
-(a) 解释为什么我们不能使用 {0%, 25%, 40%, 50%} 作为马尔可夫链的状态空间来对保单持有人的折扣水平建模。
-(b) 通过考虑额外的状态，证明可以使用马尔可夫链来对折扣水平建模。
-(c) 画出 (b) 中你的马尔可夫链的转移图并写出转移矩阵。
+**计算过程 / Working:**
+考虑 ℙ(𝑋𝑛+𝑘+1 = 𝑥𝑛+𝑘+1 | 𝑋𝑛 = 𝑥𝑛, …, 𝑋0 = 𝑥0)。我们可以通过对 𝑋𝑛+𝑘 的所有可能状态求和来边缘化：
+ℙ(𝑋𝑛+𝑘+1 = 𝑥𝑛+𝑘+1 | 𝑋𝑛 = 𝑥𝑛, …, 𝑋0 = 𝑥0)
+= Σ_{𝑥𝑛+𝑘} ℙ(𝑋𝑛+𝑘+1 = 𝑥𝑛+𝑘+1, 𝑋𝑛+𝑘 = 𝑥𝑛+𝑘 | 𝑋𝑛 = 𝑥𝑛, …, 𝑋0 = 𝑥0)
 
-**Knowledge Points / 考查知识点:**
-- 马尔可夫性质 (Markov Property)
-- 状态空间扩展 (State Space Augmentation)
-- 转移图 (Transition Diagram)
-- 转移矩阵 (Transition Matrix)
+**Explanation of working / 过程解释:**
+这里我们使用了全概率公式的变体，通过对联合事件 {𝑋𝑛+𝑘+1 = 𝑥𝑛+𝑘+1, 𝑋𝑛+𝑘 = 𝑥𝑛+𝑘} 在所有可能的 𝑥𝑛+𝑘 上求和来引入中间状态。
 
-**Step-by-Step Solution / 逐步解答:**
+**Step 4: 使用条件概率的链式法则 / Use the chain rule of conditional probability**
 
-**(a)**
+**中文思路 / Chinese reasoning:**
+我们将联合条件概率分解为两个条件概率的乘积：一个是关于 𝑋𝑛+𝑘+1 给定 𝑋𝑛+𝑘 和过去，另一个是关于 𝑋𝑛+𝑘 给定过去。
 
-**Step 1: 分析问题。**
-折扣水平的变化不仅取决于当前的折扣水平，还取决于**前一年是否有索赔**。这是因为索赔概率取决于前一年的索赔历史（0.1 vs 0.25）。
-**解释：** 马尔可夫性质要求给定当前状态，未来状态与过去状态条件独立。在这里，“当前状态”仅仅是折扣水平，不足以预测未来的折扣水平，因为我们还需要知道“前一年是否有索赔”这个信息，而这个信息不能仅从折扣水平推断出来。
+**English reasoning:**
+We decompose the joint conditional probability into a product of two conditional probabilities: one for 𝑋𝑛+𝑘+1 given 𝑋𝑛+𝑘 and the past, and one for 𝑋𝑛+𝑘 given the past.
 
-**Step 2: 给出反例。**
-假设一个保单持有人当前处于 25% 折扣状态。要计算他明年处于 40% 折扣的概率，我们需要知道他今年是否无索赔。但是，他可以从 0% 折扣状态（前一年有索赔）上升而来，也可以从 50% 折扣状态（前一年无索赔）下降而来。这两种情况下的索赔概率不同，因此仅知道当前折扣水平为 25% 不足以确定转移到 40% 的概率。
-**结论：** 状态空间 {0%, 25%, 40%, 50%} 不满足马尔可夫性质，因为转移概率依赖于更早的历史（前一年的索赔情况）。
-
-**(b)**
-
-**Step 1: 确定需要额外信息。**
-我们需要在状态中编码“前一年是否有索赔”这一信息，以便使转移概率只依赖于当前状态。
-**解释：** 通过扩展状态空间，我们可以将必要的历史信息包含在“当前状态”中，从而恢复马尔可夫性质。
-
-**Step 2: 定义新的状态空间。**
-我们可以为每个折扣水平创建两个状态：一个表示“前一年无索赔”，另一个表示“前一年有索赔”。
-**解释：** 这样，新的状态就包含了足够的信息来确定转移概率。
-**数学推导：**
-新的状态空间 S' 可以是：
-- 0C: 0% 折扣，前一年有索赔 (Claim)
-- 0NC: 0% 折扣，前一年无索赔 (No Claim)
-- 25C: 25% 折扣，前一年有索赔
-- 25NC: 25% 折扣，前一年无索赔
-- 40C: 40% 折扣，前一年有索赔
-- 40NC: 40% 折扣，前一年无索赔
-- 50C: 50% 折扣，前一年有索赔
-- 50NC: 50% 折扣，前一年无索赔
-
-**Step 3: 验证马尔可夫性质。**
-现在，给定当前状态（例如 25NC），我们知道两件事：当前的折扣水平（25%）和前一年的索赔情况（无索赔）。这足以确定转移到下一个状态的唯一概率，因为下一个状态的折扣水平由规则决定，而下一个状态的“前一年索赔情况”就是今年的索赔情况，其概率由今年的状态（即前一年的索赔情况）决定。
-**结论：** 使用这个扩展的状态空间，该过程是一个马尔可夫链。
-
-**(c)**
-
-**Step 1: 确定转移规则。**
-从一个状态 (D, H) 出发，其中 D 是折扣水平，H 是前一年的索赔历史（C 或 NC）：
-- 如果今年无索赔 (NC)，则明年折扣水平增加一级（或保持在 50%），并且明年的历史是 NC。
-- 如果今年有索赔 (C)，则明年折扣水平减少一级（或保持在 0%），并且明年的历史是 C。
-- 索赔概率取决于 H：如果 H = NC，则 P(C) = 0.1，P(NC) = 0.9。如果 H = C，则 P(C) = 0.25，P(NC) = 0.75。
-
-**Step 2: 绘制转移图 (部分示例)。**
-我们只画出部分转移，以展示模式。完整图有 8 个状态。
-
-- 从 0NC (0%, 前年无索赔):
-  - 无索赔 (P=0.9): 折扣升至 25%，历史为 NC → 25NC
-  - 有索赔 (P=0.1): 折扣保持在 0%，历史为 C → 0C
-
-- 从 0C (0%, 前年有索赔):
-  - 无索赔 (P=0.75): 折扣升至 25%，历史为 NC → 25NC
-  - 有索赔 (P=0.25): 折扣保持在 0%，历史为 C → 0C
-
-- 从 25NC (25%, 前年无索赔):
-  - 无索赔 (P=0.9): 折扣升至 40%，历史为 NC → 40NC
-  - 有索赔 (P=0.1): 折扣降至 0%，历史为 C → 0C
-
-- 从 25C (25%, 前年有索赔):
-  - 无索赔 (P=0.75): 折扣升至 40%，历史为 NC → 40NC
-  - 有索赔 (P=0.25): 折扣降至 0%，历史为 C → 0C
-
-- ... 以此类推。从 50NC 和 50C 出发，无索赔时保持在 50NC，有索赔时降至 40C。
-
-**Step 3: 写出转移矩阵。**
-矩阵的行和列按照状态顺序排列，例如：0C, 0NC, 25C, 25NC, 40C,
+**计算过程 / Working:**
+= Σ_{𝑥𝑛+𝑘} ℙ(𝑋𝑛+𝑘+1 = 𝑥𝑛+𝑘+1 | 𝑋𝑛+𝑘 = 𝑥𝑛+𝑘, 𝑋𝑛 = 𝑥𝑛, …, 𝑋0 = 𝑥0) × ℙ(𝑋𝑛+𝑘 = 𝑥𝑛+

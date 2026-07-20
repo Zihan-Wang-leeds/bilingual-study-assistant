@@ -3,18 +3,16 @@ Coursework 辅助工具 — 解析课程作业要求，生成分步工作计划
 """
 import os
 import sys
-import re
-import time
 from datetime import datetime
-from openai import OpenAI
-from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from config import API_KEY, BASE_URL, MODEL_NAME, COURSES_DIR
+from config import (
+    COURSES_DIR,
+    GENERATION_TEMPERATURE, GENERATION_MAX_TOKENS,
+)
 from pdf_loader import extract_text_from_pdf
-
-load_dotenv()
+from llm_client import call_llm_with_prompts
 
 OUTPUT_DIR = "guides"
 
@@ -27,11 +25,6 @@ class CourseworkHelper:
         self.pdf_path = pdf_path
         self.pdf_name = os.path.splitext(os.path.basename(pdf_path))[0]
         self.output_dir = os.path.join(os.path.dirname(pdf_path), OUTPUT_DIR)
-
-        self.client = OpenAI(
-            api_key=os.getenv("DEEPSEEK_API_KEY", API_KEY),
-            base_url=BASE_URL
-        )
 
         print(f"Loading coursework: {pdf_path}")
         self.pages = extract_text_from_pdf(pdf_path)
@@ -192,19 +185,12 @@ RULES:
         return full_content
 
     def _call_llm(self, system_prompt: str, user_prompt: str) -> str:
-        try:
-            response = self.client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                temperature=0.3,
-                max_tokens=6000
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            return f"API Error: {e}"
+        return call_llm_with_prompts(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            temperature=GENERATION_TEMPERATURE,
+            max_tokens=GENERATION_MAX_TOKENS,
+        )
 
 
 # ================================================================

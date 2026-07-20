@@ -43,8 +43,8 @@
 # === 添加新课程 ===
 # 1. 将课件PDF放入 课程/课程代码/ 文件夹
 # 2. 生成教材 + 习题解答
-python scripts/generate_guide.py --all
-python scripts/solve_problems.py --all
+python scripts/generate_guide.py --course MATHXXXX --all
+python scripts/solve_problems.py --course MATHXXXX --all
 
 # === Coursework 辅助 ===
 python scripts/coursework_helper.py --course MATHXXXX    # 自动检测coursework PDF
@@ -52,17 +52,19 @@ python scripts/coursework_helper.py --course MATHXXXX --file practical.pdf
 python scripts/coursework_helper.py --scan               # 扫描课程文件夹
 
 # === 生成自学教材 ===
-python scripts/generate_guide.py --all                   # 全部章节
+python scripts/generate_guide.py --all                   # 全部章节（自动检测课程）
+python scripts/generate_guide.py --course MATH2702 --all # 指定课程的全部章节
 python scripts/generate_guide.py --section 1             # 单章测试
 
 # === 生成习题解答 ===
-python scripts/solve_problems.py --all                   # 全部Problem Sheet
+python scripts/solve_problems.py --all                   # 全部Problem Sheet（自动检测课程）
+python scripts/solve_problems.py --course MATH2702 --all # 指定课程的全部习题
 python scripts/solve_problems.py --sheet 1               # 单个Problem Sheet测试
 
 # === 互动问答 ===
 python scripts/build_index.py                            # 先构建索引
 python chat.py                                           # 启动对话(5种模式，终端版)
-python web_app.py                                        # 启动Web网页版 (浏览器 http://localhost:5000)
+python web_app.py                                        # 启动Web网页版 (浏览器 http://localhost:5001)
 
 # === 调试测试 ===
 python scripts/chunker.py                                # 测试分块效果
@@ -75,9 +77,9 @@ python scripts/rag_engine.py                             # 测试RAG引擎
 2. 将PDF课件放入该文件夹：
    - `课件.pdf` → 课程讲义/Slides
    - `practical.pdf` 或 `coursework.pdf` → 课程作业
-3. 运行 `python scripts/generate_guide.py --all` 生成自学教材
-4. 运行 `python scripts/solve_problems.py --all` 生成习题解答
-5. 运行 `python scripts/coursework_helper.py` 生成课程作业计划（如有）
+3. 运行 `python scripts/generate_guide.py --course COMP2000 --all` 生成自学教材
+4. 运行 `python scripts/solve_problems.py --course COMP2000 --all` 生成习题解答
+5. 运行 `python scripts/coursework_helper.py --course COMP2000` 生成课程作业计划（如有）
 6. 运行 `python scripts/build_index.py` 构建检索索引
 7. 通过 `python chat.py` 进行互动提问
 8. 生成的文档在 `课程/课程代码/guides/` 下
@@ -146,6 +148,35 @@ python scripts/rag_engine.py                             # 测试RAG引擎
 - 问题概览（题数、考查章节）
 - 每道题：题目原文 + 中文翻译 + 考查知识点 + 逐步详解 + 最终答案 + 解题要点
 
+## AI 行为约束（RAG 问答系统）
+
+以下原则约束 `rag_engine.py` 的 LLM 生成行为。不做硬性禁止，采用分层松紧策略。
+
+### 1. 来源约束：分层而非一刀切
+
+| 内容类型 | 规则 | 示例 |
+|---------|------|------|
+| **核心内容** — 定义、定理、公式、习题答案 | **必须来自课件**，不可从训练数据编造 | "A Markov chain is defined as..." 须引用课件原文 |
+| **教学辅助** — 直觉类比、通俗解释、易错提醒、知识关联 | **AI 可自由发挥**，但需标明是辅助解释 | 用"天气预报"类比 Markov chain，标"补充说明" |
+
+### 2. 顺序保持：输入排序，输出自由
+
+- 检索结果按**课件页码排序**（而非相似度），确保 AI 看到的上下文是连贯的
+- AI 回答时不强制按章节顺序——学生问什么就答什么
+- 但上下文有序后 AI 能准确做跨节引用（"这在第 3 节定义，第 7 节深入"）
+
+### 3. 覆盖面局限（已知但接受）
+
+- 不做全局覆盖面追踪——那是课程管理系统的职责
+- 当检索仅命中 topic 的部分内容时，AI 应主动声明："课件中还有后续内容未纳入本次回答"
+- 如果课件不足以完整回答问题，AI 应如实说明，而非从训练数据填补
+
+### 修改这些约束时
+
+约束逻辑集中在：
+- Prompt 层：`prompts/study_modes.py` 中 `get_study_prompt()` 的 `Rules:` 部分
+- 检索层：`scripts/rag_engine.py` 中 `CourseRAG.search()` 的结果排序逻辑
+
 ## API配置
 
 - API Key 存放在项目 `.env` 文件的 `DEEPSEEK_API_KEY` 中
@@ -154,9 +185,9 @@ python scripts/rag_engine.py                             # 测试RAG引擎
 ## 当前已导入课程
 
 - **MATH2702** - Stochastic Processes (University of Leeds, 2025-2026)
-  - 105页课件 → 21章教材 (425KB) + 11套习题解答 (204KB)
+  - 105页课件 → 21章教材 (425KB) + 11套习题解答 (204KB) + 141个索引块
   - 内容：离散/连续时间Markov链、随机游走、鞅、Gambler's Ruin、Poisson过程、排队论
 
 - **MATH2703** - Time Series Analysis (University of Leeds, 2025-2026)
   - Practical coursework: 数据分析 + 报告（20%权重）
-  - 已生成详细 Coursework 工作计划
+  - 已生成详细 Coursework 工作计划 + 2个索引块

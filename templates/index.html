@@ -7,6 +7,19 @@
 
     <!-- Markdown 渲染 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 数学公式渲染 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']],
+                processEscapes: true
+            },
+            svg: { fontCache: 'global' },
+            startup: { typeset: false }
+        };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <!-- 代码高亮 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css">
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/core.min.js"></script>
@@ -337,15 +350,45 @@
             width: 100%;
             margin: 0.6em 0;
             font-size: 0.88em;
+            table-layout: fixed;
         }
         .msg.assistant .bubble th, .msg.assistant .bubble td {
             border: 1px solid var(--border);
             padding: 6px 10px;
             text-align: left;
+            vertical-align: top;
         }
         .msg.assistant .bubble th { background: #f8fafc; font-weight: 600; }
+        .msg.assistant .bubble th:first-child,
+        .msg.assistant .bubble td:first-child {
+            width: 28%;
+            white-space: nowrap;
+            font-weight: 650;
+        }
         .msg.assistant .bubble strong { color: #1e40af; }
         .msg.assistant .bubble em { color: var(--text-secondary); }
+        .msg.assistant .bubble mjx-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            padding: 2px 0;
+        }
+        .msg.assistant .bubble mjx-container[display="true"] {
+            margin: 0.8em 0;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+        .math-warning {
+            margin-top: 8px;
+            padding: 8px 10px;
+            border: 1px solid #fde68a;
+            border-radius: var(--radius-sm);
+            background: #fffbeb;
+            color: #92400e;
+            font-size: 0.78rem;
+        }
 
         /* Sources */
         .msg .sources {
@@ -375,6 +418,156 @@
         @keyframes bounce {
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
+        }
+
+        /* Streaming cursor blink */
+        .streaming-cursor {
+            animation: blink 0.7s infinite;
+            color: var(--primary);
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* ============================================================
+           Tab Navigation
+           ============================================================ */
+        .tab-nav {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 6px 14px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { background: var(--surface-hover); color: var(--text); }
+        .tab-btn.active { background: var(--primary); color: #fff; }
+        .tab-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+        .tab-panel.active { display: flex; }
+        .panel-content { padding: 24px; overflow-y: auto; flex: 1; }
+
+        /* ============================================================
+           Flashcards
+           ============================================================ */
+        .flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+        .flashcard {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-height: 160px;
+        }
+        .flashcard:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .flashcard .card-front { font-weight: 600; font-size: 1rem; margin-bottom: 8px; }
+        .flashcard .card-back { display: none; font-size: 0.9rem; color: var(--text-secondary); margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+        .flashcard.flipped .card-front { opacity: 0.5; }
+        .flashcard.flipped .card-back { display: block; }
+        .flashcard .card-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            margin-top: 8px;
+        }
+        .flashcard .card-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* ============================================================
+           Upload Zone
+           ============================================================ */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .tool-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .tool-section h3 { margin: 0 0 8px 0; font-size: 1rem; }
+
+        /* ============================================================
+           Progress Bars
+           ============================================================ */
+        .progress-bar-outer {
+            background: #e5e7eb;
+            border-radius: 6px;
+            height: 10px;
+            margin: 4px 0 12px;
+            overflow: hidden;
+        }
+        .progress-bar-inner {
+            background: var(--primary);
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-card .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .stat-card .stat-label { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+
+        .guide-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .guide-row:hover { background: var(--surface-hover); }
+        .guide-row .export-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .tab-nav { gap: 0; }
+            .tab-btn { padding: 6px 8px; font-size: 0.75rem; }
         }
 
         /* ============================================================
@@ -504,33 +697,94 @@
 </aside>
 
 <!-- ============================================================
-     Main Chat
+     Main Area with Tabs
      ============================================================ -->
 <div class="main">
     <div class="topbar">
         <button class="mobile-toggle" onclick="toggleSidebar()" title="菜单">☰</button>
         <span class="current-mode" id="currentModeLabel">🧑‍🏫 自学教学</span>
         <span class="current-course" id="currentCourseLabel">全部课程</span>
+        <nav class="tab-nav" id="tabNav">
+            <button class="tab-btn active" data-tab="chat" onclick="switchTab('chat')">💬 对话</button>
+            <button class="tab-btn" data-tab="flashcards" onclick="switchTab('flashcards')">📇 闪卡</button>
+            <button class="tab-btn" data-tab="progress" onclick="switchTab('progress')">📊 进度</button>
+            <button class="tab-btn" data-tab="tools" onclick="switchTab('tools')">⚙️ 工具</button>
+        </nav>
     </div>
 
-    <div class="messages" id="messages">
-        <div class="welcome" id="welcomeScreen">
-            <h2>👋 欢迎使用双语学习助手</h2>
-            <p>选择课程和学习模式，然后开始提问吧！<br>Ask me anything about your course materials.</p>
-            <div class="suggestions" id="suggestions"></div>
+    <!-- Tab: Chat -->
+    <div class="tab-panel active" id="panel-chat">
+        <div class="messages" id="messages">
+            <div class="welcome" id="welcomeScreen">
+                <h2>👋 欢迎使用双语学习助手</h2>
+                <p>选择课程和学习模式，然后开始提问吧！<br>Ask me anything about your course materials.</p>
+                <div class="suggestions" id="suggestions"></div>
+            </div>
+        </div>
+        <div class="input-area">
+            <div class="input-row">
+                <textarea id="userInput" rows="1"
+                          placeholder="输入你的问题... / Type your question..."
+                          onkeydown="onKeyDown(event)"
+                          oninput="autoResize(this)"></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="发送 / Send">➤</button>
+            </div>
+            <div class="input-hint">
+                按 Enter 发送，Shift+Enter 换行 · Press Enter to send, Shift+Enter for new line
+            </div>
         </div>
     </div>
 
-    <div class="input-area">
-        <div class="input-row">
-            <textarea id="userInput" rows="1"
-                      placeholder="输入你的问题... / Type your question..."
-                      onkeydown="onKeyDown(event)"
-                      oninput="autoResize(this)"></textarea>
-            <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="发送 / Send">➤</button>
+    <!-- Tab: Flashcards -->
+    <div class="tab-panel" id="panel-flashcards">
+        <div class="panel-content">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h2 style="margin:0;">📇 闪卡 / Flashcards</h2>
+                <button class="send-btn" onclick="generateFlashcards()" id="genFlashBtn" style="border-radius:8px;padding:8px 16px;width:auto;font-size:0.9rem;">🪄 生成闪卡</button>
+            </div>
+            <p style="color:var(--text-secondary);margin-bottom:16px;">从课件自动提取定义/定理/公式，支持导入 Anki。</p>
+            <div id="flashcardStatus"></div>
+            <div class="flashcard-grid" id="flashcardGrid">
+                <p style="color:var(--text-muted);text-align:center;padding:40px;">选择课程后点击「生成闪卡」，或选择已有闪卡查看</p>
+            </div>
         </div>
-        <div class="input-hint">
-            按 Enter 发送，Shift+Enter 换行 · Press Enter to send, Shift+Enter for new line
+    </div>
+
+    <!-- Tab: Progress -->
+    <div class="tab-panel" id="panel-progress">
+        <div class="panel-content">
+            <h2 style="margin:0 0 16px 0;">📊 学习进度 / Progress</h2>
+            <div id="progressContent">
+                <p style="color:var(--text-muted);text-align:center;padding:40px;">选择课程后自动显示学习进度</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Tools -->
+    <div class="tab-panel" id="panel-tools">
+        <div class="panel-content">
+            <h2 style="margin:0 0 16px 0;">⚙️ 工具 / Tools</h2>
+            <div class="tool-section">
+                <h3>📤 上传课件 / Upload PDF</h3>
+                <p style="color:var(--text-secondary);">拖拽 PDF 到下方区域，自动提取→分块→索引</p>
+                <div class="upload-zone" id="uploadZone"
+                     ondrop="onDrop(event)" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)">
+                    <div style="font-size:2rem;">📄</div>
+                    <div>拖拽 PDF 到此处 / Drop PDF here</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);">或点击选择文件</div>
+                    <input type="file" id="fileInput" accept=".pdf" style="display:none;" onchange="onFileSelected(event)">
+                    <button class="btn-icon" onclick="document.getElementById('fileInput').click()" style="margin-top:8px;">选择文件</button>
+                </div>
+                <div id="uploadStatus"></div>
+            </div>
+            <div class="tool-section" style="margin-top:24px;">
+                <h3>📥 导出教材 / Export Guides</h3>
+                <p style="color:var(--text-secondary);">将章节教材导出为 PDF（需安装 weasyprint 或 pandoc）</p>
+                <div id="exportStatus"></div>
+                <div id="guidesList" style="margin-top:8px;">
+                    <p style="color:var(--text-muted);">选择课程后显示可用教材列表</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -546,7 +800,7 @@ const state = {
     mode: 'teach',
     courseCode: null,
     courses: [],
-    messages: [],
+    messages: [],   // [{role: 'user'|'assistant', content: '...'}]
     loading: false
 };
 
@@ -610,6 +864,8 @@ function loadModes() {
           desc: '知识框架梳理 + 重要公式 + 自测题' },
         { key: 'coursework', icon: '📋', label: '课程作业', enLabel: 'Coursework Help',
           desc: '需求拆解 + 方法建议 + 代码框架 + 报告结构' },
+        { key: 'quiz', icon: '📝', label: '模拟测验', enLabel: 'Quiz Mode',
+          desc: '生成练习题 + 自动批改 + 薄弱点分析' },
     ];
 
     const list = document.getElementById('modeList');
@@ -642,6 +898,7 @@ function switchMode(mode) {
         homework: '✏️ 作业辅导 Homework Help',
         review: '📝 考前复习 Exam Review',
         coursework: '📋 课程作业 Coursework Help',
+        quiz: '📝 模拟测验 Quiz Mode',
     };
     document.getElementById('currentModeLabel').textContent = labels[mode] || labels.teach;
     updateSuggestions();
@@ -674,6 +931,221 @@ function clearChat() {
     updateSuggestions();
 }
 
+// ============================================================
+// Tab Switching
+// ============================================================
+function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    const btn = document.querySelector(`[data-tab="${name}"]`);
+    if (btn) btn.classList.add('active');
+    const panel = document.getElementById(`panel-${name}`);
+    if (panel) panel.classList.add('active');
+
+    if (name === 'flashcards') loadFlashcards();
+    if (name === 'progress') loadProgress();
+    if (name === 'tools') loadGuidesList();
+}
+
+// ============================================================
+// Flashcards
+// ============================================================
+async function generateFlashcards() {
+    const course = state.courseCode;
+    if (!course) { alert('请先选择课程 / Please select a course first'); return; }
+    const btn = document.getElementById('genFlashBtn');
+    const status = document.getElementById('flashcardStatus');
+    btn.disabled = true; btn.textContent = '⏳ 生成中...';
+    status.innerHTML = '<p style="color:var(--text-secondary);">正在从课件提取闪卡，请稍候...</p>';
+    try {
+        const res = await fetch('/api/flashcards/generate', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({course_code: course})
+        });
+        const data = await res.json();
+        if (data.success) {
+            status.innerHTML = `<p style="color:var(--success);">✅ ${data.message}</p>`;
+            loadFlashcards();
+        } else {
+            status.innerHTML = `<p style="color:var(--danger);">❌ ${data.error}</p>`;
+        }
+    } catch(e) {
+        status.innerHTML = `<p style="color:var(--danger);">❌ ${e.message}</p>`;
+    }
+    btn.disabled = false; btn.textContent = '🪄 生成闪卡';
+}
+
+async function loadFlashcards() {
+    const course = state.courseCode;
+    const grid = document.getElementById('flashcardGrid');
+    if (!course) {
+        grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">请先在侧边栏选择课程</p>';
+        return;
+    }
+    grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px;">加载中...</p>';
+    try {
+        const res = await fetch(`/api/flashcards?course=${course}`);
+        const data = await res.json();
+        if (!data.exists || !data.cards.length) {
+            grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">暂无闪卡，点击「生成闪卡」从课件自动提取</p>';
+            return;
+        }
+        grid.innerHTML = data.cards.map(c => `
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="card-front">${escapeHtml(c.title || c.front)}</div>
+                <div class="card-back">${renderAssistantMarkdown(c.back)}</div>
+                <div class="card-hint">🇨🇳 ${escapeHtml(c.cn || '')}</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);">点击翻转 / Click to flip</div>
+            </div>
+        `).join('');
+    } catch(e) {
+        grid.innerHTML = `<p style="color:var(--danger);">加载失败: ${e.message}</p>`;
+    }
+}
+
+// ============================================================
+// Progress
+// ============================================================
+async function loadProgress() {
+    const course = state.courseCode;
+    const div = document.getElementById('progressContent');
+    if (!course) {
+        div.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">请先在侧边栏选择课程查看进度</p>';
+        return;
+    }
+    div.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px;">加载中...</p>';
+    try {
+        const res = await fetch(`/api/progress?course=${course}`);
+        const data = await res.json();
+        if (data.error) { div.innerHTML = `<p style="color:var(--danger);">${data.error}</p>`; return; }
+        const secPct = data.sections ? data.sections.percent : 0;
+        div.innerHTML = `
+            <div class="stat-grid">
+                <div class="stat-card"><div class="stat-value">${data.sections ? data.sections.read : 0}/${data.sections ? data.sections.total : 0}</div><div class="stat-label">📖 章节已读</div></div>
+                <div class="stat-card"><div class="stat-value">${data.problems_solved || 0}/${data.total_problems || 0}</div><div class="stat-label">✏️ 习题已做</div></div>
+                <div class="stat-card"><div class="stat-value">${data.quiz ? data.quiz.attempts : 0} 次</div><div class="stat-label">📝 测验完成</div></div>
+                <div class="stat-card"><div class="stat-value">${data.study ? data.study.total_hours : 0}h</div><div class="stat-label">⏱️ 学习时长</div></div>
+            </div>
+            <h4>📖 章节进度</h4>
+            <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${secPct}%;"></div></div>
+            <p style="font-size:0.85rem;color:var(--text-secondary);">${secPct}% 完成</p>
+            ${data.quiz && data.quiz.attempts > 0 ? `
+            <h4 style="margin-top:16px;">📝 测验成绩</h4>
+            <p style="font-size:0.9rem;">平均: ${data.quiz.average}% · 最佳: ${data.quiz.best}%</p>` : ''}
+            <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-icon" onclick="markProgress('study_session')" style="padding:6px 12px;font-size:0.8rem;">⏱️ +30分钟学习</button>
+                <button class="btn-icon" onclick="markProgress('section_read')" style="padding:6px 12px;font-size:0.8rem;">📖 标记已读章节</button>
+            </div>`;
+    } catch(e) {
+        div.innerHTML = `<p style="color:var(--danger);">加载失败: ${e.message}</p>`;
+    }
+}
+
+async function markProgress(action) {
+    const course = state.courseCode;
+    if (!course) return;
+    let body = {course_code: course, action: action};
+    if (action === 'study_session') body.minutes = 30;
+    if (action === 'section_read') {
+        const num = prompt('章节号 / Section number:');
+        if (!num) return;
+        body.number = parseInt(num);
+    }
+    try {
+        await fetch('/api/progress/mark', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(body)
+        });
+        loadProgress();
+    } catch(e) { console.error(e); }
+}
+
+// ============================================================
+// Tools: Upload + Export
+// ============================================================
+function onDragOver(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('dragover'); }
+function onDragLeave(e) { document.getElementById('uploadZone').classList.remove('dragover'); }
+function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) uploadFile(file);
+}
+function onFileSelected(e) {
+    const file = e.target.files[0];
+    if (file) uploadFile(file);
+}
+async function uploadFile(file) {
+    if (!file.name.endsWith('.pdf')) { alert('仅支持 PDF 文件'); return; }
+    const course = prompt('课程代码 / Course code (e.g. MATH2702):', state.courseCode || '');
+    if (!course) return;
+    const status = document.getElementById('uploadStatus');
+    status.innerHTML = '<p style="color:var(--text-secondary);">⏳ 正在处理...</p>';
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('course_code', course.toUpperCase());
+    try {
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+            status.innerHTML = `<p style="color:var(--success);">✅ ${data.message}</p>`;
+            loadStats();
+        } else {
+            status.innerHTML = `<p style="color:var(--danger);">❌ ${data.error}</p>`;
+        }
+    } catch(e) {
+        status.innerHTML = `<p style="color:var(--danger);">❌ ${e.message}</p>`;
+    }
+}
+
+async function loadGuidesList() {
+    const course = state.courseCode;
+    const div = document.getElementById('guidesList');
+    if (!course) {
+        div.innerHTML = '<p style="color:var(--text-muted);">请先选择课程</p>';
+        return;
+    }
+    try {
+        const res = await fetch(`/api/guides?course=${course}`);
+        const data = await res.json();
+        if (!data.guides || !data.guides.length) {
+            div.innerHTML = '<p style="color:var(--text-muted);">暂无教材文件</p>';
+            return;
+        }
+        div.innerHTML = data.guides.filter(g => g.name.startsWith('Section_')).slice(0, 30).map(g => `
+            <div class="guide-row">
+                <span>📄 ${g.name.replace('.md','').replace(/_/g,' ')} (${g.size_kb} KB)</span>
+                <button class="export-btn" onclick="exportGuide('${g.name}')">导出 PDF</button>
+            </div>
+        `).join('');
+    } catch(e) {
+        div.innerHTML = `<p style="color:var(--danger);">${e.message}</p>`;
+    }
+}
+
+async function exportGuide(filename) {
+    const course = state.courseCode;
+    const status = document.getElementById('exportStatus');
+    status.innerHTML = '<p style="color:var(--text-secondary);">⏳ 正在导出...</p>';
+    // Extract section number from filename
+    const m = filename.match(/Section_(\d+)/);
+    const section = m ? parseInt(m[1]) : null;
+    try {
+        const res = await fetch('/api/export', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({course_code: course, section: section})
+        });
+        const data = await res.json();
+        if (data.success) {
+            status.innerHTML = `<p style="color:var(--success);">✅ 已导出: ${data.filename || data.output}</p>`;
+        } else {
+            status.innerHTML = `<p style="color:var(--danger);">❌ ${data.error}<br><small>请安装: pip install weasyprint 或 brew install pandoc</small></p>`;
+        }
+    } catch(e) {
+        status.innerHTML = `<p style="color:var(--danger);">❌ ${e.message}</p>`;
+    }
+}
+
 function updateSuggestions() {
     const el = document.getElementById('suggestions');
     if (!el) return;
@@ -702,6 +1174,11 @@ function updateSuggestions() {
             'Help me analyze this coursework requirement',
             'How should I structure my data analysis report?',
             'What statistical methods are appropriate here?',
+        ],
+        quiz: [
+            'Generate a quiz on Markov chains with 5 questions',
+            'Test me on Poisson processes - medium difficulty',
+            'Create a mixed quiz covering sections 1-5',
         ],
     };
 
@@ -742,7 +1219,10 @@ async function sendMessage() {
     const welcome = document.getElementById('welcomeScreen');
     if (welcome) welcome.remove();
 
-    // Add user message
+    // Track user message in state
+    state.messages.push({role: 'user', content: question});
+
+    // Add user message to UI
     addMessage('user', question);
     input.value = '';
     input.style.height = 'auto';
@@ -753,29 +1233,88 @@ async function sendMessage() {
     const typingMsg = addTypingIndicator();
 
     try {
-        const res = await fetch('/api/chat', {
+        // Build conversation history for the server
+        const history = state.messages.slice(0, -1);  // exclude current question
+
+        const res = await fetch('/api/chat/stream', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 question: question,
                 course_code: state.courseCode,
-                mode: state.mode
+                mode: state.mode,
+                history: history.length > 0 ? history : null
             })
         });
 
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
-        const data = await res.json();
-
         // Remove typing indicator
         typingMsg.remove();
 
-        // Add assistant message
-        addMessage('assistant', data.answer, data.sources);
+        // Create assistant bubble for streaming
+        const assistantDiv = addMessage('assistant', '', null, true);
+
+        // Read SSE stream (throttled DOM updates to avoid freezing on long responses)
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let accumulated = '';
+        let sources = null;
+        let streamDone = false;
+        let throttleTimer = null;
+
+        function flushBubble() {
+            if (throttleTimer) { clearTimeout(throttleTimer); throttleTimer = null; }
+            updateAssistantBubble(assistantDiv, accumulated, sources, /* skipMath */ true);
+        }
+
+        while (!streamDone) {
+            const {done, value} = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, {stream: true});
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+
+            for (const line of lines) {
+                if (!line.startsWith('data: ')) continue;
+                const payload = line.slice(6);
+                if (payload === '[DONE]') { streamDone = true; break; }
+
+                try {
+                    const data = JSON.parse(payload);
+                    if ('sources' in data) {
+                        sources = data.sources;
+                    } else if (data.token) {
+                        accumulated += data.token;
+                        // Throttle: update DOM at most every 80ms
+                        if (!throttleTimer) {
+                            throttleTimer = setTimeout(flushBubble, 80);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[SSE] parse error:', e, 'payload:', payload.slice(0, 100));
+                }
+            }
+        }
+        reader.cancel();
+
+        // Final render with full MathJax
+        if (throttleTimer) { clearTimeout(throttleTimer); throttleTimer = null; }
+        if (!accumulated) {
+            updateAssistantBubble(assistantDiv, '⚠️ 未收到回答，请重试。 / No response received, please try again.', sources);
+        } else {
+            updateAssistantBubble(assistantDiv, accumulated, sources, /* skipMath */ false);
+        }
+        // Save to state history
+        state.messages.push({role: 'assistant', content: accumulated});
 
     } catch (e) {
         typingMsg.remove();
-        addMessage('assistant', `❌ **错误 / Error**: ${e.message}\n\n请确认服务器正在运行。Please make sure the server is running.`, []);
+        const errMsg = `❌ **错误 / Error**: ${e.message}\n\n请确认服务器正在运行。Please make sure the server is running.`;
+        addMessage('assistant', errMsg, []);
+        state.messages.push({role: 'assistant', content: errMsg});
     } finally {
         state.loading = false;
         document.getElementById('sendBtn').disabled = false;
@@ -783,7 +1322,7 @@ async function sendMessage() {
     }
 }
 
-function addMessage(role, content, sources) {
+function addMessage(role, content, sources, isStreaming) {
     const container = document.getElementById('messages');
     const div = document.createElement('div');
     div.className = `msg ${role}`;
@@ -793,41 +1332,142 @@ function addMessage(role, content, sources) {
             <div class="avatar">👤</div>
             <div class="bubble">${escapeHtml(content)}</div>`;
     } else {
-        // Render markdown
-        let html = marked.parse(content);
+        // If streaming, create a placeholder bubble that will be updated
+        const bubbleId = 'bubble-' + Date.now();
+        let html = isStreaming ? '<span class="streaming-cursor">▊</span>' : renderAssistantMarkdown(content);
 
-        // Render sources if present
+        // Render sources if present (only when not streaming)
         let sourcesHtml = '';
-        if (sources && sources.length > 0) {
-            sourcesHtml = `
-            <div class="sources">
-                <details>
-                    <summary>📎 参考来源 / References (${sources.length})</summary>
-                    <ul>
-                        ${sources.map((s, i) => `
-                            <li>
-                                <strong>[${i + 1}]</strong>
-                                ${s.course ? s.course + ' · ' : ''}
-                                ${s.section ? 'Section ' + s.section : ''}
-                                ${s.section_title ? ': ' + s.section_title : ''}
-                            </li>
-                        `).join('')}
-                    </ul>
-                </details>
-            </div>`;
+        if (sources && sources.length > 0 && !isStreaming) {
+            sourcesHtml = renderSourcesHtml(sources);
         }
 
         div.innerHTML = `
             <div class="avatar">🤖</div>
             <div>
-                <div class="bubble">${html}</div>
+                <div class="bubble" id="${bubbleId}">${html}</div>
                 ${sourcesHtml}
             </div>`;
+        div.dataset.bubbleId = bubbleId;
     }
 
     container.appendChild(div);
+    if (!isStreaming) {
+        typesetMath(div);
+    }
     scrollToBottom();
     return div;
+}
+
+function renderSourcesHtml(sources) {
+    return `
+    <div class="sources">
+        <details>
+            <summary>📎 参考来源 / References (${sources.length})</summary>
+            <ul>
+                ${sources.map((s, i) => `
+                    <li>
+                        <strong>[${i + 1}]</strong>
+                        ${s.course ? s.course + ' · ' : ''}
+                        ${s.section ? 'Section ' + s.section : ''}
+                        ${s.section_title ? ': ' + s.section_title : ''}
+                    </li>
+                `).join('')}
+            </ul>
+        </details>
+    </div>`;
+}
+
+function updateAssistantBubble(div, content, sources, skipMath) {
+    const bubble = div.querySelector('.bubble');
+    if (!bubble) return;
+    bubble.innerHTML = renderAssistantMarkdown(content) + '<span class="streaming-cursor" style="display:none">▊</span>';
+    // Update sources
+    const existingSources = div.querySelector('.sources');
+    if (existingSources) existingSources.remove();
+    if (sources && sources.length > 0) {
+        const sourcesContainer = document.createElement('div');
+        sourcesContainer.innerHTML = renderSourcesHtml(sources);
+        div.querySelector('div:last-child')?.appendChild?.(sourcesContainer.firstElementChild) ||
+            div.appendChild(sourcesContainer.firstElementChild);
+    }
+    // Only run MathJax on final render (skip during streaming to avoid freezing)
+    if (!skipMath) {
+        typesetMath(div);
+    }
+    scrollToBottom();
+}
+
+function normalizeMathContent(content) {
+    // Convert model outputs like:
+    // [
+    // X_n = X_0 + \sum_{i=1}^{n} Z_i
+    // ]
+    // into MathJax display math delimiters.
+    let normalized = content
+        .replace(/(^|\n)\s*\$\s*(?=\n|$)/g, '$1')
+        .replace(/(^|\n)\s*\[\s*\n([\s\S]*?)\n\s*\]\s*(?=\n|$)/g, (match, prefix, body) => {
+        const trimmed = body.trim();
+        const looksLikeMath = /\\[a-zA-Z]+|[_^{}=+\-*/]|[A-Z]_\w/.test(trimmed);
+        return looksLikeMath ? `${prefix}\\[\n${trimmed}\n\\]\n` : match;
+    });
+
+    normalized = normalized.replace(/(^|\n)(?!\s*[-*|>#`])\s*([A-Za-z]_\{?[A-Za-z0-9]+\}?\s*=.*(?:\\[a-zA-Z]+|[A-Za-z]_\{?[A-Za-z0-9]+\}?).*)\s*(?=\n|$)/g,
+        '$1\\[\n$2\n\\]');
+
+    return wrapInlineRawMath(normalized);
+}
+
+function renderAssistantMarkdown(content) {
+    const normalized = normalizeMathContent(content);
+    const protectedMath = [];
+    const protectedText = normalized.replace(
+        /(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$(?!\s)(?:\\.|[^$\n]){1,120}?(?<!\s)\$)/g,
+        (match) => {
+            const token = `@@MATH_${protectedMath.length}@@`;
+            protectedMath.push(match);
+            return token;
+        }
+    );
+
+    let html = marked.parse(protectedText);
+    protectedMath.forEach((math, index) => {
+        html = html.replace(new RegExp(`@@MATH_${index}@@`, 'g'), math);
+    });
+    return html;
+}
+
+function wrapInlineRawMath(text) {
+    const protectedPattern = /(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$(?!\s)(?:\\.|[^$\n]){1,120}?(?<!\s)\$|```[\s\S]*?```|`[^`]*`)/g;
+    return text.split(protectedPattern).map(part => {
+        if (!part || protectedPattern.test(part)) {
+            protectedPattern.lastIndex = 0;
+            return part;
+        }
+
+        return part
+            .replace(/(^|[\s（(，。；：,;:])((?:[A-Z]|[a-z])_\{?[A-Za-z0-9]+\}?)(?=[\s，。；：,;:）).]|$)/g,
+                '$1\\($2\\)')
+            .replace(/(^|[\s（(，。；：,;:])(\\mathbb\{[A-Z]\})(?=[\s，。；：,;:）).]|$)/g,
+                '$1\\($2\\)')
+            .replace(/(^|[\s（(，。；：,;:])(\\sum_\{[^}]+\}\^\{?[^}\s]+\}?)(?=[\s，。；：,;:）).]|$)/g,
+                '$1\\($2\\)');
+    }).join('');
+}
+
+function typesetMath(root) {
+    if (!window.MathJax || !window.MathJax.typesetPromise) {
+        if (root && root.querySelector && root.querySelector('.bubble')) {
+            const warning = document.createElement('div');
+            warning.className = 'math-warning';
+            warning.textContent = '公式渲染库未加载 / Math renderer did not load. 请检查网络后刷新页面。';
+            root.querySelector('.bubble').appendChild(warning);
+        }
+        return;
+    }
+    window.MathJax.typesetPromise([root]).catch(err => {
+        console.warn('MathJax typeset failed:', err);
+    });
 }
 
 function addTypingIndicator() {

@@ -1,46 +1,52 @@
-# Section 13: Poisson Process with Poisson Increments
+# Section 13: Poisson process with Poisson increments
 
-> MATH2702 Stochastic Processes - 自学教材
-> 生成时间: 2026-07-17 14:52
+> MATH2702 - 自学教材 / Self-Study Guide
+> 生成时间: 2026-07-20 15:43
 > 来源页: 69-71
 
 ---
 
-# MATH2702 Study Guide / 学习指南
+# MATH2702: Stochastic Processes / 随机过程
+
 ## Section 13: Poisson Process with Poisson Increments / 泊松过程与泊松增量
 
 ---
 
 ### 📋 Section Overview / 章节概览
 
-This section introduces the **Poisson Process (泊松过程)** , a fundamental continuous-time stochastic process with discrete state space. We begin with a review of the **Poisson distribution (泊松分布)** and then define the Poisson process through its key property: **independent Poisson increments (独立泊松增量)** . We also explore how to combine and split Poisson processes through **summed (求和)** and **marked (标记)** processes.
+**中文解释：** 本节是连续时间马尔可夫跳跃过程（Continuous Time Markov Jump Processes）的第一部分。我们将学习泊松过程（Poisson Process），这是一种在连续时间中、离散状态空间上的随机过程。泊松过程是随机过程理论中最基础、最重要的模型之一，广泛应用于排队论、保险精算、通信网络等领域。本节从泊松分布开始复习，然后给出泊松过程的定义（通过泊松增量），最后讨论泊松过程的求和与标记性质。
 
-**Why this matters / 为什么重要**: The Poisson process is the building block for modeling random arrivals over time - from phone calls at a call center, insurance claims, emails, to radioactive decay. Understanding it is essential for queueing theory, reliability engineering, finance, and many other fields. This is the foundation for **continuous-time Markov chains (连续时间马尔可夫链)** , which we will study next.
+**English explanation:** This section is the first part of Continuous Time Markov Jump Processes. We will study the Poisson Process, a stochastic process in continuous time with discrete state space. The Poisson process is one of the most fundamental and important models in stochastic process theory, widely used in queueing theory, actuarial science, telecommunications, and many other fields. This section begins with a review of the Poisson distribution, then provides the definition of the Poisson process (via Poisson increments), and finally discusses the summation and marking properties of Poisson processes.
+
+**Why this matters / 为什么重要：**
+- The Poisson process models random arrivals over time (e.g., customer arrivals, phone calls, insurance claims)
+- 泊松过程模拟随时间发生的随机到达事件（如顾客到达、电话呼叫、保险索赔）
+- It is the building block for more complex continuous-time Markov processes
+- 它是更复杂连续时间马尔可夫过程的基础构件
 
 ---
 
 ### 🎯 Learning Objectives / 学习目标
 
-After completing this section, you will be able to:
+After completing this section, you should be able to / 完成本节后，你应该能够：
 
-1. **Recall and apply** the Poisson distribution's properties (mean, variance, sum, marking)
-2. **Define** the Poisson process using the independent Poisson increments property
-3. **Calculate** probabilities for Poisson process events over any time interval
-4. **Apply** the summed Poisson process theorem to combine independent processes
-5. **Apply** the marked Poisson process theorem to split a process
-6. **Solve** real-world problems using Poisson process models
+1. **Recall and apply** properties of the Poisson distribution, including expectation, variance, and the sum of independent Poisson variables / **回忆并应用**泊松分布的性质，包括期望、方差和独立泊松变量的和
+2. **Define** the Poisson process using the Poisson increments definition / **定义**泊松过程（使用泊松增量定义）
+3. **Calculate** probabilities for the Poisson process over any time interval / **计算**泊松过程在任意时间区间上的概率
+4. **Apply** the summed Poisson process theorem to combine independent Poisson processes / **应用**泊松过程求和定理来合并独立的泊松过程
+5. **Apply** the marked Poisson process theorem to split a Poisson process / **应用**泊松过程标记定理来分割一个泊松过程
+6. **Solve** real-world problems using Poisson process models / **使用**泊松过程模型解决实际问题
 
 ---
 
 ### 📚 Prerequisites / 前置知识
 
-Before studying this section, you should be familiar with:
+Before studying this section, you should be familiar with / 在学习本节之前，你应该熟悉：
 
-- **Probability distributions (概率分布)** : Especially the Poisson distribution
-- **Independence (独立性)** : What it means for random variables to be independent
-- **Expectation and variance (期望与方差)** : Basic properties
-- **Discrete-time stochastic processes (离散时间随机过程)** : From earlier chapters (random walks, Markov chains)
-- **Basic calculus (基础微积分)** : For understanding rates and time intervals
+- **Poisson distribution** / **泊松分布**: probability mass function, expectation, variance
+- **Independent random variables** / **独立随机变量**: definition and properties
+- **Basic probability** / **基础概率**: probability calculations, conditional probability
+- **Discrete-time Markov chains** / **离散时间马尔可夫链** (from previous sections): understanding of state space, transition probabilities
 
 ---
 
@@ -48,397 +54,276 @@ Before studying this section, you should be familiar with:
 
 ---
 
-#### Topic 1: Poisson Distribution Review / 泊松分布回顾
+#### Topic 1: Poisson Distribution Review / 泊松分布复习
 
-**Intuition / 直觉理解**
+##### Intuition / 直觉理解
 
-The **Poisson distribution (泊松分布)** models the number of "arrivals" (事件发生次数) that occur in a fixed interval of time or space, when these events happen at a constant average rate and independently of each other.
+**中文解释：** 泊松分布是概率论中最重要的离散分布之一。它通常用来模拟在固定时间段内"到达"事件的数量。想象一个呼叫中心：在一小时内，你会接到多少个电话？这个数量通常可以用泊松分布来建模。泊松分布的关键参数是速率 λ（lambda），它表示单位时间内事件的平均发生次数。
 
-**Analogy / 类比**: Imagine you are watching raindrops fall on a square meter of pavement. On average, 10 drops fall per minute. The actual number in any given minute follows a Poisson distribution with rate λ = 10. Some minutes you might see 8 drops, others 12, but the average is 10.
+**English explanation:** The Poisson distribution is one of the most important discrete distributions in probability theory. It is typically used to model the number of "arrivals" in a fixed period of time. Imagine a call centre: how many calls will you receive in one hour? This number can usually be modelled using the Poisson distribution. The key parameter of the Poisson distribution is the rate λ (lambda), which represents the average number of events occurring per unit time.
 
-**Formal Definition / 形式化定义**
+**Real-world examples / 实际应用例子：**
+- Number of calls to a call centre in one hour / 呼叫中心一小时内接到的电话数量
+- Number of claims to an insurance company in one year / 保险公司一年内收到的索赔数量
+- Number of particles decaying from radioactive material in one second / 放射性物质一秒钟内衰变的粒子数量
 
-A discrete random variable (离散随机变量) \(X\) has a **Poisson distribution (泊松分布)** with rate (速率) \(\lambda\), written \(X \sim \text{Po}(\lambda)\), if its **probability mass function (概率质量函数, PMF)** is:
+##### Formal Definition / 形式化定义
 
-\[
+**Definition / 定义：** A discrete random variable $X$ has a Poisson distribution with rate $\lambda$, written $X \sim \text{Po}(\lambda)$, if its probability mass function (PMF) is:
+
+$$
 \mathbb{P}(X = n) = \frac{e^{-\lambda} \lambda^n}{n!}, \quad n = 0, 1, 2, \ldots
-\]
+$$
 
-**Symbol explanation / 符号说明**:
-- \(X\): random variable representing the number of arrivals (表示到达次数的随机变量)
-- \(\lambda\) (lambda): the rate parameter, the average number of arrivals (速率参数，平均到达次数)
-- \(n\): a specific number of arrivals (具体的到达次数)
-- \(e\): Euler's number, approximately 2.71828 (自然常数)
-- \(n!\): n factorial = n × (n-1) × ... × 2 × 1 (n的阶乘)
-- \(\mathbb{P}(X = n)\): probability that exactly n arrivals occur (恰好发生n次到达的概率)
+**Symbol explanation / 符号说明：**
 
-**Key Properties / 关键性质**
+| Symbol | Meaning (English) | 含义（中文） |
+|--------|-------------------|--------------|
+| $X$ | Random variable | 随机变量 |
+| $\lambda$ | Rate parameter (mean number of events per unit time) | 速率参数（单位时间内事件的平均数） |
+| $n$ | Number of events | 事件数量 |
+| $e$ | Euler's number (≈ 2.71828) | 欧拉数 |
+| $\mathbb{P}(X = n)$ | Probability that X equals n | X等于n的概率 |
 
-The textbook lists three important properties:
+**中文解释：** 这个公式告诉我们，在固定时间段内恰好发生n次事件的概率。注意分母是n的阶乘，这保证了所有概率之和为1。当λ较小时，分布集中在0附近；当λ较大时，分布更分散，近似于正态分布。
 
-1. **Expectation and Variance (期望与方差)** :
-   \[
-   \mathbb{E}[X] = \lambda, \quad \text{Var}(X) = \lambda
-   \]
-   - \(\mathbb{E}[X]\): expected value (mean) of X (期望值/均值)
-   - \(\text{Var}(X)\): variance of X (方差)
-   - Note: For Poisson, mean = variance (均值等于方差)
+**English explanation:** This formula tells us the probability that exactly n events occur in a fixed time period. Note that the denominator is n factorial, which ensures all probabilities sum to 1. When λ is small, the distribution is concentrated near 0; when λ is large, the distribution is more spread out and approximates a normal distribution.
 
-2. **Sum of Independent Poisson Variables (独立泊松变量之和)** :
-   If \(X \sim \text{Po}(\lambda)\) and \(Y \sim \text{Po}(\mu)\) are independent (独立), then:
-   \[
-   X + Y \sim \text{Po}(\lambda + \mu)
-   \]
-   - The sum of two independent Poisson random variables is also Poisson
-   - The rates add together
+##### Key Properties / 关键性质
 
-3. **Marking Property (标记性质)** :
-   Let \(X \sim \text{Po}(\lambda)\) represent arrivals. Independently "mark" each arrival with probability \(p\). Then:
-   - Number of marked arrivals \(Y \sim \text{Po}(p\lambda)\)
-   - Number of unmarked arrivals \(Z \sim \text{Po}((1-p)\lambda)\)
-   - \(Y\) and \(Z\) are independent
+**Property 1: Expectation and Variance / 性质1：期望和方差**
 
-**Note from textbook / 教材注**: The textbook says "I say 'recall', but it is OK if the third one is new to you." (我说"回顾"，但第三个性质对你来说是新的也没关系。)
+$$
+\mathbb{E}[X] = \lambda \quad \text{and} \quad \text{Var}(X) = \lambda
+$$
 
-**Common Applications / 常见应用**:
-- Number of calls to a call centre in one hour (一小时内呼叫中心的电话数)
-- Number of claims to an insurance company in one year (一年内保险公司的索赔数)
-- Number of particles decaying from radioactive material in one second (一秒内放射性物质衰变的粒子数)
+**中文解释：** 泊松分布的一个独特性质是它的期望和方差相等，都等于λ。这意味着如果平均每小时接到10个电话（λ=10），那么方差也是10，标准差约为√10 ≈ 3.16。
 
----
+**English explanation:** A unique property of the Poisson distribution is that its expectation and variance are equal, both equal to λ. This means if you receive an average of 10 calls per hour (λ=10), then the variance is also 10, and the standard deviation is approximately √10 ≈ 3.16.
 
-#### Topic 2: Definition of Poisson Process / 泊松过程的定义
+**Property 2: Sum of Independent Poisson Variables / 性质2：独立泊松变量的和**
 
-**Intuition / 直觉理解**
+If $X \sim \text{Po}(\lambda)$ and $Y \sim \text{Po}(\mu)$ are independent, then:
 
-Instead of just counting arrivals in a fixed time period, we now want to model the **entire evolution** of arrivals over time. This is a **stochastic process (随机过程)** with:
-- **State space (状态空间)** : \(\mathcal{S} = \mathbb{Z}_+ = \{0, 1, 2, \ldots\}\) (discrete, counting number of arrivals)
-- **Time (时间)** : \(t \in [0, \infty)\) (continuous)
+$$
+X + Y \sim \text{Po}(\lambda + \mu)
+$$
 
-**Notation note / 符号说明**: In continuous time, we write \(X(t)\) instead of \(X_n\) (which was used for discrete time).
+**中文解释：** 两个独立泊松随机变量的和仍然服从泊松分布，其参数是原参数之和。例如，如果大学邮箱每小时收到4封邮件（λ=4），个人邮箱每小时收到2封邮件（μ=2），那么总邮件数服从Po(6)分布。
 
-**Analogy / 类比**: Imagine you are at a bus stop. The number of buses that have arrived by time \(t\) is \(X(t)\). At time 0, no buses have arrived: \(X(0) = 0\). In any interval of length \(s\), the number of new arrivals follows a Poisson distribution with rate proportional to \(s\).
+**English explanation:** The sum of two independent Poisson random variables is still Poisson distributed, with parameter equal to the sum of the original parameters. For example, if a university email receives 4 emails per hour (λ=4) and a personal email receives 2 emails per hour (μ=2), then the total number of emails follows a Po(6) distribution.
 
-**Formal Definition / 形式化定义**
+**Property 3: Marking Property / 性质3：标记性质**
 
-**Definition 13.1: Poisson Process (泊松过程)**
+Let $X \sim \text{Po}(\lambda)$ represent some arrivals, and independently "mark" each arrival with probability $p$. Then:
+- The number of marked arrivals $Y \sim \text{Po}(p\lambda)$
+- The number of unmarked arrivals $Z \sim \text{Po}((1-p)\lambda)$
+- $Y$ and $Z$ are independent
 
-The **Poisson process (泊松过程)** with rate \(\lambda\) is a stochastic process \((X(t))\) with continuous time \(t \in [0, \infty)\) and discrete state space \(\mathcal{S} = \mathbb{Z}_+\) satisfying:
+**中文解释：** 这个性质说：如果我们有一个泊松过程，每个到达事件独立地以概率p被"标记"，那么标记事件的数量和未标记事件的数量都服从泊松分布，并且它们相互独立。这个性质可能对你是新的，但它在后面会非常有用。
 
-1. **Initial condition (初始条件)** : \(X(0) = 0\)
-
-2. **Poisson increments (泊松增量)** : For all \(s, t > 0\):
-   \[
-   X(t+s) - X(t) \sim \text{Po}(\lambda s)
-   \]
-   - The number of arrivals in any interval of length \(s\) follows a Poisson distribution with mean \(\lambda s\)
-   - The rate is proportional to the interval length
-
-3. **Independent increments (独立增量)** : For all \(t_1 \leq t_2 \leq t_3 \leq t_4\):
-   \[
-   X(t_2) - X(t_1) \text{ and } X(t_4) - X(t_3) \text{ are independent}
-   \]
-   - Arrivals in non-overlapping time intervals are independent
-   - **Important**: Overlapping intervals are NOT independent (重叠区间不独立)
-
-**Symbol explanation / 符号说明**:
-- \(X(t)\): number of arrivals up to time \(t\) (截至时间t的到达次数)
-- \(\lambda\) (lambda): rate parameter, average number of arrivals per unit time (速率参数，单位时间平均到达次数)
-- \(s\): length of time interval (时间区间长度)
-- \(t\): starting time (起始时间)
-- \(\text{Po}(\lambda s)\): Poisson distribution with mean \(\lambda s\) (均值为\(\lambda s\)的泊松分布)
-
-**Historical Note / 历史注记**:
-- The Poisson process was discovered in the first decade of the 20th century (20世纪第一个十年)
-- Named after the Poisson distribution
-- Important contributors: **Filip Lundberg** (Swedish actuary/mathematician) and **A.K. Erlang** (Danish engineer/mathematician)
-- **Siméon Denis Poisson** (French mathematician/physicist) studied the distribution in 1837
-- **Abraham de Moivre** (French mathematician) used it over 100 years earlier
+**English explanation:** This property states: if we have a Poisson process, and each arrival is independently "marked" with probability p, then the number of marked events and the number of unmarked events both follow Poisson distributions, and they are independent of each other. This property may be new to you, but it will be very useful later.
 
 ---
 
-#### Topic 3: Worked Examples / 例题
+#### Topic 2: Definition of Poisson Process via Poisson Increments / 通过泊松增量定义泊松过程
+
+##### Intuition / 直觉理解
+
+**中文解释：** 现在我们不只是想模拟固定时间段内的到达数量，而是想连续地模拟随时间变化的总到达数量。这是一个连续时间、离散状态空间的随机过程。想象一个呼叫中心，每小时平均接到100个电话。我们假设：从0开始计数，第一个小时内的电话数服从Po(100)，第二个小时内的电话数也服从Po(100)且与第一个小时独立，两小时内的电话数服从Po(200)，半小时内的电话数服从Po(50)。这些性质定义了泊松过程。
+
+**English explanation:** Now, instead of just modelling the number of arrivals in a fixed amount of time, we want to continuously model the total number of arrivals as it changes over time. This is a stochastic process with continuous time and discrete state space. Imagine a call centre receiving an average of 100 calls per hour. We assume: we start counting at 0, the number of calls in the first hour follows Po(100), the number in the second hour also follows Po(100) and is independent of the first hour, the number in a two-hour period follows Po(200), and the number in a half-hour period follows Po(50). These properties define the Poisson process.
+
+**Notation note / 符号说明：** In continuous time, we normally write stochastic processes as $(X(t))$, with the time variable being $t$ in brackets, rather than a subscript $n$ as we had in discrete time. / 在连续时间中，我们通常将随机过程写为$(X(t))$，时间变量用括号中的t表示，而不是像离散时间中那样用下标n。
+
+##### Formal Definition / 形式化定义
+
+**Definition 13.1: Poisson Process / 定义13.1：泊松过程**
+
+The Poisson process with rate $\lambda$ is defined as follows. It is a stochastic process $(X(t))$ with continuous time $t \in [0, \infty)$ and discrete state space $\mathcal{S} = \mathbb{Z}_+ = \{0, 1, 2, \ldots\}$ with the following properties:
+
+1. **Initial condition / 初始条件：** $X(0) = 0$
+2. **Poisson increments / 泊松增量：** $X(t+s) - X(t) \sim \text{Po}(\lambda s)$ for all $s, t > 0$
+3. **Independent increments / 独立增量：** $X(t_2) - X(t_1)$ and $X(t_4) - X(t_3)$ are independent for all $t_1 \leq t_2 \leq t_3 \leq t_4$
+
+**Symbol explanation / 符号说明：**
+
+| Symbol | Meaning (English) | 含义（中文） |
+|--------|-------------------|--------------|
+| $X(t)$ | Number of arrivals up to time t | 截至时间t的到达总数 |
+| $\lambda$ | Rate of arrivals per unit time | 单位时间内的到达率 |
+| $s$ | Length of time interval | 时间区间长度 |
+| $t$ | Starting time | 起始时间 |
+| $\mathbb{Z}_+$ | Non-negative integers | 非负整数集合 |
+| $t_1 \leq t_2 \leq t_3 \leq t_4$ | Non-overlapping time intervals | 不重叠的时间区间 |
+
+**中文解释：** 定义中的三个条件非常重要：
+1. 初始条件：在时间0时，还没有任何到达事件发生。
+2. 泊松增量：在任何长度为s的时间区间内，到达事件的数量服从参数为λs的泊松分布。注意，这个分布只依赖于区间长度s，而不依赖于起始时间t（这就是"平稳增量"性质）。
+3. 独立增量：不重叠的时间区间内的到达数量是相互独立的。注意，重叠的时间区间不会有独立增量，因为重叠部分的到达会被两个区间都计数。
+
+**English explanation:** The three conditions in the definition are very important:
+1. Initial condition: at time 0, no arrivals have occurred yet.
+2. Poisson increments: in any time interval of length s, the number of arrivals follows a Poisson distribution with parameter λs. Note that this distribution only depends on the interval length s, not on the starting time t (this is the "stationary increments" property).
+3. Independent increments: the numbers of arrivals in non-overlapping time intervals are independent of each other. Note that overlapping time intervals will not have independent increments, as arrivals in the overlap will count for both intervals.
+
+**Historical note / 历史注记：** The Poisson process was discovered in the first decade of the 20th century, and the process was named after the distribution. Important work was done by the Swedish actuary and mathematician Filip Lundberg and the Danish engineer and mathematician A.K. Erlang. / 泊松过程在20世纪第一个十年被发现，该过程以分布命名。瑞典精算师兼数学家Filip Lundberg和丹麦工程师兼数学家A.K. Erlang做出了重要贡献。
+
+##### Worked Examples / 例题
 
 **Example 13.1: Insurance Claims / 保险索赔**
 
-**Problem / 问题**: Claims arrive at an insurance company at a rate of \(\lambda = 8\) per hour, modeled as a Poisson process. What is the probability there are no claims in a given 15-minute period?
+**Problem / 问题：** Claims arrive at an insurance company at a rate of $\lambda = 8$ per hour, modelled as a Poisson process. What is the probability there are no claims in a given 15 minute period?
 
-**Solution / 解答**:
+**中文解释：** 保险公司每小时平均收到8个索赔，建模为泊松过程。求在任意15分钟内没有索赔的概率。
 
-**Step 1**: Determine the time interval length.
-- 15 minutes = 15/60 = 0.25 hours
-- So \(s = 0.25\)
+**Solution / 解答：**
 
-**Step 2**: Find the mean number of claims in this interval.
-- By property 2: \(X(t+0.25) - X(t) \sim \text{Po}(\lambda s) = \text{Po}(8 \times 0.25) = \text{Po}(2)\)
-- Mean = 2 claims per 15-minute period
+**Step 1: Determine the time interval / 步骤1：确定时间区间**
+15 minutes = 15/60 = 0.25 hours
 
-**Step 3**: Calculate the probability of 0 claims.
-\[
-\mathbb{P}(\text{no claims}) = \frac{e^{-2} \times 2^0}{0!} = e^{-2} = 0.135
-\]
+**Step 2: Find the Poisson parameter / 步骤2：找到泊松参数**
+By property 2, the number of claims in 15 minutes has a Poisson distribution with mean:
+$$\lambda s = 8 \times 0.25 = 2$$
 
-**Answer / 答案**: The probability is \(e^{-2} \approx 0.135\) or 13.5%.
+**Step 3: Calculate the probability / 步骤3：计算概率**
+The probability there are no claims (n=0) is:
+$$\mathbb{P}(X = 0) = \frac{e^{-2} \times 2^0}{0!} = e^{-2} = 0.135$$
 
----
+**Answer / 答案：** 0.135 or 13.5%
 
-**Example 13.2: Professor's Visitors / 教授访客**
+**中文解释：** 注意，0! = 1，任何数的0次方等于1，所以公式简化为e^{-λs}。这里e^{-2} ≈ 0.135，意味着在任意15分钟内，有13.5%的概率没有索赔到达。
 
-**Problem / 问题**: A professor receives visitors to her office at a rate of \(\lambda = 2.5\) per day, modeled as a Poisson process. What is the probability she gets at least one visitor every day this (5-day) week?
-
-**Solution / 解答**:
-
-**Step 1**: Find probability of at least one visitor on any given day.
-- For one day, \(s = 1\), so \(X(t+1) - X(t) \sim \text{Po}(2.5)\)
-- Probability of at least one = 1 - probability of zero
-\[
-\mathbb{P}(\text{at least 1}) = 1 - \frac{e^{-2.5} \times 2.5^0}{0!} = 1 - e^{-2.5} = 0.918
-\]
-
-**Step 2**: Use independence across days.
-- By property 3 (independent increments), the numbers of visitors on different days are independent
-- Probability of at least one each day for 5 days:
-\[
-(0.918)^5 = 0.652
-\]
-
-**Answer / 答案**: The probability is approximately 0.652 or 65.2%.
+**English explanation:** Note that 0! = 1 and any number to the power of 0 equals 1, so the formula simplifies to e^{-λs}. Here e^{-2} ≈ 0.135, meaning there is a 13.5% probability of no claims arriving in any given 15-minute period.
 
 ---
 
-#### Topic 4: Summed and Marked Poisson Processes / 求和与标记泊松过程
+**Example 13.2: Professor's Visitors / 教授的访客**
 
-**Intuition / 直觉理解**
+**Problem / 问题：** A professor receives visitors to her office at a rate of $\lambda = 2.5$ per day, modelled as a Poisson process. What is the probability she gets at least one visitor every day this (5-day) week?
 
-- **Summed process (求和过程)** : If you have two independent Poisson processes, their sum is also a Poisson process. This is like combining two streams of arrivals into one.
-- **Marked process (标记过程)** : If you have one Poisson process and each arrival is independently classified (marked) into one of two categories, each category forms its own Poisson process, and they are independent.
+**中文解释：** 教授每天平均接待2.5位访客，建模为泊松过程。求本周（5天）每天至少有一位访客的概率。
 
-**Analogy / 类比**:
-- **Summed**: Emails arrive at your university account (rate 4/hr) and personal account (rate 2/hr). Total emails = sum of two Poisson processes.
-- **Marked**: All goals in a football match (rate 2.72/game). Each goal is independently marked as "home" (probability 0.56) or "away" (probability 0.44).
+**Solution / 解答：**
 
----
+**Step 1: Probability of at least one visitor on a given day / 步骤1：某天至少有一位访客的概率**
+$$\mathbb{P}(\text{at least one}) = 1 - \mathbb{P}(\text{no visitors}) = 1 - \frac{e^{-2.5} \times 2.5^0}{0!} = 1 - e^{-2.5} = 0.918$$
 
-**Theorem 13.1: Summed Poisson Process (求和泊松过程)**
+**Step 2: Use independence across days / 步骤2：利用天与天之间的独立性**
+By property 3 (independent increments), the numbers of visitors on different days are independent. So the probability of getting at least one visitor each day this week is:
+$$0.918^5 = 0.652$$
 
-**Statement / 陈述**:
-Let \((X(t))\) and \((Y(t))\) be independent Poisson processes with rates \(\lambda\) and \(\mu\) respectively. Then the process \((Z(t))\) given by:
-\[
-Z(t) = X(t) + Y(t)
-\]
-is a Poisson process with rate \(\lambda + \mu\).
+**Answer / 答案：** 0.652 or 65.2%
 
-**Symbol explanation / 符号说明**:
-- \(X(t)\): first Poisson process with rate \(\lambda\) (第一个速率为\(\lambda\)的泊松过程)
-- \(Y(t)\): second Poisson process with rate \(\mu\) (第二个速率为\(\mu\)的泊松过程)
-- \(Z(t) = X(t) + Y(t)\): sum process (求和过程)
-- Rate of \(Z\): \(\lambda + \mu\) (速率相加)
+**中文解释：** 这里我们利用了独立增量性质：不同天的访客数量是独立的。注意，我们假设"一天"是长度为1的时间区间，且这些区间不重叠。每天至少一位访客的概率是0.918，5天都满足的概率就是0.918^5。
 
-**Proof / 证明**: The proof is assigned as a problem on Problem Sheet 7 (作业单7). The key idea is to verify the three defining properties of a Poisson process for \(Z(t)\).
+**English explanation:** Here we use the independent increments property: the numbers of visitors on different days are independent. Note that we assume a "day" is a time interval of length 1, and these intervals do not overlap. The probability of at least one visitor per day is 0.918, and the probability this holds for all 5 days is 0.918^5.
 
 ---
 
-**Example 13.3: Combined Emails / 合并邮件**
+#### Topic 3: Summed and Marked Poisson Processes / 泊松过程的求和与标记
 
-**Problem / 问题**: A student receives emails to her university address at a rate of \(\lambda = 4\) emails per hour, and to her personal address at a rate of \(\mu = 2\) per hour. Using a Poisson process model, what is the probability the student receives 3 or fewer emails in a 30-minute period?
+##### Intuition / 直觉理解
 
-**Solution / 解答**:
+**中文解释：** 现在我们讨论泊松过程的两个重要操作：求和与标记。求和是将两个独立的泊松过程合并成一个；标记是将一个泊松过程分割成两个。这两个操作是互逆的，在实际应用中非常有用。
 
-**Step 1**: Find the combined rate.
-- By Theorem 13.1, total emails follow a Poisson process with rate \(\lambda + \mu = 4 + 2 = 6\) per hour
+**English explanation:** Now we discuss two important operations on Poisson processes: summation and marking. Summation combines two independent Poisson processes into one; marking splits one Poisson process into two. These two operations are inverse to each other and are very useful in practical applications.
 
-**Step 2**: Find the mean for 30 minutes.
-- 30 minutes = 0.5 hours
-- Mean = \(6 \times 0.5 = 3\) emails in 30 minutes
-- So \(Z(0.5) \sim \text{Po}(3)\)
+##### Theorem 13.1: Summed Poisson Process / 定理13.1：泊松过程求和
 
-**Step 3**: Calculate probability of 3 or fewer.
-\[
-\mathbb{P}(Z \leq 3) = \sum_{n=0}^{3} \frac{e^{-3} \times 3^n}{n!}
-\]
+**Theorem / 定理：** Let $(X(t))$ and $(Y(t))$ be independent Poisson processes with rates $\lambda$ and $\mu$ respectively. Then the process $(Z(t))$ given by $Z(t) = X(t) + Y(t)$ is a Poisson process with rate $\lambda + \mu$.
 
-\[
-= \frac{e^{-3} \times 3^0}{0!} + \frac{e^{-3} \times 3^1}{1!} + \frac{e^{-3} \times 3^2}{2!} + \frac{e^{-3} \times 3^3}{3!}
-\]
+**中文解释：** 这个定理说：两个独立泊松过程的和仍然是一个泊松过程，其速率是原速率之和。例如，如果大学邮箱的邮件到达是速率为4的泊松过程，个人邮箱的邮件到达是速率为2的泊松过程，那么总邮件到达就是速率为6的泊松过程。
 
-\[
-= e^{-3} \left(1 + 3 + \frac{9}{2} + \frac{27}{6}\right)
-\]
+**English explanation:** This theorem states: the sum of two independent Poisson processes is still a Poisson process, with rate equal to the sum of the original rates. For example, if university email arrivals form a Poisson process with rate 4, and personal email arrivals form a Poisson process with rate 2, then the total email arrivals form a Poisson process with rate 6.
 
-\[
-= e^{-3} \left(1 + 3 + 4.5 + 4.5\right) = 13e^{-3}
-\]
+**Proof / 证明：** The proof of this is a question on Problem Sheet 7. / 这个证明是习题7上的一个问题。
 
-\[
-= 13 \times 0.0498 = 0.647
-\]
-
-**Answer / 答案**: The probability is approximately 0.647 or 64.7%.
+**Key insight / 关键洞察：** The proof would need to verify all three properties of the Poisson process definition for $Z(t)$: $Z(0)=0$, Poisson increments, and independent increments. / 证明需要验证$Z(t)$满足泊松过程定义的所有三个性质：$Z(0)=0$、泊松增量和独立增量。
 
 ---
 
-**Theorem 13.2: Marked Poisson Process (标记泊松过程)**
+**Example 13.3: Student Emails / 学生邮件**
 
-**Statement / 陈述**:
-Let \((X(t))\) be a Poisson process with rate \(\lambda\). Each arrival is independently marked with probability \(p\). Then:
-- The marked process \((Y(t))\) is a Poisson process with rate \(p\lambda\)
-- The unmarked process \((Z(t))\) is a Poisson process with rate \((1-p)\lambda\)
-- \((Y(t))\) and \((Z(t))\) are independent
+**Problem / 问题：** A student receives emails to her university mail address at a rate of $\lambda = 4$ emails per hour, and to her personal email address at a rate of $\mu = 2$ per hour. Using a Poisson process model, what is the probability the student receives 3 or fewer emails in a 30 minute period?
 
-**Symbol explanation / 符号说明**:
-- \(X(t)\): original Poisson process with rate \(\lambda\) (原始泊松过程，速率为\(\lambda\))
-- \(p\): probability of marking each arrival (标记每个到达的概率)
-- \(Y(t)\): marked arrivals (标记的到达)
-- \(Z(t)\): unmarked arrivals (未标记的到达)
-- Rate of \(Y\): \(p\lambda\) (标记过程的速率)
-- Rate of \(Z\): \((1-p)\lambda\) (未标记过程的速率)
+**中文解释：** 学生大学邮箱每小时收到4封邮件，个人邮箱每小时收到2封邮件。使用泊松过程模型，求学生在30分钟内收到3封或更少邮件的概率。
 
-**Proof / 证明**: The textbook states "Given the third fact that you were 'reminded' of, it is easy to check the necessary properties." (基于之前"回顾"的第三个性质，很容易验证必要的性质。) This refers to the marking property of the Poisson distribution.
+**Solution / 解答：**
+
+**Step 1: Find the total rate / 步骤1：找到总速率**
+The total number of emails is a sum of Poisson processes with rate:
+$$\lambda + \mu = 4 + 2 = 6 \text{ per hour}$$
+
+**Step 2: Find the Poisson parameter for 30 minutes / 步骤2：找到30分钟的泊松参数**
+30 minutes = 0.5 hours, so the parameter is:
+$$(\lambda + \mu) \times 0.5 = 6 \times 0.5 = 3$$
+
+**Step 3: Calculate the probability / 步骤3：计算概率**
+The probability that 3 or fewer emails are received is:
+$$\mathbb{P}(X \leq 3) = \sum_{n=0}^{3} \frac{e^{-3} \times 3^n}{n!}$$
+
+Let's calculate each term:
+- $n=0$: $\frac{e^{-3} \times 3^0}{0!} = e^{-3}$
+- $n=1$: $\frac{e^{-3} \times 3^1}{1!} = 3e^{-3}$
+- $n=2$: $\frac{e^{-3} \times 3^2}{2!} = \frac{9e^{-3}}{2} = 4.5e^{-3}$
+- $n=3$: $\frac{e^{-3} \times 3^3}{3!} = \frac{27e^{-3}}{6} = 4.5e^{-3}$
+
+Sum: $e^{-3} + 3e^{-3} + 4.5e^{-3} + 4.5e^{-3} = 13e^{-3} = 0.647$
+
+**Answer / 答案：** 0.647 or 64.7%
+
+**中文解释：** 注意，我们首先将两个独立的泊松过程相加，得到总速率为6的泊松过程。然后计算半小时内的泊松参数为3。最后计算n=0,1,2,3的概率并求和。13e^{-3} ≈ 0.647，意味着有64.7%的概率在半小时内收到不超过3封邮件。
+
+**English explanation:** Note that we first sum the two independent Poisson processes to get a Poisson process with total rate 6. Then we calculate the Poisson parameter for half an hour as 3. Finally, we calculate and sum the probabilities for n=0,1,2,3. 13e^{-3} ≈ 0.647, meaning there is a 64.7% probability of receiving 3 or fewer emails in half an hour.
+
+---
+
+##### Theorem 13.2: Marked Poisson Process / 定理13.2：泊松过程标记
+
+**Theorem / 定理：** Let $(X(t))$ be a Poisson process with rate $\lambda$. Each arrival is independently marked with probability $p$. Then:
+- The marked process $(Y(t))$ is a Poisson process with rate $p\lambda$
+- The unmarked process $(Z(t))$ is a Poisson process with rate $(1-p)\lambda$
+- $(Y(t))$ and $(Z(t))$ are independent
+
+**中文解释：** 这个定理是泊松分布标记性质在泊松过程中的推广。它说：如果我们有一个速率为λ的泊松过程，每个到达事件独立地以概率p被标记，那么标记事件构成一个速率为pλ的泊松过程，未标记事件构成一个速率为(1-p)λ的泊松过程，并且这两个过程相互独立。
+
+**English explanation:** This theorem is the extension of the Poisson distribution's marking property to the Poisson process. It states: if we have a Poisson process with rate λ, and each arrival is independently marked with probability p, then the marked events form a Poisson process with rate pλ, the unmarked events form a Poisson process with rate (1-p)λ, and these two processes are independent.
+
+**Proof / 证明：** Given the third fact about the Poisson distribution (the marking property), it is easy to check the necessary properties. / 给定泊松分布的第三个性质（标记性质），很容易验证必要的性质。
+
+**Key insight / 关键洞察：** The marking theorem is the "opposite" of the summation theorem: summation combines two processes, while marking splits one process into two. / 标记定理是求和定理的"逆操作"：求和将两个过程合并，标记将一个过程分割成两个。
 
 ---
 
 **Example 13.4: Football Goals / 足球进球**
 
-**Problem / 问题**: In the 2019/20 English Premier League football season, an average of \(\lambda = 2.72\) goals were scored per game, with a proportion \(p = 0.56\) of them scored by the home team. If we model this as a Poisson process, what is the probability a match ends in a 1-1 draw?
+**Problem / 问题：** In the 2019/20 English Premier League football season, an average of $\lambda = 2.72$ goals were scored per game, with a proportion $p = 0.56$ of them scored by the home team. If we model this as a Poisson process, what is the probability a match ends in a 1–1 draw?
 
-**Solution / 解答**:
+**中文解释：** 在2019/20赛季英格兰足球超级联赛中，每场比赛平均进球2.72个，其中56%由主队打进。如果将其建模为泊松过程，求比赛以1-1平局结束的概率。
 
-**Step 1**: Find rates for home and away goals.
-- Home goals: rate = \(p\lambda = 0.56 \times 2.72 = 1.52\) per game
-- Away goals: rate = \((1-p)\lambda = 0.44 \times 2.72 = 1.20\) per game
+**Solution / 解答：**
 
-**Step 2**: By Theorem 13.2, home and away goals are independent Poisson processes.
+**Step 1: Find the rates for home and away goals / 步骤1：找到主队和客队的进球率**
+- Home goals rate: $p\lambda = 0.56 \times 2.72 = 1.52$ goals per game
+- Away goals rate: $(1-p)\lambda = 0.44 \times 2.72 = 1.20$ goals per game
 
-**Step 3**: Calculate probability of exactly 1 home goal AND exactly 1 away goal.
-\[
-\mathbb{P}(\text{Home}=1) = \frac{e^{-1.52} \times 1.52^1}{1!} = 1.52e^{-1.52}
-\]
-\[
-\mathbb{P}(\text{Away}=1) = \frac{e^{-1.20} \times 1.20^1}{1!} = 1.20e^{-1.20}
-\]
+**Step 2: Use independence of home and away goals / 步骤2：利用主队和客队进球的独立性**
+Under the Poisson process assumption, home and away goals are independent (by the marking theorem).
 
-**Step 4**: By independence:
-\[
-\mathbb{P}(1\text{-}1 \text{ draw}) = (1.52e^{-1.52}) \times (1.20e^{-1.20})
-\]
-\[
-= 1.52 \times 1.20 \times e^{-(1.52+1.20)}
-\]
-\[
-= 1.824 \times e^{-2.72}
-\]
-\[
-= 1.824 \times 0.0658 = 0.12
-\]
+**Step 3: Calculate the probability / 步骤3：计算概率**
+The probability the home team scores exactly 1 goal AND the away team scores exactly 1 goal is:
+$$\mathbb{P}(\text{home}=1) \times \mathbb{P}(\text{away}=1)$$
 
-**Answer / 答案**: The probability is approximately 0.12 or 12%.
+For home goals (Poisson with rate 1.52):
+$$\mathbb{P}(\text{home}=1) = \frac{e^{-1.52} \times 1.52^1}{1!} = 1.52e^{-1.52}$$
 
----
+For away goals (Poisson with rate 1.20):
+$$\mathbb{P}(\text{away}=1) = \frac{e^{-1.20} \times 1.20^1}{1!} = 1.20e^{-1.20}$$
 
-### 🔗 Connections / 知识关联
+Therefore:
+$$\mathbb{P}(1-1 \text{ draw}) = 1.52e^{-1.52} \times 1.20e^{-1.20} = 0.12$$
 
-**Previous topics / 之前的内容**:
-- **Discrete-time Markov chains (离散时间马尔可夫链)** : The Poisson process is a continuous-time Markov chain
-- **Random walks (随机游走)** : Both are fundamental stochastic processes
-- **Poisson distribution (泊松分布)** : The foundation for the Poisson process
+**Answer / 答案：** 0.12 or 12%
 
-**Future topics / 后续内容**:
-- **Section 14**: The Poisson process viewed through inter-arrival times (指数分布)
-- **Continuous-time Markov chains (连续时间马尔可夫链)** : The Poisson process is the simplest example
-- **Queueing theory (排队论)** : Poisson processes model arrival streams
-- **Renewal theory (更新理论)** : Generalization of Poisson processes
-
-**Key insight / 关键洞察**: The Poisson process bridges discrete-time Markov chains (which we studied) and continuous-time Markov chains (which we will study next). It's the "bridge" between these two worlds.
-
----
-
-### ⚠️ Common Mistakes / 常见误区
-
-1. **Confusing Poisson distribution with Poisson process (混淆泊松分布与泊松过程)**
-   - Poisson distribution: models count in a FIXED interval
-   - Poisson process: models the ENTIRE evolution over time
-   - Remember: The process uses the distribution as a building block
-
-2. **Forgetting that increments must be for NON-OVERLAPPING intervals (忘记增量必须用于非重叠区间)**
-   - \(X(3) - X(1)\) and \(X(4) - X(2)\) are NOT independent (they overlap from time 2 to 3)
-   - Only intervals that don't overlap at all are independent
-
-3. **Mixing up rate and mean (混淆速率与均值)**
-   - Rate \(\lambda\) is per unit time
-   - Mean for interval of length \(s\) is \(\lambda s\)
-   - Example: If \(\lambda = 8\) per hour, mean for 15 min = \(8 \times 0.25 = 2\)
-
-4. **Forgetting to convert time units (忘记转换时间单位)**
-   - Always ensure rate and time interval use the same units
-   - If rate is per hour, time must be in hours
-
-5. **Applying summed process theorem without checking independence (未检查独立性就应用求和定理)**
-   - Theorem 13.1 requires \(X(t)\) and \(Y(t)\) to be INDEPENDENT
-   - If they are dependent, the sum may not be a Poisson process
-
----
-
-### ✍️ Practice / 练习
-
-**Question 1**: A radioactive source emits particles at a rate of \(\lambda = 3\) per second, modeled as a Poisson process. What is the probability that exactly 5 particles are emitted in a 2-second interval?
-
-**Hint / 提示**: 
-- First find the mean for a 2-second interval: \(\lambda s = 3 \times 2 = 6\)
-- Then use the Poisson PMF: \(\mathbb{P}(X = 5) = \frac{e^{-6} \times 6^5}{5!}\)
-
----
-
-**Question 2**: Two independent Poisson processes have rates \(\lambda_1 = 2\) and \(\lambda_2 = 3\) per hour. What is the probability that in a 30-minute period, the total number of arrivals from both processes is at least 4?
-
-**Hint / 提示**:
-- Use Theorem 13.1 to find the combined rate
-- Convert 30 minutes to hours
-- Calculate \(\mathbb{P}(Z \geq 4) = 1 - \mathbb{P}(Z \leq 3)\)
-
----
-
-**Question 3**: A Poisson process with rate \(\lambda = 10\) per hour has each arrival independently marked as "urgent" with probability \(p = 0.3\). What is the probability that in a 1-hour period, there are exactly 2 urgent arrivals and exactly 5 non-urgent arrivals?
-
-**Hint / 提示**:
-- Use Theorem 13.2: urgent process rate = \(0.3 \times 10 = 3\), non-urgent rate = \(0.7 \times 10 = 7\)
-- They are independent
-- Calculate \(\mathbb{P}(\text{urgent}=2) \times \mathbb{P}(\text{non-urgent}=5)\)
-
----
-
-**Question 4**: A call center receives calls at a rate of 20 per hour. What is the probability that the center receives its first call within the first 3 minutes of operation?
-
-**Hint / 提示**:
-- This is about the time until the first arrival
-- Think: "no calls in first 3 minutes" means \(X(0.05) = 0\) (3 minutes = 0.05 hours)
-- Then probability of first call within 3 minutes = \(1 - \mathbb{P}(\text{no calls in 3 min})\)
-
----
-
-**Question 5**: True or False: If \(X(t)\) is a Poisson process with rate \(\lambda\), then \(X(5) - X(2)\) and \(X(3) - X(1)\) are independent.
-
-**Hint / 提示**:
-- Check if the intervals [2,5] and [1,3] overlap
-- Remember: only non-overlapping intervals have independent increments
-
----
-
-### 📌 Key Takeaways / 要点总结
-
-1. **Poisson distribution (泊松分布)** : \(X \sim \text{Po}(\lambda)\) with PMF \(\mathbb{P}(X=n) = e^{-\lambda}\lambda^n/n!\), mean = variance = \(\lambda\)
-
-2. **Poisson process definition (泊松过程定义)** : Three properties - \(X(0)=0\), Poisson increments \(X(t+s)-X(t) \sim \text{Po}(\lambda s)\), independent increments for non-overlapping intervals
-
-3. **Rate interpretation (速率解释)** : \(\lambda\) is the average number of arrivals per unit time; for interval length \(s\), mean = \(\lambda s\)
-
-4. **Summed Poisson process (求和泊松过程)** : Sum of independent Poisson processes with rates \(\lambda\) and \(\mu\) is Poisson with rate \(\lambda + \mu\)
-
-5. **Marked Poisson process (标记泊松过程)** : Splitting a Poisson process with marking probability \(p\) yields two independent Poisson processes with rates \(p\lambda\) and \((1-p)\lambda\)
-
-6. **Time unit consistency (时间单位一致性)** : Always ensure rate and time interval use the same units
-
-7. **Independence condition (独立性条件)** : Only non-overlapping time intervals have independent increments
-
----
-
-**Next section preview / 下一节预告**: Section 14 will explore the Poisson process from a different angle - the times between arrivals follow an **exponential distribution (指数分布)** , giving us another way to understand and simulate Poisson processes.
+**中文解释：** 这个例子展示了标记泊松过程的应用。我们将总进球过程（速率为2.72）标记为主队进球（概率0.56）和客队进球（概率0.44）。根据标记定理，主队进球是速率为1.52的泊松过程，客队进球是速率为1.20的泊松过程，且两者独立。因此1-1平局的概率就是两个泊松

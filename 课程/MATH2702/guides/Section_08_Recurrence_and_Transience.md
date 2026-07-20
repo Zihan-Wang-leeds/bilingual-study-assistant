@@ -1,488 +1,356 @@
-# Section 8: Recurrence and Transience
+# Section 8: Recurrence and transience
 
-> MATH2702 Stochastic Processes - 自学教材
-> 生成时间: 2026-07-17 14:48
+> MATH2702 - 自学教材 / Self-Study Guide
+> 生成时间: 2026-07-20 15:40
 > 来源页: 44-50
 
 ---
 
-# 📚 MATH2702 Study Guide: Recurrence and Transience / 递归与瞬变性
+# 📘 Section 8: Recurrence and Transience / 递归性与瞬变性
 
 ## 📋 Section Overview / 章节概览
 
-This section introduces the fundamental classification of states in Markov chains into **recurrent (递归)** and **transient (瞬变)** states. Understanding whether a state is recurrent or transient is crucial for analyzing the long-run behavior of Markov chains. We will learn:
+**中文解释：** 本章节是马尔可夫链理论中最重要的部分之一。我们将学习如何对马尔可夫链中的状态进行分类，判断哪些状态会"永远回来"（递归状态），哪些状态会"一去不复返"（瞬变状态）。这种分类对于理解马尔可夫链的长期行为至关重要。我们还将进一步区分"正递归"和"零递归"状态，并学习如何利用通信类（communicating classes）的性质快速判断整个类的递归性或瞬变性。
 
-- How to classify states as recurrent or transient
-- How these properties are shared within communicating classes
-- The distinction between positive and null recurrence
-- The Strong Markov Property and its applications
+**English explanation:** This section is one of the most important parts of Markov chain theory. We will learn how to classify states in a Markov chain, determining which states "keep coming back forever" (recurrent states) and which states "leave and never return" (transient states). This classification is crucial for understanding the long-run behavior of Markov chains. We will further distinguish between "positive recurrent" and "null recurrent" states, and learn how to use the properties of communicating classes to quickly determine the recurrence or transience of an entire class.
 
-This classification helps us predict whether a Markov chain will keep returning to certain states or eventually leave them forever, which is essential for understanding stationary distributions and long-term stability.
+**Why this matters / 为什么重要：**
+- 递归性决定了马尔可夫链是否会在某个状态无限次访问
+- 瞬变性意味着状态最终会被永久离开
+- 正递归与零递归的区分对于后续学习平稳分布（stationary distribution）至关重要
+- 这些概念在排队论、金融建模、物理系统等众多领域都有应用
+
+---
 
 ## 🎯 Learning Objectives / 学习目标
 
-By the end of this section, you will be able to:
+完成本章学习后，你应该能够：
 
-1. **Define** recurrent and transient states using return probability
-2. **Apply** Theorem 8.1 to determine recurrence/transience using ∑p_ii^(n)
-3. **Prove** that recurrence/transience is a class property
-4. **Classify** communicating classes as open/closed, finite/infinite, and determine their recurrence status
-5. **Distinguish** between positive and null recurrence
-6. **Understand** the Strong Markov Property and its role in proofs
+1. **定义** 递归状态和瞬变状态，并解释它们之间的区别
+2. **计算** 返回概率 \(m_i\) 并据此判断状态类型
+3. **应用** 定理8.1，利用 \( \sum p_{ii}^{(n)} \) 的收敛性判断状态类型
+4. **利用** 定理8.2和8.3，通过通信类的性质快速判断递归性或瞬变性
+5. **区分** 正递归和零递归状态
+6. **理解** 强马尔可夫性质及其在证明中的应用
+
+---
 
 ## 📚 Prerequisites / 前置知识
 
-Before studying this section, you should be familiar with:
+在开始本章之前，请确保你已掌握以下内容：
 
-- **Markov chains basics**: State space, transition matrix, transition diagram
-- **Communicating classes**: Definition, closed/open classes
-- **Chapman-Kolmogorov equations**: p_ij^(n+m) = ∑_k p_ik^(n) p_kj^(m)
-- **Geometric distribution**: P(X = r) = (1-p)^r p, E[X] = (1-p)/p
-- **Conditional probability**: P(A|B) = P(A∩B)/P(B)
-- **Stopping times**: Definition from Section 4
+| 概念 | 中文 | English |
+|------|------|---------|
+| 马尔可夫链定义 | 马尔可夫链的基本定义和转移概率 | Markov chain definition and transition probabilities |
+| 转移矩阵 | 转移矩阵 \(P\) 及其元素 \(p_{ij}\) | Transition matrix and its elements |
+| n步转移概率 | \(p_{ij}^{(n)}\) 的含义和计算 | n-step transition probabilities |
+| 通信类 | 状态之间的可达性和通信关系 | Communicating classes, accessibility and communication |
+| 闭类 | 封闭的通信类 | Closed communicating classes |
+| 期望值 | 随机变量的期望值计算 | Expected value of random variables |
+
+---
 
 ## 📖 Core Content / 核心内容
 
-### Topic 1: Recurrent and Transient States / 递归状态与瞬变状态
+### Topic 8.1: Recurrent and Transient States / 递归状态与瞬变状态
 
 #### Intuition / 直觉理解
 
-Imagine you are at a party. Some people you keep running into again and again (recurrent states), while others you might meet a few times but eventually never see again (transient states).
+**中文解释：** 想象你是一个旅行者，在一个由不同城市（状态）组成的网络中旅行。有些城市你去了之后会不断回来——就像你的家乡，你总是会回去。这些城市就是"递归状态"。另一些城市你去了之后可能再也不回来——就像你度假时路过的一个小镇，你只去一次就永远离开了。这些城市就是"瞬变状态"。
 
-**Recurrent states (递归状态)**: If we ever visit state i, we keep returning to i again and again. Starting from i, the expected number of visits to i is infinite, and the number of visits is certain to be infinite.
+更精确地说：
+- **递归状态（Recurrent state）**：从该状态出发，你几乎肯定会再次回到该状态，而且会无限次地回来。
+- **瞬变状态（Transient state）**：从该状态出发，你可能会回来几次，但最终会永远离开，再也不会回来。
 
-**Transient states (瞬变状态)**: We might visit state i a few times, but eventually we leave i and never come back. Starting from i, the expected number of visits to i is finite, and the number of visits is certain to be finite.
+**English explanation:** Imagine you are a traveler moving through a network of cities (states). Some cities you keep returning to — like your hometown, you always come back. These are "recurrent states." Other cities you might visit and never return — like a small town you pass through on vacation, you visit once and leave forever. These are "transient states."
 
-The key difference is the **return probability** m_i:
-- If m_i = 1: recurrent
-- If m_i < 1: transient
+More precisely:
+- **Recurrent state**: Starting from this state, you will almost surely return to it again, and you will return infinitely many times.
+- **Transient state**: Starting from this state, you might return a few times, but eventually you will leave forever and never come back.
+
+**Key intuition table / 关键直觉表：**
+
+| Property / 性质 | Recurrent / 递归 | Transient / 瞬变 |
+|-----------------|------------------|------------------|
+| 返回次数 | 无限次 | 有限次 |
+| 期望返回次数 | 无穷大 | 有限 |
+| 返回概率 \(m_i\) | 1 | < 1 |
+
+---
 
 #### Formal Definition / 形式化定义
 
-**Definition 8.1**: Let (X_n) be a Markov chain on a state space 𝒮. For i ∈ 𝒮, let m_i be the **return probability (返回概率)**:
+**Definition 8.1 / 定义8.1**
 
-m_i = ℙ(X_n = i for some n ≥ 1 | X_0 = i)
+Let \((X_n)\) be a Markov chain on a state space \(\mathcal{S}\). For \(i \in \mathcal{S}\), let \(m_i\) be the **return probability (返回概率)**:
 
-where:
-- X_n = state at time n
-- X_0 = initial state
-- ℙ = probability measure
-- n ≥ 1 means we consider returns at any future time (not counting the starting point)
+\[
+m_i = \mathbb{P}(X_n = i \text{ for some } n \ge 1 \mid X_0 = i)
+\]
 
-If m_i = 1, we say state i is **recurrent (递归的)**.
-If m_i < 1, we say state i is **transient (瞬变的)**.
+If \(m_i = 1\), we say that state \(i\) is **recurrent (递归的)**; if \(m_i < 1\), we say that state \(i\) is **transient (瞬变的)**.
+
+**Symbol explanation / 符号解释：**
+
+| Symbol | 中文含义 | English meaning |
+|--------|----------|-----------------|
+| \(X_n\) | 第n步的状态 | State at step n |
+| \(\mathcal{S}\) | 状态空间 | State space |
+| \(i\) | 某个特定状态 | A particular state |
+| \(m_i\) | 从状态i出发，最终返回i的概率 | Probability of eventually returning to state i |
+| \(\mathbb{P}(\cdot \mid X_0 = i)\) | 给定初始状态为i的条件概率 | Conditional probability given initial state i |
+
+**Important note / 重要说明：** 注意定义中的"for some \(n \ge 1\)"意味着我们在至少一步之后返回。我们不考虑 \(n=0\) 的情况（即一开始就在状态i不算返回）。
+
+---
 
 #### Key Properties / 关键性质
 
-**Theorem 8.1**: Consider a Markov chain with transition matrix P.
+**Theorem 8.1 / 定理8.1**
 
-- If state i is **recurrent**, then ∑_{n=1}^∞ p_ii^(n) = ∞, and we return to state i infinitely many times with probability 1.
-- If state i is **transient**, then ∑_{n=1}^∞ p_ii^(n) < ∞, and we return to state i infinitely many times with probability 0.
+Consider a Markov chain with transition matrix \(P\).
 
-Where:
-- p_ii^(n) = ℙ(X_n = i | X_0 = i), the n-step transition probability from i to i
-- ∑_{n=1}^∞ p_ii^(n) = expected number of visits to i (starting from i), excluding the initial visit
+- If state \(i\) is **recurrent**, then \(\sum_{n=1}^{\infty} p_{ii}^{(n)} = \infty\), and we return to state \(i\) infinitely many times with probability 1.
+  
+  如果状态 \(i\) 是递归的，那么 \(\sum_{n=1}^{\infty} p_{ii}^{(n)} = \infty\)，并且我们以概率1无限次返回状态 \(i\)。
 
-**Important note**: The expected number of visits to i starting from i is:
-𝔼(# visits to i | X_0 = i) = ∑_{n=0}^∞ ℙ(X_n = i | X_0 = i) = 1 + ∑_{n=1}^∞ p_ii^(n)
+- If state \(i\) is **transient**, then \(\sum_{n=1}^{\infty} p_{ii}^{(n)} < \infty\), and we return to state \(i\) infinitely many times with probability 0.
+  
+  如果状态 \(i\) 是瞬变的，那么 \(\sum_{n=1}^{\infty} p_{ii}^{(n)} < \infty\)，并且我们以概率0无限次返回状态 \(i\)。
 
-The "1" accounts for the initial visit at time 0.
+**Symbol explanation / 符号解释：**
 
-#### Proof / 证明
+| Symbol | 中文含义 | English meaning |
+|--------|----------|-----------------|
+| \(p_{ii}^{(n)}\) | 从状态i出发，n步后回到i的概率 | Probability of being at state i after n steps, starting from i |
+| \(\sum_{n=1}^{\infty} p_{ii}^{(n)}\) | 所有n步返回概率之和 | Sum of all n-step return probabilities |
 
-**Proof of Theorem 8.1**:
+**Why this matters / 为什么重要：** 这个定理给出了判断递归性和瞬变性的另一种方法。我们不需要直接计算返回概率 \(m_i\)，而是可以通过检查 \(\sum p_{ii}^{(n)}\) 是否收敛来判断。
 
-**Part 1: Recurrent case**
+**Expected number of visits / 期望访问次数：**
 
-Suppose state i is recurrent, so m_i = 1.
+Starting from state \(i\), the expected number of visits to state \(i\) is:
 
-Step 1: Starting from i, the probability we return is m_i = 1.
-Step 2: After that return, because of the Markov property, it is as if we restart the chain from i. So the probability we return again is still m_i = 1.
-Step 3: Repeating this argument, we keep on returning, so we definitely visit infinitely often (with probability 1).
-Step 4: Since the number of visits to i starting from i is always infinite, its expectation is infinite too.
-Step 5: This expectation is ∑_{n=1}^∞ p_ii^(n) = ∞.
+\[
+\mathbb{E}(\# \text{ visits to } i \mid X_0 = i) = \sum_{n=0}^{\infty} \mathbb{P}(X_n = i \mid X_0 = i) = 1 + \sum_{n=1}^{\infty} p_{ii}^{(n)}
+\]
 
-**Part 2: Transient case**
+从状态 \(i\) 出发，访问状态 \(i\) 的期望次数为 \(1 + \sum_{n=1}^{\infty} p_{ii}^{(n)}\)。注意这里 \(n=0\) 时我们已经在状态 \(i\)，所以贡献了1次访问。
 
-Suppose state i is transient, so m_i < 1.
+---
 
-Step 1: The probability we return to i exactly r times before never coming back is:
-ℙ((number of returns to i) = r) = m_i^r (1 - m_i)
+#### Proof of Theorem 8.1 / 定理8.1的证明
 
-This is because we must return on the first r occasions (probability m_i^r), but then fail to return on the next occasion (probability 1 - m_i).
+**Proof / 证明：**
 
-Step 2: This is a geometric distribution Geom(1 - m_i) with support {0, 1, 2, ...}.
+**Part 1: Recurrent case / 递归情况**
 
-Step 3: The expectation of this type of geometric random variable is (1-p)/p, where p = 1 - m_i.
+**中文解释：** 假设状态 \(i\) 是递归的，即 \(m_i = 1\)。从状态 \(i\) 出发，我们第一次返回的概率是1。根据马尔可夫性质，返回之后，链重新从状态 \(i\) 开始，所以再次返回的概率仍然是 \(m_i = 1\)。重复这个过程，我们一定会无限次返回（概率为1）。因此，访问次数是无限的，期望值也是无限的，所以 \(\sum_{n=1}^{\infty} p_{ii}^{(n)} = \infty\)。
 
-Step 4: Therefore:
-𝔼(number of returns to i) = ∑_{n=1}^∞ p_ii^(n) = (1 - (1 - m_i))/(1 - m_i) = m_i/(1 - m_i)
+**English explanation:** Suppose state \(i\) is recurrent, so \(m_i = 1\). Starting from state \(i\), the probability we return is 1. After that return, by the Markov property, the chain restarts from state \(i\), so the probability of returning again is still \(m_i = 1\). Repeating this, we keep on returning, definitely visiting infinitely often (with probability 1). Since the number of visits is always infinite, its expectation is infinite too, and this expectation is \(\sum_{n=1}^{\infty} p_{ii}^{(n)} = \infty\).
 
-Step 5: Since m_i < 1, this expectation is finite.
+**Part 2: Transient case / 瞬变情况**
 
-Step 6: Since the expected number of returns is finite, the probability we return infinitely many times must be 0.
+**中文解释：** 假设状态 \(i\) 是瞬变的，即 \(m_i < 1\)。那么，我们恰好返回 \(r\) 次然后永远不再返回的概率是：
 
-**Commentary**: The key insight is that the Markov property allows us to "restart" the chain after each return, making the return events independent with probability m_i each time.
+\[
+\mathbb{P}(\text{number of returns} = r) = m_i^r (1 - m_i)
+\]
+
+这是因为我们必须在前 \(r\) 次都返回（概率 \(m_i^r\)），然后在第 \(r+1\) 次不再返回（概率 \(1 - m_i\)）。这是一个几何分布 \(\text{Geom}(1 - m_i)\)（支持集为 \(\{0, 1, 2, \ldots\}\) 的版本）。
+
+对于这种几何分布，期望值为 \(\frac{1 - (1 - m_i)}{1 - m_i} = \frac{m_i}{1 - m_i}\)。由于 \(m_i < 1\)，这个期望值是有限的。因此，\(\sum_{n=1}^{\infty} p_{ii}^{(n)} = \frac{m_i}{1 - m_i} < \infty\)。由于期望返回次数是有限的，无限次返回的概率必须为0。
+
+**English explanation:** Suppose state \(i\) is transient, so \(m_i < 1\). The probability we return exactly \(r\) times before never coming back is:
+
+\[
+\mathbb{P}(\text{number of returns} = r) = m_i^r (1 - m_i)
+\]
+
+This is because we must return on the first \(r\) occasions (probability \(m_i^r\)), but then fail to return on the next occasion (probability \(1 - m_i\)). This is a geometric distribution \(\text{Geom}(1 - m_i)\) (the version with support \(\{0, 1, 2, \ldots\}\)).
+
+For this type of geometric distribution, the expectation is \(\frac{1 - (1 - m_i)}{1 - m_i} = \frac{m_i}{1 - m_i}\). Since \(m_i < 1\), this expectation is finite. Therefore, \(\sum_{n=1}^{\infty} p_{ii}^{(n)} = \frac{m_i}{1 - m_i} < \infty\). Since the expected number of returns is finite, the probability of returning infinitely many times must be 0.
+
+**Key insight / 关键洞察：** 这个证明巧妙地利用了"返回后重新开始"的思想，这是马尔可夫性质的核心应用。注意在证明中我们使用了"强马尔可夫性质"（将在8.4节讨论），因为返回时间是一个随机时间，而不是固定时间。
+
+---
 
 #### Worked Examples / 例题
 
-**Example 8.1: Simple Random Walk (简单随机游走)**
+**Example 8.1: Simple Random Walk / 简单随机游走**
 
-Consider the simple random walk on ℤ where:
-- At each step, move right with probability p, left with probability q = 1-p
-- p_ii^(n) = probability of being at position i after n steps starting from i
+**中文解释：** 考虑简单随机游走。在上一节中，我们看到对于简单对称随机游走（\(p = \frac{1}{2}\)），我们有 \(m_i = 1\)，所以简单对称随机游走是递归的。但对于 \(p \neq \frac{1}{2}\)，我们有 \(m_i < 1\)，所以所有其他简单随机游走都是瞬变的。
 
-From Section 7, we know:
-- For p = 1/2 (symmetric random walk): m_i = 1, so the chain is **recurrent**
-- For p ≠ 1/2: m_i < 1, so the chain is **transient**
+**English explanation:** Consider the simple random walk. In the last section we saw that for the simple symmetric random walk with \(p = \frac{1}{2}\) we have \(m_i = 1\), so the simple symmetric random walk is recurrent. But for \(p \neq \frac{1}{2}\) we have \(m_i < 1\), so all other simple random walks are transient.
 
-**Example 8.2: A Markov Chain with Multiple Classes**
-
-Consider the Markov chain from Example 6.7 with states {1, 2, 3, 4, 5, 6, 7}:
-
-[Transition diagram described in text]
-
-**States 5, 6, 7**: These form a triangle where the chain cycles around. The return probability is clearly 1, so these states are **recurrent**.
-
-**States 1, 2, 3, 4**: These are **transient**. Let's prove this directly:
-
-- **State 4**: From state 4, we might go straight to state 5 (with probability p_45). If we go to state 5, we cannot come back to 4. So m_4 ≤ 1 - p_45 = 2/3 < 1. Therefore state 4 is transient.
-
-- **State 1**: From state 1, we might go to state 4 (with probability p_14) and then to state 5 (with probability p_45). If this happens, we cannot return to 1. So m_1 ≤ 1 - p_14·p_45 = 1 - (1/2)(1/3) = 5/6 < 1. Therefore state 1 is transient.
-
-- **State 3**: Similarly, m_3 ≤ 1 - p_34·p_45 = 1 - (1/2)(1/3) = 5/6 < 1. Therefore state 3 is transient.
-
-- **State 2**: m_2 ≤ 1 - p_21·p_14·p_45 = 1 - (1/2)(1/2)(1/3) = 11/12 < 1. Therefore state 2 is transient.
-
-**Observation**: All states in communicating class {1, 2, 3, 4} are transient, while all states in class {5, 6, 7} are recurrent. This suggests recurrence/transience is a class property.
+**Intuition / 直觉理解：** 对称随机游走（向左向右概率相等）就像一个醉汉，他最终总会回到原点。但如果有偏向（比如向右的概率更大），那么他最终会越走越远，再也回不来了。
 
 ---
 
-### Topic 2: Recurrent and Transient Classes / 递归类与瞬变类
+**Example 8.2: A More Complex Chain / 一个更复杂的链**
+
+**中文解释：** 考虑我们在例6.7中见过的链（如图9所示）：
+
+对于状态5、6和7，很明显返回概率为1，因为马尔可夫链在三角形中循环，所以这些状态是递归的。
+
+状态1、2、3和4是瞬变的。我们马上会看到一种快速判断的方法，但在此之前，我们可以通过直接计算来证明。
+
+从状态4出发，我们可能直接去状态5，在这种情况下我们无法回来，所以 \(m_4 \le 1 - p_{45} = \frac{2}{3}\)，状态4是瞬变的。类似地，如果从1到4再到5，我们肯定无法回到1，所以 \(m_1 \le 1 - p_{14}p_{45} = \frac{5}{6}\)，状态1是瞬变的。通过类似的论证，\(m_3 \le 1 - p_{34}p_{45} = \frac{5}{6}\)，\(m_2 \le 1 - p_{21}p_{14}p_{45} = \frac{11}{12}\)，所以这些状态也都是瞬变的。
+
+注意通信类 \(\{1, 2, 3, 4\}\) 中的所有状态都是瞬变的，而通信类 \(\{5, 6, 7\}\) 中的所有状态都是递归的。我们很快就会回到这个重要观察。
+
+**English explanation:** Consider the chain we saw previously as Example 6.7 (shown in Figure 9):
+
+For states 5, 6, and 7, it is clear that the return probability is 1, since the Markov chain cycles around the triangle, so these states are recurrent.
+
+States 1, 2, 3, and 4 are transient. We will see a very quick way to show this shortly, but in the meantime we can prove it directly.
+
+From state 4, we might go straight to state 5, in which case we cannot come back, so \(m_4 \le 1 - p_{45} = \frac{2}{3}\), and state 4 is transient. Similarly, if we move from 1 to 4 to 5, we definitely will not come back to 1, so \(m_1 \le 1 - p_{14}p_{45} = \frac{5}{6}\), and state 1 is transient. By similar arguments, \(m_3 \le 1 - p_{34}p_{45} = \frac{5}{6}\), and \(m_2 \le 1 - p_{21}p_{14}p_{45} = \frac{11}{12}\), so these states are all transient too.
+
+Notice that all states in the communicating class \(\{1, 2, 3, 4\}\) are transient, while all states in the communicating class \(\{5, 6, 7\}\) are recurrent. We shall return to this point shortly.
+
+**Figure 9 / 图9：** (The transition diagram from Subsection 7.2)
+
+```
+    2 ←→ 1 ←→ 4 → 5 ←→ 6
+    ↑         ↓   ↑     ↓
+    └── 3 ←──┘   └── 7 ←┘
+```
+
+(Note: The actual diagram has specific transition probabilities as shown in the original material.)
+
+---
+
+### Topic 8.2: Recurrent and Transient Classes / 递归类与瞬变类
 
 #### Intuition / 直觉理解
 
-If you can travel between two states (they communicate), they must share the same fate: either both are recurrent or both are transient. This makes sense because if you can go from i to j and back, then visiting i infinitely often means you'll also visit j infinitely often.
+**中文解释：** 在例8.2中，我们观察到同一个通信类中的所有状态要么都是递归的，要么都是瞬变的。这不是巧合！这是一个普遍规律：递归性和瞬变性是"类性质"（class property），意味着在一个通信类中，所有状态共享相同的递归/瞬变性质。
+
+**English explanation:** In Example 8.2, we observed that all states in the same communicating class are either all recurrent or all transient. This is not a coincidence! This is a general rule: recurrence and transience are "class properties," meaning that within a communicating class, all states share the same recurrence/transience property.
+
+---
 
 #### Formal Definition / 形式化定义
 
-**Theorem 8.2**: Within a communicating class, either every state is transient or every state is recurrent.
+**Theorem 8.2 / 定理8.2**
 
-Formally: Let i, j ∈ 𝒮 be such that i ↔ j (i communicates with j). If i is recurrent, then j is recurrent also; while if i is transient, then j is transient also.
+Within a communicating class, either every state is transient or every state is recurrent.
 
-**Terminology**: We can refer to a communicating class as a "recurrent class (递归类)" or a "transient class (瞬变类)". If a Markov chain is irreducible, we can refer to it as a "recurrent Markov chain" or a "transient Markov chain".
+在一个通信类中，要么所有状态都是瞬变的，要么所有状态都是递归的。
 
-#### Proof / 证明
+**Formally / 形式化地：** Let \(i, j \in \mathcal{S}\) be such that \(i \leftrightarrow j\). If \(i\) is recurrent, then \(j\) is recurrent also; while if \(i\) is transient, then \(j\) is transient also.
 
-**Proof of Theorem 8.2**:
+如果 \(i\) 和 \(j\) 相互可达（属于同一个通信类），那么它们要么都是递归的，要么都是瞬变的。
 
-**Part 1: If i is recurrent, then j is recurrent**
+**Consequence / 推论：** For this reason, we can refer to a communicating class as a "recurrent class" or a "transient class." If a Markov chain is irreducible, we can refer to it as a "recurrent Markov chain" or a "transient Markov chain."
 
-Step 1: Since i ↔ j, there exist n, m ≥ 1 such that p_ij^(n) > 0 and p_ji^(m) > 0.
-
-Step 2: Using the Chapman-Kolmogorov equations:
-∑_{r=1}^∞ p_jj^(n+m+r) ≥ ∑_{r=1}^∞ p_ji^(m) · p_ii^(r) · p_ij^(n)
-
-Explanation: To go from j to j in n+m+r steps, we can:
-- First go from j to i in m steps (p_ji^(m))
-- Then go from i to i in r steps (p_ii^(r))
-- Then go from i to j in n steps (p_ij^(n))
-
-Step 3: This gives:
-∑_{r=1}^∞ p_jj^(n+m+r) ≥ p_ji^(m) · (∑_{r=1}^∞ p_ii^(r)) · p_ij^(n)
-
-Step 4: Since i is recurrent, ∑_{r=1}^∞ p_ii^(r) = ∞ (by Theorem 8.1).
-
-Step 5: Since p_ji^(m) > 0 and p_ij^(n) > 0, the right side is ∞.
-
-Step 6: Therefore ∑_{r=1}^∞ p_jj^(n+m+r) = ∞, which means ∑_{s=1}^∞ p_jj^(s) = ∞.
-
-Step 7: By Theorem 8.1, j is recurrent.
-
-**Part 2: If i is transient, then j is transient**
-
-Step 1: Suppose i is transient.
-Step 2: If j were recurrent, then by Part 1 (with i and j swapped), i would be recurrent.
-Step 3: This contradicts the assumption that i is transient.
-Step 4: Therefore j must be transient.
-
-#### Key Properties / 关键性质
-
-**Theorem 8.3**: Classification of communicating classes
-
-1. **Every open communicating class is transient.**
-2. **Every finite closed communicating class is recurrent.**
-
-This theorem completely classifies the transience and recurrence of classes, with the rare exception of infinite closed classes, which can require further examination.
-
-**Explanation**:
-- An **open class** is one from which we can leave (not closed)
-- A **closed class** is one from which we cannot leave
-- A **finite closed class** is both closed and has a finite number of states
-
-#### Proof / 证明
-
-**Proof of Theorem 8.3**:
-
-**Part 1: Open classes are transient**
-
-Step 1: Suppose i is in an open communicating class. Then there exists j such that i → j (p_ij^(n) > 0 for some n) but j ↛ i (once we reach j, we cannot return to i).
-
-Step 2: Consider the probability we return to i after time n. We condition on whether X_n = j or not.
-
-ℙ(return to i after time n | X_0 = i) = 
-p_ij^(n) · ℙ(return to i after time n | X_n = j, X_0 = i) 
-+ (1 - p_ij^(n)) · ℙ(return to i after time n | X_n ≠ j, X_0 = i)
-
-Step 3: Since we cannot get from j to i, the first term is 0.
-The second term is at most (1 - p_ij^(n)) because probabilities are ≤ 1.
-
-Step 4: Therefore:
-ℙ(return to i after time n | X_0 = i) ≤ 0 + (1 - p_ij^(n)) < 1
-
-This is because p_ij^(n) > 0, so 1 - p_ij^(n) < 1.
-
-Step 5: If i were recurrent, we would certainly return infinitely often, and in particular certainly return after time n. But we just showed this probability is < 1.
-
-Step 6: Therefore i must be transient.
-
-**Part 2: Finite closed classes are recurrent**
-
-Step 1: Suppose class C is finite and closed.
-
-Step 2: Since C is closed, once we enter C, we stay in C forever.
-
-Step 3: Since C is finite, we have infinitely many time steps but only finitely many states. By the pigeonhole principle, there must be at least one state i ∈ C that we visit infinitely often (with positive probability).
-
-Step 4: This state i cannot be transient (because transient states have probability 0 of being visited infinitely often).
-
-Step 5: Therefore i must be recurrent.
-
-Step 6: By Theorem 8.2, since all states in C communicate, the whole class is recurrent.
-
-#### Worked Examples / 例题
-
-**Revisiting Example 8.2**:
-
-Using Theorem 8.3, we can classify the classes much more easily:
-
-- Class {5, 6, 7}: This is **closed** (no transitions leave this class) and **finite** (3 states). Therefore it is **recurrent**.
-
-- Class {1, 2, 3, 4}: This is **open** (transitions leave to class {5, 6, 7}). Therefore it is **transient**.
-
-This is much less effort than the previous method of bounding return probabilities!
+因此，我们可以称一个通信类为"递归类"或"瞬变类"。如果马尔可夫链是不可约的，我们可以称它为"递归马尔可夫链"或"瞬变马尔可夫链"。
 
 ---
 
-### Topic 3: Positive and Null Recurrence / 正常递归与零递归
+#### Proof of Theorem 8.2 / 定理8.2的证明
 
-#### Intuition / 直觉理解
+**Proof / 证明：**
 
-Among recurrent states, we can further distinguish based on the **expected return time**:
-- **Positive recurrent (正常递归)**: We return, and on average it doesn't take too long (finite expected return time)
-- **Null recurrent (零递归)**: We return, but on average it takes forever (infinite expected return time)
+**Part 1 / 第一部分：** Suppose \(i \leftrightarrow j\) and \(i\) is recurrent. Then, for some \(n, m\) we have \(p_{ij}^{(n)} > 0\) and \(p_{ji}^{(m)} > 0\).
 
-Think of it like waiting for a bus: positive recurrent means the bus always comes and the average wait is reasonable; null recurrent means the bus always comes eventually, but the average wait is infinite!
+假设 \(i \leftrightarrow j\) 且 \(i\) 是递归的。那么存在正整数 \(n, m\) 使得 \(p_{ij}^{(n)} > 0\) 和 \(p_{ji}^{(m)} > 0\)。
 
-#### Formal Definition / 形式化定义
+By the Chapman–Kolmogorov equations (查普曼-科尔莫戈罗夫方程):
 
-**Definition 8.2**: Let (X_n) be a Markov chain on a state space 𝒮. Let i ∈ 𝒮 be a recurrent state, so m_i = 1, and let μ_i be the **expected return time (期望返回时间)**:
+\[
+\sum_{r=1}^{\infty} p_{jj}^{(n+m+r)} \ge \sum_{r=1}^{\infty} p_{ji}^{(m)} p_{ii}^{(r)} p_{ij}^{(n)}
+\]
 
-μ_i = 𝔼[first return time to i | X_0 = i]
+**中文解释：** 这个不等式告诉我们，从 \(j\) 出发经过 \(n+m+r\) 步回到 \(j\) 的概率，至少等于从 \(j\) 到 \(i\)（\(m\) 步），然后在 \(i\) 处经过 \(r\) 步回到 \(i\)，再从 \(i\) 回到 \(j\)（\(n\) 步）的概率。
 
-If μ_i < ∞, we say state i is **positive recurrent (正常递归的)**.
-If μ_i = ∞, we say state i is **null recurrent (零递归的)**.
+**English explanation:** This inequality tells us that the probability of returning from \(j\) to \(j\) in \(n+m+r\) steps is at least the probability of going from \(j\) to \(i\) (in \(m\) steps), then returning to \(i\) in \(r\) steps, then going from \(i\) back to \(j\) (in \(n\) steps).
 
-**Note**: Transient states always have μ_i = ∞ (since they may never return).
+\[
+= p_{ji}^{(m)} \left( \sum_{r=1}^{\infty} p_{ii}^{(r)} \right) p_{ij}^{(n)}
+\]
 
-#### Key Properties / 关键性质
+If \(i\) is recurrent, then \(\sum_{r} p_{ii}^{(r)} = \infty\). Then from the above equation, we also have \(\sum_{r} p_{jj}^{(n+m+r)} = \infty\), meaning \(\sum_{s} p_{jj}^{(s)} = \infty\), and \(j\) is recurrent.
 
-The following facts can be proven similarly to previous results:
+如果 \(i\) 是递归的，那么 \(\sum_{r} p_{ii}^{(r)} = \infty\)。从上面的不等式，我们也有 \(\sum_{r} p_{jj}^{(n+m+r)} = \infty\)，这意味着 \(\sum_{s} p_{jj}^{(s)} = \infty\)，所以 \(j\) 也是递归的。
 
-1. **In a recurrent class, either all states are positive recurrent or all states are null recurrent.**
-   - This means we can refer to a "positive recurrent class" or a "null recurrent class"
-   - An irreducible Markov chain can be "positive recurrent" or "null recurrent"
+**Part 2 / 第二部分：** Suppose \(i\) is transient. Then \(j\) cannot be recurrent, because if it were, the previous argument with \(i\) and \(j\) swapped over would force \(i\) to in fact be recurrent also. So \(j\) must be transient.
 
-2. **All finite closed classes are positive recurrent.**
-
-**Complete Classification**:
-- Open classes → transient
-- Finite closed classes → positive recurrent
-- Infinite closed classes → can be positive recurrent, null recurrent, or transient
-
-#### Worked Examples / 例题
-
-**Simple Symmetric Random Walk (简单对称随机游走)**:
-
-We know from Section 7 that:
-- The simple symmetric random walk (p = 1/2) is recurrent (m_i = 1)
-- The expected return time μ_i = ∞
-
-Therefore, the simple symmetric random walk is **null recurrent**.
-
-**Pólya's Theorem (波利亚定理)**:
-
-Consider the simple symmetric random walk in d-dimensions on ℤ^d. At each step, we pick one of the d coordinates and increase or decrease it by 1; each of the 2d possibilities has probability 1/(2d).
-
-- d = 1: null recurrent
-- d = 2: null recurrent
-- d ≥ 3: transient
-
-**Famous quote**: "A drunk man will find his way home, but a drunk bird may get lost forever." - Shizuo Kakutani
-
-This means: A drunk person walking randomly in 1D or 2D will eventually return home (recurrent), but a drunk bird flying randomly in 3D may never return (transient).
+假设 \(i\) 是瞬变的。那么 \(j\) 不可能是递归的，因为如果 \(j\) 是递归的，那么将第一部分论证中的 \(i\) 和 \(j\) 互换，就会迫使 \(i\) 也是递归的（矛盾）。所以 \(j\) 必须是瞬变的。
 
 ---
 
-### Topic 4: Strong Markov Property / 强马尔可夫性质 (Optional, Non-examinable)
+**Theorem 8.3 / 定理8.3**
 
-#### Intuition / 直觉理解
+- **Every open communicating class is transient.**
+  
+  每个开放的通信类都是瞬变的。
 
-In the proof of Theorem 8.1, we used the Markov property at the "first return to state i". But the first return time is a **random time**, not a fixed time! Did we cheat?
+- **Every finite closed communicating class is recurrent.**
+  
+  每个有限封闭的通信类都是递归的。
 
-Actually, we didn't cheat because the first return time is a **stopping time**, and the Markov property also applies to stopping times. This is called the **Strong Markov Property**.
+**Important note / 重要说明：** This theorem completely classifies the transience and recurrence of classes, with the rare exception of infinite closed classes, which can require further examination.
 
-#### Formal Definition / 形式化定义
-
-**Definition 8.3**: Let (X_n) be a stochastic process in discrete time, and let T be a random time. Then T is a **stopping time (停时)** if for all n, whether or not the event {T = n} occurs is completely determined by the random variables X_0, X_1, ..., X_n.
-
-**Examples of stopping times**:
-- "The first visit to state i" → stopping time (we know immediately when we reach i)
-- "Three time-steps after the second visit to j" → stopping time (we count three steps after the second visit)
-
-**Non-examples**:
-- "The time-step before the first visit to i" → not a stopping time (we need to go one more step to know)
-- "The final visit to j" → not a stopping time (we don't know if we'll come back)
-
-**Theorem 8.4 (Strong Markov Property)**: Let (X_n) be a Markov chain on a state space 𝒮, and let T be a stopping time that is finite with probability 1. Then for all states x_0, ..., x_{T-1}, i, j ∈ 𝒮:
-
-ℙ(X_{T+1} = j | X_T = i, X_{T-1} = x_{T-1}, ..., X_0 = x_0) = p_ij
-
-#### Proof / 证明
-
-**Proof of Theorem 8.4**:
-
-Step 1: Start with the left side and condition on the value of T:
-
-ℙ(X_{T+1} = j | X_T = i, X_{T-1} = x_{T-1}, ..., X_0 = x_0)
-= ∑_{n=0}^∞ ℙ(T = n) · ℙ(X_{n+1} = j | X_n = i, X_{n-1} = x_{n-1}, ..., X_0 = x_0, T = n)
-
-Step 2: Since T is a stopping time, the event {T = n} is determined by X_0, ..., X_n. Therefore, conditioning on T = n is redundant given X_0, ..., X_n:
-
-= ∑_{n=0}^∞ ℙ(T = n) · ℙ(X_{n+1} = j | X_n = i, X_{n-1} = x_{n-1}, ..., X_0 = x_0)
-
-Step 3: Apply the (ordinary) Markov property:
-
-= ∑_{n=0}^∞ ℙ(T = n) · ℙ(X_{n+1} = j | X_n = i)
-
-Step 4: By definition, ℙ(X_{n+1} = j | X_n = i) = p_ij:
-
-= ∑_{n=0}^∞ ℙ(T = n) · p_ij
-
-Step 5: Take p_ij out of the sum:
-
-= p_ij · ∑_{n=0}^∞ ℙ(T = n)
-
-Step 6: Since T is finite with probability 1, ∑_{n=0}^∞ ℙ(T = n) = 1:
-
-= p_ij
-
-This completes the proof.
+这个定理完全分类了类的瞬变性和递归性，唯一的例外是无限封闭类，这需要进一步检查。
 
 ---
 
-### Topic 5: A Useful Lemma / 一个有用的引理 (Optional, Non-examinable)
+#### Proof of Theorem 8.3 / 定理8.3的证明
 
-**Lemma 8.1**: Let (X_n) be an irreducible and recurrent Markov chain. Then for any initial distribution and any state j, we will certainly hit j, so the hitting time H_j is finite with probability 1.
+**Part 1: Open classes are transient / 开放类是瞬变的**
 
-**Proof**:
+**中文解释：** 假设 \(i\) 在一个开放的通信类中，所以存在某个 \(j\) 使得 \(i \rightarrow j\)（即存在 \(n\) 使得 \(p_{ij}^{(n)} > 0\)），但 \(j \not\rightarrow i\)（即一旦到达 \(j\) 就无法返回 \(i\)）。我们需要证明 \(i\) 是瞬变的。
 
-Step 1: It suffices to prove the lemma when the initial distribution is "start at i". For other initial distributions, we can repeat the argument for all i, then build any initial distribution from a weighted sum.
+考虑在时间 \(n\) 之后返回 \(i\) 的概率。我们根据 \(X_n = j\) 与否进行条件化：
 
-Step 2: Since the chain is irreducible, we have j → i, so pick m with p_ji^(m) > 0.
+\[
+\mathbb{P}(\text{return to } i \text{ after time } n \mid X_0 = i)
+\]
 
-Step 3: Since the chain is recurrent, we know the return probability from j to j is 1, and we return infinitely many times with probability 1.
+\[
+= p_{ij}^{(n)} \cdot \mathbb{P}(\text{return to } i \text{ after time } n \mid X_n = j, X_0 = i) + (1 - p_{ij}^{(n)}) \cdot \mathbb{P}(\text{return to } i \text{ after time } n \mid X_n \neq j, X_0 = i)
+\]
 
-Step 4: We have:
-1 = ℙ(X_n = j for infinitely many n | X_0 = j)
-= ℙ(X_n = j for some n > m | X_0 = j)
+\[
+\le \mathbb{P}(\text{return to } i \text{ after time } n \mid X_n = j, X_0 = i) + (1 - p_{ij}^{(n)})
+\]
 
-Step 5: Condition on the state at time m:
-= ∑_k ℙ(X_m = k | X_0 = j) · ℙ(X_n = j for some n > m | X_m = k, X_0 = j)
+\[
+= 0 + (1 - p_{ij}^{(n)}) < 1
+\]
 
-Step 6: Using the Markov property:
-= ∑_k p_jk^(m) · ℙ(H_j < ∞ | X_0 = k)
+**English explanation:** Suppose \(i\) is in an open communicating class, so for some \(j\) we have \(i \rightarrow j\), meaning \(p_{ij}^{(n)} > 0\) for some \(n\), but \(j \not\rightarrow i\), meaning that once we reach \(j\) we cannot return to \(i\). We need to show that \(i\) is transient.
 
-Step 7: Note that ∑_k p_jk^(m) = 1 (sum of probabilities of going anywhere in m steps).
+Consider the probability we return to \(i\) after time \(n\). We condition on whether \(X_n = j\) or not:
 
-Step 8: For this sum to equal 1, we must have ℙ(H_j < ∞ | X_0 = k) = 1 whenever p_jk^(m) > 0.
+\[
+\mathbb{P}(\text{return to } i \text{ after time } n \mid X_0 = i)
+\]
 
-Step 9: Since p_ji^(m) > 0, we have ℙ(H_j < ∞ | X_0 = i) = 1, as required.
+\[
+= p_{ij}^{(n)} \cdot \mathbb{P}(\text{return to } i \text{ after time } n \mid X_n = j, X_0 = i) + (1 - p_{ij}^{(n)}) \cdot \mathbb{P}(\text{return to } i \text{ after time } n \mid X_n \neq j, X_0 = i)
+\]
 
----
+\[
+\le \mathbb{P}(\text{return to } i \text{ after time } n \mid X_n = j, X_0 = i) + (1 - p_{ij}^{(n)})
+\]
 
-## 🔗 Connections / 知识关联
+\[
+= 0 + (1 - p_{ij}^{(n)}) < 1
+\]
 
-### Previous Topics / 先前知识
-- **Section 4 (Stopping Times)**: The concept of stopping times is used in the Strong Markov Property
-- **Section 6 (Communicating Classes)**: Understanding classes is essential for Theorem 8.2 and 8.3
-- **Section 7 (Return Probabilities)**: Methods for calculating m_i are used in examples
+**Key reasoning / 关键推理：** 由于从 \(j\) 无法到达 \(i\)，所以给定 \(X_n = j\) 后返回 \(i\) 的概率为0。而 \(p_{ij}^{(n)} > 0\)，所以 \(1 - p_{ij}^{(n)} < 1\)。因此，在时间 \(n\) 之后返回 \(i\) 的概率严格小于1。如果 \(i\) 是递归的，那么它肯定会无限次返回，特别地，在时间 \(n\) 之后也肯定会返回。所以 \(i\) 必须是瞬变的。
 
-### Future Topics / 后续知识
-- **Section 9 (Stationary Distributions)**: Positive recurrent Markov chains settle into stationary distributions
-- **Long-term stability**: Understanding recurrence helps predict long-run behavior
-
-### Real-world Applications / 实际应用
-- **Queueing theory**: Recurrent/transient classification helps determine if queues grow unbounded
-- **Random walks**: Understanding diffusion processes in physics and finance
-- **Network analysis**: Identifying important nodes that are visited repeatedly
-
----
-
-## ⚠️ Common Mistakes / 常见误区
-
-1. **Confusing "expected number of visits" with "probability of return"**
-   - Expected number of visits = ∑ p_ii^(n)
-   - Return probability = m_i = ℙ(return at some time)
-   - They are related but different concepts
-
-2. **Thinking all states in a closed class are recurrent**
-   - Only **finite** closed classes are guaranteed recurrent
-   - Infinite closed classes can be transient (e.g., 3D random walk)
-
-3. **Forgetting the initial visit in expected number of visits**
-   - 𝔼(# visits) = 1 + ∑_{n=1}^∞ p_ii^(n)
-   - The "1" accounts for the starting point
-
-4. **Misapplying the Markov property at random times**
-   - The ordinary Markov property only applies at fixed times
-   - For random times, we need the Strong Markov Property and stopping times
-
-5. **Thinking null recurrent means "never returns"**
-   - Null recurrent states DO return with probability 1
-   - But the expected return time is infinite
+**English explanation of reasoning:** Since we cannot get from \(j\) to \(i\), the probability of returning to \(i\) given \(X_n = j\) is 0. And since \(p_{ij}^{(n)} > 0\), we have \(1 - p_{ij}^{(n)} < 1\). Therefore, the probability of returning to \(i\) after time \(n\) is strictly less than 1. If \(i\) were recurrent, we would certainly return infinitely often, and in particular certainly return after time \(n\). So \(i\) must be transient instead.
 
 ---
 
-## ✍️ Practice / 练习
+**Part 2: Finite closed classes are recurrent / 有限封闭类是递归的**
 
-### Question 1
-Consider a Markov chain with state space {1, 2, 3} and transition matrix:
-P = [[0.5, 0.5, 0], [0, 0, 1], [0, 1, 0]]
+**中文解释：** 假设类 \(C\) 是有限且封闭的。那么必然存在某个 \(i \in C\)，使得一旦我们访问 \(i\)，我们无限次返回 \(i\) 的概率严格为正。这是因为我们将在有限个状态 \(C\) 中停留无限多个时间步。那么状态 \(i\) 不是瞬变的，所以它必须是递归的，这意味着整个类都是递归的。
 
-Classify each state as recurrent or transient. Is the chain irreducible?
+**English explanation:** Suppose the class \(C\) is finite and closed. Then there must be an \(i \in C\) such that, once we visit \(i\), the probability that we return to \(i\) infinitely many times is strictly positive; this is because we are going to stay in the finitely many states of \(C\) for infinitely many time steps. Then that state \(i\) is not transient, so it must be recurrent, which means that the whole class is recurrent.
 
-**Hint**: Draw the transition diagram first. Look for closed communicating classes.
-
-### Question 2
-Prove or disprove: If a state i is transient, then ∑_{n=1}^∞ p_ii^(n) < ∞.
-
-**Hint**: Use Theorem 8.1.
-
-### Question 3
-Consider the simple random walk with p = 0.3. Is this chain recurrent or transient? What about p = 0.5?
-
-**Hint**: Use Example 8.1.
-
-### Question 4
-A Markov chain has two communicating classes: C1 = {1, 2} and C2 = {3, 4, 5}. From state 2,
+**Intuition / 直觉理解：** 在一个有限封闭类中，我们只能在这些有限个状态

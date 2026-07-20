@@ -1,0 +1,15 @@
+openai
+python-dotenv
+numpy
+scikit-learn
+flask
+PyMuPDF
+pdfplumber
+PyPDF2
+httpx
+# 可选：语义搜索 (recommended for better Chinese/English retrieval)
+chromadb
+sentence-transformers
+# 可选：PDF 导出
+# weasyprint
+# markdown
