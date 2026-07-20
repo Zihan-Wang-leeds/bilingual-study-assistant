@@ -8,7 +8,6 @@ import os
 import sys
 import re
 import time
-import json
 from datetime import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -16,60 +15,24 @@ from dotenv import load_dotenv
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import API_KEY, BASE_URL, MODEL_NAME, COURSES_DIR
-from pdf_loader import extract_text_from_pdf
+from pdf_loader import extract_text_from_pdf, extract_with_structure
 
 load_dotenv()
 
 # 输出目录
 OUTPUT_DIR = "guides"
 
-# MATH2702 section definitions (number, title, key search words)
-MATH2702_SECTIONS = [
-    (1, "Stochastic Processes and the Markov Property",
-     "Stochastic processes and the Markov property"),
-    (2, "Random Walk",
-     "Random walk"),
-    (3, "Discrete Time Markov Chains",
-     "Discrete time Markov chains"),
-    (4, "Martingales and Gambler's Ruin",
-     "Martingales and Gambler"),
-    (5, "Examples from Actuarial Science",
-     "Examples from actuarial"),
-    (6, "Class Structure",
-     "Class Structure"),
-    (7, "Hitting Times",
-     "Hitting times"),
-    (8, "Recurrence and Transience",
-     "Recurrence and transience"),
-    (9, "Stationary Distributions",
-     "Stationary distributions"),
-    (10, "Reversibility of Markov Chains",
-     "Reversibility"),
-    (11, "Long-term Behaviour of Markov Chains",
-     "Long-term behaviour of Markov ch"),
-    (12, "End of Part I: Discrete Time Markov Chains",
-     "End of Part I"),
-    (13, "Poisson Process with Poisson Increments",
-     "Poisson process with Poisson increments"),
-    (14, "Poisson Process with Exponential Holding Times",
-     "Poisson process with exponential"),
-    (15, "Poisson Process in Infinitesimal Time Periods",
-     "Poisson process in infinitesimal"),
-    (16, "Counting Processes",
-     "Counting processes"),
-    (17, "Continuous Time Markov Jump Processes",
-     "Continuous time Markov jump processes"),
-    (18, "Forward and Backward Equations",
-     "Forward and backward equations"),
-    (19, "Class Structure and Hitting Times (CT)",
-     "Class structure and hitting times"),
-    (20, "Long-term Behaviour of Markov Jump Processes",
-     "Long-term behaviour of Markov jump"),
-    (21, "Queues",
-     "Queues"),
-    (22, "End of Part II: Continuous Time Markov Jump Processes",
-     "End of Part II"),
+# 非章节关键词（词边界匹配，避免 "toc" 误杀 "stochastic"）
+_SKIP_KEYWORDS = [
+    r'\bcontents?\b', r'\bschedule\b', r'\babout\b', r'\bproblem\s*sheet\b',
+    r'\btoc\b', r'\btable\s+of\s+contents\b', r'\boutline\b', r'\bsyllabus\b',
 ]
+_SKIP_PATTERN = re.compile('|'.join(_SKIP_KEYWORDS), re.IGNORECASE)
+
+
+def _matches_skip_keyword(title: str) -> bool:
+    """检查标题是否匹配非章节关键词（词边界匹配）。"""
+    return bool(_SKIP_PATTERN.search(title))
 
 
 class GuideGenerator:
@@ -93,112 +56,124 @@ class GuideGenerator:
         print(f"  {len(self.pages)} pages loaded")
 
     # ================================================================
-    # Section boundaries detection
+    # Section boundaries detection (auto-detected, no hardcoded list)
     # ================================================================
 
-    def _find_section_boundaries(self, sections_def: list[tuple]) -> list[dict]:
+    def _auto_detect_sections(self) -> list[dict]:
         """
-        通过扫描页面找到每个章节的起始和结束页。
+        使用 pdf_loader.extract_with_structure() 自动检测章节边界。
+
+        MATH2702 课件的标题结构：
+          "1"           ← 纯数字
+          "Stochastic processes and the Markov property"  ← 紧随的标题
+        二者在同一页、同层级，需要配对合并。
 
         返回: [{number, title, start_page, end_page}, ...]
         """
-        boundaries = []
+        print("Auto-detecting sections via font/heading analysis...")
+        structure = extract_with_structure(self.pdf_path)
+        outline = structure["outline"]
+        total_pages = structure["total"]
 
-        for sec_num, sec_title, search_key in sections_def:
-            start_page = self._find_section_start(sec_num, search_key)
-            if start_page:
-                boundaries.append({
-                    "number": sec_num,
-                    "title": sec_title,
-                    "start_page": start_page,
-                    "end_page": None  # 稍后填充
-                })
+        body_outline = [
+            o for o in outline
+            if o["page"] > 6
+            and not _matches_skip_keyword(o["title"])
+        ]
 
-        # 填充 end_page（下一节的起始页 - 1）
-        for i, b in enumerate(boundaries):
-            if i + 1 < len(boundaries):
-                b["end_page"] = boundaries[i + 1]["start_page"] - 1
+        # 配对逻辑：纯数字标题 + 紧随的非数字标题 = 一个章节
+        number_pattern = re.compile(r'^(\d{1,2})$')
+        part_pattern = re.compile(r'^Part\s+[IVX]+', re.IGNORECASE)
+        sections = []
+
+        i = 0
+        while i < len(body_outline):
+            item = body_outline[i]
+            title = item["title"].strip()
+
+            # Part I/II 标记（不独立成章，但标记阶段切换）
+            if part_pattern.match(title):
+                i += 1
+                continue
+
+            # 纯数字 → 尝试与后续标题配对
+            m = number_pattern.match(title)
+            if m:
+                sec_num = int(m.group(1))
+                page = item["page"]
+                full_title_parts = []
+
+                # 收集同页紧随的非数字标题
+                j = i + 1
+                while j < len(body_outline) and body_outline[j]["page"] == page:
+                    next_title = body_outline[j]["title"].strip()
+                    if number_pattern.match(next_title):
+                        break  # 遇到下一个数字，说明这个数字没有标题跟随
+                    # 跳过 Problem Sheet
+                    if 'problem sheet' in next_title.lower():
+                        j += 1
+                        continue
+                    full_title_parts.append(next_title)
+                    j += 1
+
+                if full_title_parts:
+                    # 合并标题片段（处理 "exam-" 和 "ples" 分开的情况）
+                    full_title = " ".join(full_title_parts)
+                    # 修复断词：移除 " - " 前后的多余空格中的连字符
+                    full_title = re.sub(r'-\s+', '', full_title)
+
+                    if len(full_title) >= 3:
+                        sections.append({
+                            "number": sec_num,
+                            "title": full_title,
+                            "start_page": page,
+                            "end_page": None,
+                        })
+                i = j
             else:
-                b["end_page"] = len(self.pages)
+                # 非数字标题 → 检测是否是独立章节（如 "Part I: ..." 下的隐式数字）
+                # 跳过前几页的非章节内容
+                i += 1
 
-        # 标记覆盖范围
-        covered_pages = set()
-        for b in boundaries:
-            for p in range(b["start_page"], b["end_page"] + 1):
-                covered_pages.add(p)
+        # 按章节号排序
+        sections.sort(key=lambda s: s["number"])
+        # 去重
+        seen = set()
+        deduped = []
+        for s in sections:
+            if s["number"] not in seen:
+                seen.add(s["number"])
+                deduped.append(s)
+        sections = deduped
 
-        # 处理未被覆盖的页面（front matter, problem sheets between sections）
-        uncovered = sorted(set(range(1, len(self.pages) + 1)) - covered_pages)
-        if uncovered:
-            print(f"  Note: {len(uncovered)} pages not in any section (problem sheets, etc.)")
+        # 填充 end_page
+        for i, s in enumerate(sections):
+            if i + 1 < len(sections):
+                s["end_page"] = sections[i + 1]["start_page"] - 1
+            else:
+                s["end_page"] = total_pages
 
-        return boundaries
+        # 过滤无效范围
+        valid = [s for s in sections if s["end_page"] >= s["start_page"]]
 
-    def _find_section_start(self, sec_num: int, search_key: str,
-                            skip_first_n_pages: int = 6) -> int:
-        """
-        找到某个章节在PDF中的起始页码。
+        print(f"  Auto-detected {len(valid)} sections from {len(outline)} headings")
+        for s in valid[:5]:
+            print(f"    Section {s['number']:2d}: {s['title'][:55]:55s} pages {s['start_page']:3d}-{s['end_page']:3d}")
+        if len(valid) > 5:
+            print(f"    ... and {len(valid) - 5} more")
 
-        skip_first_n_pages: 跳过目录页（TOC会包含所有章节标题，但不是正文开始）
-        """
-        # 构建搜索模式：行首或换行后的 "数字 标题"
-        # 注意：TOC条目通常后面跟"......"页码，正文标题是独立行
-        # 排除TOC特征：行中包含 "....." 的TOC条目不是正文
-        pattern = re.compile(
-            rf'(?:^|\n)\s*{sec_num}\s+{re.escape(search_key[:40])}',
-            re.IGNORECASE
-        )
-
-        # 从后往前搜索（正文在后，TOC在前），且跳过目录页
-        for page in reversed(self.pages):
-            if page["page"] <= skip_first_n_pages:
-                continue
-            text = page["text"]
-            if pattern.search(text):
-                # 排除TOC条目（含有连续点号的）
-                # 检查匹配行是否包含 "...." 特征
-                match = pattern.search(text)
-                line_start = text.rfind('\n', 0, match.start())
-                line_end = text.find('\n', match.end())
-                line = text[max(0, line_start):line_end if line_end > 0 else len(text)]
-                if '.....' not in line and '·' not in line:
-                    return page["page"]
-
-        # 如果严格匹配失败，尝试更宽松的匹配
-        words = search_key.split()[:3]
-        loose_pattern = re.compile(
-            rf'(?:^|\n)\s*{sec_num}\s+.*{re.escape(words[0])}.*{re.escape(words[-1])}',
-            re.IGNORECASE
-        )
-        for page in reversed(self.pages):
-            if page["page"] <= skip_first_n_pages:
-                continue
-            text = page["text"]
-            if loose_pattern.search(text):
-                match = loose_pattern.search(text)
-                line_start = text.rfind('\n', 0, match.start())
-                line_end = text.find('\n', match.end())
-                line = text[max(0, line_start):line_end if line_end > 0 else len(text)]
-                if '.....' not in line:
-                    return page["page"]
-
-        print(f"  WARNING: Section {sec_num} '{search_key}' start page not found")
-        return None
+        return valid
 
     # ================================================================
     # Guide generation
     # ================================================================
 
-    def generate_all(self, sections_def: list[tuple] = None,
-                     start_from: int = 1):
+    def generate_all(self, start_from: int = 1):
         """
-        生成所有章节的教材。
+        生成所有章节的教材。使用自动检测，无需硬编码章节列表。
         """
-        if sections_def is None:
-            sections_def = MATH2702_SECTIONS
-
         print(f"\nDetecting section boundaries...")
-        boundaries = self._find_section_boundaries(sections_def)
+        boundaries = self._auto_detect_sections()
         print(f"  Found {len(boundaries)} sections")
 
         os.makedirs(self.output_dir, exist_ok=True)
@@ -277,13 +252,47 @@ class GuideGenerator:
                 texts.append(f"[Page {page['page']}]\n{page['text']}")
         return "\n\n".join(texts)
 
+    MAX_CHARS_PER_CHUNK = 25000  # ~6000 tokens, 留安全边距
+
     def _generate_section_guide(self, boundary: dict, section_text: str) -> str:
-        """调用LLM生成一个章节的教学教材。"""
-        # 估算token数，如果太长则截断
-        max_chars = 30000  # ~7500 tokens, 安全值
-        if len(section_text) > max_chars:
-            print(f"  Truncating section text: {len(section_text)} → {max_chars} chars")
-            section_text = section_text[:max_chars] + "\n\n[Content truncated due to length]"
+        """调用LLM生成一个章节的教学教材。长章节自动分段处理后合并。"""
+        if len(section_text) <= self.MAX_CHARS_PER_CHUNK:
+            return self._generate_single_guide(boundary, section_text)
+
+        # 长章节：在段落边界拆分为多个chunk，分别生成后合并
+        chunks = self._split_at_paragraphs(section_text, self.MAX_CHARS_PER_CHUNK)
+        print(f"  Long section ({len(section_text)} chars) → {len(chunks)} chunks")
+
+        partial_guides = []
+        for i, chunk_text in enumerate(chunks):
+            print(f"    Generating chunk {i+1}/{len(chunks)} ({len(chunk_text)} chars)...")
+            partial_boundary = dict(boundary)
+            partial_boundary["title"] = f"{boundary['title']} (Part {i+1}/{len(chunks)})"
+            guide = self._generate_single_guide(partial_boundary, chunk_text)
+            partial_guides.append(guide)
+            if i < len(chunks) - 1:
+                time.sleep(1)
+
+        # 合并各段
+        return self._merge_partial_guides(boundary, partial_guides)
+
+    def _split_at_paragraphs(self, text: str, max_chars: int) -> list[str]:
+        """在段落边界将文本拆分为不超过 max_chars 的片段。"""
+        paragraphs = text.split("\n\n")
+        chunks = []
+        current = ""
+        for para in paragraphs:
+            if len(current) + len(para) > max_chars and current:
+                chunks.append(current.strip())
+                current = para
+            else:
+                current += "\n\n" + para if current else para
+        if current.strip():
+            chunks.append(current.strip())
+        return chunks
+
+    def _generate_single_guide(self, boundary: dict, section_text: str) -> str:
+        """生成单个章节教材（文本已确保不超过限制）。"""
 
         prompt = f"""You are a university professor creating self-study materials for a Chinese-speaking student studying abroad.
 
@@ -366,7 +375,7 @@ IMPORTANT RULES:
         # 添加文件头
         header = f"""# Section {boundary['number']}: {boundary['title']}
 
-> {self.course_code} Stochastic Processes - 自学教材
+> {self.course_code} - 自学教材 / Self-Study Guide
 > 生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M')}
 > 来源页: {boundary['start_page']}-{boundary['end_page']}
 
@@ -374,6 +383,47 @@ IMPORTANT RULES:
 
 """
         return header + content
+
+    def _merge_partial_guides(self, boundary: dict, partial_guides: list[str]) -> str:
+        """
+        合并分段生成的教材。对重复的章节标题去重，用分隔线标注分段点。
+        """
+        if len(partial_guides) == 1:
+            return partial_guides[0]
+
+        merged_header = f"""# Section {boundary['number']}: {boundary['title']}
+
+> {self.course_code} - 自学教材
+> 生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+> 来源页: {boundary['start_page']}-{boundary['end_page']}
+> ⚠️ 本章较长，分为 {len(partial_guides)} 部分生成后合并
+
+---
+
+"""
+        parts = []
+        for i, guide in enumerate(partial_guides):
+            # 去除各分段自带的 header（以 "# " 开头的行），避免重复
+            lines = guide.split("\n")
+            content_start = 0
+            # 跳过 frontmatter header（开头以 "# " 或 "> " 开头的行直到 "---"）
+            in_header = True
+            for j, line in enumerate(lines):
+                if in_header and line.strip() == "---":
+                    content_start = j + 1
+                    in_header = False
+                elif in_header and not (line.startswith("# ") or line.startswith("> ")):
+                    in_header = False
+                    content_start = j
+                    break
+
+            content = "\n".join(lines[content_start:]).strip()
+            if len(partial_guides) > 1:
+                parts.append(f"## Part {i+1}/{len(partial_guides)}\n\n{content}")
+            else:
+                parts.append(content)
+
+        return merged_header + "\n\n---\n\n".join(parts)
 
     @staticmethod
     def _safe_filename(title: str) -> str:
@@ -405,9 +455,9 @@ def main():
     ap.add_argument("--from-section", type=int, default=1, help="Start from section N")
     args = ap.parse_args()
 
-    # Always detect all section boundaries first
-    print("Detecting all section boundaries...")
-    all_boundaries = gen._find_section_boundaries(MATH2702_SECTIONS)
+    # Auto-detect section boundaries (no hardcoded list needed)
+    print("Auto-detecting section boundaries...")
+    all_boundaries = gen._auto_detect_sections()
     print(f"Found {len(all_boundaries)} section boundaries")
 
     if args.all:
