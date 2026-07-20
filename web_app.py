@@ -53,13 +53,13 @@ MODE_DESCRIPTIONS = {
 }
 
 
-def get_port(default=5000):
-    """Read --port N from argv, falling back to PORT or the default."""
+def get_port(default=5001):
+    """Read --port N from argv, falling back to PORT env or the default."""
     if "--port" in sys.argv:
         try:
             return int(sys.argv[sys.argv.index("--port") + 1])
         except (IndexError, ValueError):
-            print("Invalid --port value, using default 5000.")
+            print("Invalid --port value, using default 5001.")
             return default
     return int(os.getenv("PORT", default))
 
