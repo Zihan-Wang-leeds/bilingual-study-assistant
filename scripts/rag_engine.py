@@ -168,6 +168,8 @@ class CourseRAG:
                         "metadata": self.all_chunks[orig_idx]["metadata"],
                         "score": round(float(similarities[idx]), 4)
                     })
+            # 按页码排序，保持课件原始顺序
+            results.sort(key=lambda r: r["metadata"].get("page_start", r["metadata"].get("section", 999)))
             return results
         else:
             # 搜索全部课程
@@ -181,6 +183,8 @@ class CourseRAG:
                         "metadata": self.all_chunks[idx]["metadata"],
                         "score": round(float(similarities[idx]), 4)
                     })
+            # 按页码排序，保持课件原始顺序
+            results.sort(key=lambda r: r["metadata"].get("page_start", r["metadata"].get("section", 999)))
             return results
 
     # ================================================================
@@ -272,7 +276,10 @@ Course materials for this question:
 {context}
 
 Rules:
-1. Base your teaching on the provided course materials
+1. SOURCE DISCIPLINE / 来源约束:
+   - Core content (definitions, theorems, formulas, problem answers) MUST come from the provided course materials. Do not invent definitions or theorems.
+   - Teaching aids (intuition, analogies, plain-language explanations, common-mistake warnings, cross-topic connections) may be freely created — this is your value as a tutor. But when you do, mark the boundary clearly (e.g. "通俗理解 / Intuitive analogy:" or "补充说明 / Supplementary note:").
+   - If the course materials are insufficient to answer the question fully, say so honestly rather than filling gaps from your training data.
 2. Cite sources (e.g. "In Section X of the lecture notes...")
 3. Always provide English technical terms alongside their Chinese translations
 4. Format: Key terms in "English (中文)" format

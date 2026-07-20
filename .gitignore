@@ -11,3 +11,4 @@ env/
 
 # Local generated stores/caches
 chroma_db/
+knowledge_index.json
