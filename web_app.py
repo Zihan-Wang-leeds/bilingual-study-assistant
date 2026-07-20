@@ -28,6 +28,8 @@ except ModuleNotFoundError:
 from config import COURSES_DIR
 from pdf_loader import extract_text_from_pdf
 from chunker import chunk_pdf
+from progress_tracker import ProgressTracker, get_all_progress
+from generate_flashcards import generate_flashcards, save_flashcards
 
 app = Flask(__name__) if Flask else None
 
@@ -196,13 +198,167 @@ def api_upload():
         return jsonify({"error": f"Processing failed: {str(e)}"}), 500
 
 
+def api_guides():
+    """列出课程的所有教材文件"""
+    course_code = request.args.get('course', '').strip().upper()
+    if not course_code:
+        return {"error": "course parameter required"}, 400
+    guides_dir = os.path.join(COURSES_DIR, course_code, "guides")
+    if not os.path.exists(guides_dir):
+        return {"guides": [], "course": course_code}
+    files = []
+    for f in sorted(os.listdir(guides_dir)):
+        if f.endswith('.md'):
+            path = os.path.join(guides_dir, f)
+            size = os.path.getsize(path)
+            files.append({"name": f, "size": size, "size_kb": round(size/1024, 1)})
+    return {"guides": files, "course": course_code, "count": len(files)}
+
+
+def api_flashcards_generate():
+    """生成闪卡"""
+    data = request.get_json() or {}
+    course_code = data.get('course_code', '').strip().upper()
+    if not course_code:
+        return {"error": "course_code required"}, 400
+    pdf_path = os.path.join(COURSES_DIR, course_code, "课件.pdf")
+    if not os.path.exists(pdf_path):
+        return {"error": f"课件.pdf not found for {course_code}"}, 404
+    try:
+        cards = generate_flashcards(course_code, pdf_path)
+        output_dir = os.path.join(COURSES_DIR, course_code, "guides")
+        save_flashcards(course_code, output_dir, cards)
+        return {"success": True, "count": len(cards), "message": f"Generated {len(cards)} flashcards"}
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+
+def api_flashcards_list():
+    """获取已生成的闪卡内容"""
+    course_code = request.args.get('course', '').strip().upper()
+    if not course_code:
+        return {"error": "course parameter required"}, 400
+    md_path = os.path.join(COURSES_DIR, course_code, "guides", "Flashcards.md")
+    if not os.path.exists(md_path):
+        return {"cards": [], "exists": False}
+    with open(md_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    # Parse cards from markdown
+    cards = []
+    import re
+    for m in re.finditer(r'## Card (\d+): (.+?)\n\n\*\*Front.+\*\*: (.+?)\n\n\*\*Back.+\*\*: (.+?)\n\n\*\*中文\*\*: (.+?)\n\n', content):
+        cards.append({"id": m.group(1), "title": m.group(2), "front": m.group(3), "back": m.group(4), "cn": m.group(5)})
+    return {"cards": cards, "exists": True, "count": len(cards)}
+
+
+def api_progress():
+    """获取课程学习进度"""
+    course_code = request.args.get('course', '').strip().upper()
+    if not course_code:
+        all_p = get_all_progress(COURSES_DIR)
+        return {"all": all_p}
+    course_dir = os.path.join(COURSES_DIR, course_code)
+    if not os.path.exists(course_dir):
+        return {"error": "Course not found"}, 404
+    tracker = ProgressTracker(course_dir)
+    guides_dir = os.path.join(course_dir, "guides")
+    total_sections = 0
+    total_problems = 0
+    if os.path.exists(guides_dir):
+        for f in os.listdir(guides_dir):
+            if f.startswith("Section_") and f.endswith(".md"):
+                total_sections += 1
+            if f.startswith("Problem_Sheet_") and f.endswith(".md"):
+                total_problems += 1
+    report = tracker.get_report(total_sections)
+    report["total_problems"] = total_problems
+    return report
+
+
+def api_progress_mark():
+    """标记学习进度"""
+    data = request.get_json() or {}
+    course_code = data.get('course_code', '').strip().upper()
+    action = data.get('action', '')
+    if not course_code:
+        return {"error": "course_code required"}, 400
+    course_dir = os.path.join(COURSES_DIR, course_code)
+    if not os.path.exists(course_dir):
+        return {"error": "Course not found"}, 404
+    tracker = ProgressTracker(course_dir)
+    if action == 'section_read' and data.get('number'):
+        tracker.mark_section_read(int(data['number']), data.get('title', ''))
+        return {"success": True, "sections_read": tracker.get_sections_read()}
+    elif action == 'problem_solved' and data.get('number'):
+        tracker.mark_problem_solved(int(data['number']))
+        return {"success": True, "problems_solved": tracker.data["problems_solved"]}
+    elif action == 'study_session' and data.get('minutes'):
+        tracker.add_study_session(int(data['minutes']))
+        return {"success": True, "stats": tracker.get_study_stats()}
+    elif action == 'quiz_score' and data.get('score') is not None:
+        tracker.add_quiz_score(data.get('topic', 'Web Quiz'), int(data['score']), int(data.get('total', 10)))
+        return {"success": True, "quiz_stats": tracker.get_quiz_stats()}
+    else:
+        return {"error": f"Unknown action: {action}"}, 400
+
+
+def api_export_pdf():
+    """导出教材为 PDF"""
+    data = request.get_json() or {}
+    course_code = data.get('course_code', '').strip().upper()
+    section = data.get('section')
+    if not course_code:
+        return {"error": "course_code required"}, 400
+    guides_dir = os.path.join(COURSES_DIR, course_code, "guides")
+    if not os.path.exists(guides_dir):
+        return {"error": "No guides found"}, 404
+    try:
+        from export_pdf import export_to_pdf
+        if section:
+            import re
+            pattern = re.compile(rf'Section_{section:02d}_.*\.md')
+            for f in os.listdir(guides_dir):
+                if pattern.match(f):
+                    md_path = os.path.join(guides_dir, f)
+                    output = export_to_pdf(md_path)
+                    return {"success": True, "output": output, "filename": os.path.basename(output)}
+            return {"error": f"Section {section} not found"}, 404
+        else:
+            return {"error": "Specify --section or use --all in CLI"}, 400
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+
 if app:
+    # GET routes
     app.add_url_rule('/api/stats', 'api_stats', lambda: jsonify(api_stats()))
     app.add_url_rule('/api/courses', 'api_courses', lambda: jsonify(api_courses()))
     app.add_url_rule('/api/modes', 'api_modes', lambda: jsonify(api_modes()))
+    app.add_url_rule('/api/guides', 'api_guides', lambda: (
+        lambda r: jsonify(r[0]) if isinstance(r, tuple) else jsonify(r)
+    )(api_guides()))
+    app.add_url_rule('/api/flashcards', 'api_flashcards', lambda: jsonify(api_flashcards_list()))
+    app.add_url_rule('/api/progress', 'api_progress', lambda: jsonify(api_progress()))
+
+    # POST routes
     @app.route('/api/upload', methods=['POST'])
     def upload_route():
         payload, status = api_upload()
+        return jsonify(payload), status
+
+    @app.route('/api/flashcards/generate', methods=['POST'])
+    def flashcards_generate_route():
+        payload, status = api_flashcards_generate()
+        return jsonify(payload), status
+
+    @app.route('/api/progress/mark', methods=['POST'])
+    def progress_mark_route():
+        payload, status = api_progress_mark()
+        return jsonify(payload), status
+
+    @app.route('/api/export', methods=['POST'])
+    def export_route():
+        payload, status = api_export_pdf()
         return jsonify(payload), status
 
     @app.route('/api/chat', methods=['POST'])
