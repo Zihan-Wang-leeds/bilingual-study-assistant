@@ -1,334 +1,255 @@
 # Problem Sheet 8 - 详细解答 / Detailed Solutions
 
 > MATH2702 Stochastic Processes
-> 生成时间 / Generated: 2026-07-17 15:14
+> 生成时间 / Generated: 2026-07-20 16:06
 > 来源页 / Source Pages: 82-82
 
 ---
 
-好的，作为大学数学导师，我将为MATH2702: 随机过程 的问题单8提供完整、详细的逐步解答。
+好的，作为大学数学导师，我将为您提供MATH2702: 随机过程习题集8的完整双语解答。
 
 ---
 
 ### Question 1 / 第1题
 
 **Problem / 题目原文:**
-Let (𝑋(𝑡)) be a Poisson process with rate 𝜆.
-(a) Fix 𝑛. What is the expected time between the 𝑛th arrival and the (𝑛+1)th arrival?
+1. Let (𝑋(𝑡)) be a Poisson process with rate 𝜆.
+(a) Fix 𝑛. What is the expected time between the 𝑛th arrival and the (𝑛+ 1)th arrival?
 (b) Fix 𝑡. What is the expected time between the previous arrival before 𝑡 and the next arrival after 𝑡?
 (c) Your answers to the previous two questions should be different. Explain why one should expect the second answer to be bigger than the first.
 
-**中文翻译:**
-设 (𝑋(𝑡)) 是一个速率为 𝜆 的泊松过程。
-(a) 固定 𝑛。求第 𝑛 次到达和第 (𝑛+1) 次到达之间的期望时间。
-(b) 固定 𝑡。求在时间 𝑡 之前最后一次到达和在时间 𝑡 之后第一次到达之间的期望时间。
-(c) 你对前两个问题的答案应该是不同的。解释为什么第二个答案应该比第一个大。
+**中文翻译 / Chinese Translation:**
+1. 设 (𝑋(𝑡)) 是一个速率为 𝜆 的泊松过程。
+(a) 固定 𝑛。求第 𝑛 次到达与第 (𝑛+1) 次到达之间的期望时间。
+(b) 固定 𝑡。求在时间 𝑡 之前最后一次到达与在时间 𝑡 之后第一次到达之间的期望时间。
+(c) 你对前两个问题的答案应该是不同的。解释为什么预期第二个答案比第一个大。
 
 **Knowledge Points / 考查知识点:**
-- Poisson process properties (stationary and independent increments)
-- Inter-arrival times (exponential distribution)
-- Memoryless property of exponential distribution
-- Inspection paradox / waiting time paradox
+- 泊松过程的到达间隔时间分布 (Exponential distribution of interarrival times in a Poisson process)
+- 泊松过程的无记忆性 (Memoryless property of the Poisson process)
+- 检查悖论 (Inspection Paradox)
 
 **Step-by-Step Solution / 逐步解答:**
 
-**(a) Expected time between the nth and (n+1)th arrival**
+#### (a) 固定 n 的期望间隔时间
 
-*Step 1: Identify the distribution of inter-arrival times.*
-For a Poisson process with rate λ, the inter-arrival times, i.e., the time between successive arrivals, are independent and identically distributed (i.i.d.) exponential random variables with mean 1/λ.
-Let $T_n$ be the time between the $(n-1)$th and $n$th arrival. Then $T_n \sim \text{Exp}(\lambda)$.
+**1. 中文思路 / Chinese reasoning:**
+对于泊松过程，到达间隔时间（即连续两次到达之间的时间）是独立同分布的指数随机变量，其参数为速率 λ。第 n 次和第 n+1 次到达之间的时间正是第 (n+1) 个到达间隔时间。因此，我们只需要计算一个指数分布随机变量的期望值。
 
-*Step 2: Apply this to the specific interval.*
-The time between the $n$th arrival and the $(n+1)$th arrival is exactly the inter-arrival time $T_{n+1}$.
+**English reasoning:**
+For a Poisson process, the interarrival times (the times between successive arrivals) are independent and identically distributed exponential random variables with rate λ. The time between the nth and (n+1)th arrival is precisely the (n+1)th interarrival time. Therefore, we just need to compute the expectation of an exponential random variable.
 
-*Step 3: Calculate the expectation.*
-The expected value of an exponential random variable with rate λ is $1/\lambda$.
-Therefore, $\mathbb{E}[T_{n+1}] = 1/\lambda$.
+**2. 计算过程 / Working:**
+设 $T_{n+1}$ 为第 $n+1$ 个到达间隔时间。我们知道 $T_{n+1} \sim \text{Exp}(\lambda)$。
+一个指数随机变量的期望是 $\mathbb{E}[T_{n+1}] = \frac{1}{\lambda}$。
 
-**Intermediate Result:** The expected time is $1/\lambda$.
-
-**(b) Expected time between the previous arrival before t and the next arrival after t**
-
-*Step 1: Define the relevant random variables.*
-Let $A_t$ be the time of the last arrival before or at time $t$ (the "previous arrival").
-Let $B_t$ be the time of the first arrival after time $t$ (the "next arrival").
-We want to find $\mathbb{E}[B_t - A_t]$.
-
-*Step 2: Decompose the interval.*
-The interval $[A_t, B_t]$ can be split into two parts:
-1.  The time since the last arrival: $S_t = t - A_t$ (the "age" or "backward recurrence time").
-2.  The time until the next arrival: $R_t = B_t - t$ (the "residual life" or "forward recurrence time").
-So, $B_t - A_t = S_t + R_t$.
-
-*Step 3: Determine the distribution of $R_t$.*
-Due to the memoryless property of the exponential distribution and the stationary increments of the Poisson process, the time until the next arrival $R_t$ is exponentially distributed with rate λ, regardless of $t$.
-Thus, $\mathbb{E}[R_t] = 1/\lambda$.
-
-*Step 4: Determine the distribution of $S_t$.*
-For a Poisson process, the time since the last arrival $S_t$ also follows an exponential distribution with rate λ. This is a known property: the backward recurrence time has the same distribution as the forward recurrence time.
-Thus, $\mathbb{E}[S_t] = 1/\lambda$.
-
-*Step 5: Combine the expectations.*
-Since $S_t$ and $R_t$ are independent (a property of the Poisson process), the expected total length is the sum of the expectations:
-$\mathbb{E}[B_t - A_t] = \mathbb{E}[S_t] + \mathbb{E}[R_t] = 1/\lambda + 1/\lambda = 2/\lambda$.
-
-**Intermediate Result:** The expected time is $2/\lambda$.
-
-**(c) Explanation for the difference**
-
-*Step 1: State the results.*
-From (a), the expected time between two *specific consecutive* arrivals (the nth and (n+1)th) is $1/\lambda$.
-From (b), the expected time between the arrival before a *fixed time* t and the arrival after t is $2/\lambda$.
-
-*Step 2: Explain the "Inspection Paradox".*
-The reason the second answer is larger is due to the **inspection paradox** (or waiting time paradox). When we fix a time $t$, we are more likely to "land" in a longer inter-arrival interval than a shorter one. This is because longer intervals occupy more time on the timeline, so a randomly chosen point $t$ has a higher probability of falling within them.
-
-*Step 3: Elaborate on the bias.*
-- In part (a), we are looking at a *specific* inter-arrival interval (the one between the nth and (n+1)th arrival). This is a "typical" interval with an expected length of $1/\lambda$.
-- In part (b), we are looking at the *interval that contains the fixed time t*. This interval is not a "typical" one; it is "length-biased". The probability of an interval being selected is proportional to its length. Therefore, the expected length of the selected interval is longer than the expected length of a typical interval. In fact, for a Poisson process, the expected length of the interval containing a fixed point is $2/\lambda$, which is the sum of the expected forward and backward recurrence times.
+**Explanation of working / 过程解释:**
+我们定义 $T_{n+1}$ 为第 $n$ 次和第 $n+1$ 次到达之间的时间。根据泊松过程的定义，所有到达间隔时间 $T_1, T_2, \ldots$ 是独立同分布的，且都服从参数为 $\lambda$ 的指数分布。指数分布 $\text{Exp}(\lambda)$ 的概率密度函数为 $f(t) = \lambda e^{-\lambda t}$，其期望值 $\mathbb{E}[T] = \int_0^\infty t \lambda e^{-\lambda t} dt = 1/\lambda$。
 
 **Final Answer / 最终答案:**
-(a) $\boxed{1/\lambda}$
-(b) $\boxed{2/\lambda}$
-(c) The second answer is larger due to the inspection paradox. A fixed time $t$ is more likely to fall within a longer inter-arrival interval, biasing the expected length of the interval containing $t$ upwards.
+$$\boxed{\frac{1}{\lambda}}$$
+期望时间为 $\frac{1}{\lambda}$。 / The expected time is $\frac{1}{\lambda}$.
+
+#### (b) 固定 t 的期望间隔时间
+
+**1. 中文思路 / Chinese reasoning:**
+这个问题涉及到“检查悖论”。我们固定一个时间点 t，然后考虑包含这个时间点的那个“完整”的到达间隔。这个间隔由两部分组成：从 t 之前最后一次到达到 t 的时间（记为 $S_t$），以及从 t 到 t 之后第一次到达的时间（记为 $X_t$）。由于泊松过程具有无记忆性，$X_t$ 仍然服从参数为 $\lambda$ 的指数分布，其期望为 $1/\lambda$。然而，$S_t$ 的分布与 $X_t$ 相同，也是指数分布，期望为 $1/\lambda$。因此，整个间隔的期望是 $1/\lambda + 1/\lambda = 2/\lambda$。
+
+**English reasoning:**
+This problem involves the "inspection paradox". We fix a time point t and consider the "complete" interarrival interval that contains this time point. This interval consists of two parts: the time from the last arrival before t to t (denoted $S_t$), and the time from t to the next arrival after t (denoted $X_t$). Due to the memoryless property of the Poisson process, $X_t$ is still an exponential random variable with rate λ, so its expectation is $1/\lambda$. However, $S_t$ also has the same distribution as $X_t$, which is exponential with expectation $1/\lambda$. Therefore, the expectation of the whole interval is $1/\lambda + 1/\lambda = 2/\lambda$.
+
+**2. 计算过程 / Working:**
+设 $S_t$ 为从时间 t 回溯到上一次到达的时间，$X_t$ 为从时间 t 到下一次到达的时间。
+由泊松过程的无记忆性，$X_t \sim \text{Exp}(\lambda)$，所以 $\mathbb{E}[X_t] = 1/\lambda$。
+对于 $S_t$，由于泊松过程的时间可逆性，$S_t$ 也服从 $\text{Exp}(\lambda)$ 分布，所以 $\mathbb{E}[S_t] = 1/\lambda$。
+因此，期望的总间隔时间为 $\mathbb{E}[S_t + X_t] = \mathbb{E}[S_t] + \mathbb{E}[X_t] = \frac{1}{\lambda} + \frac{1}{\lambda} = \frac{2}{\lambda}$。
+
+**Explanation of working / 过程解释:**
+我们定义 $S_t$ 和 $X_t$。无记忆性意味着，无论我们在什么时间点 t 观察，剩余等待时间 $X_t$ 的分布与一个全新的到达间隔时间完全相同，即指数分布。对于 $S_t$，因为泊松过程在时间上是可逆的（即如果我们反转时间轴，它仍然是一个相同速率的泊松过程），所以从 t 回溯到上一次到达的时间 $S_t$ 也具有相同的指数分布。因此，包含 t 的整个间隔的期望长度是这两个独立指数随机变量期望之和，即 $2/\lambda$。
+
+**Final Answer / 最终答案:**
+$$\boxed{\frac{2}{\lambda}}$$
+期望时间为 $\frac{2}{\lambda}$。 / The expected time is $\frac{2}{\lambda}$.
+
+#### (c) 解释为什么第二个答案更大
+
+**1. 中文思路 / Chinese reasoning:**
+在 (a) 中，我们随机选择一个特定的到达间隔（第 n 个间隔），它的期望长度是 $1/\lambda$。在 (b) 中，我们随机选择一个时间点 t，然后测量包含这个时间点的那个间隔。因为较长的间隔更有可能覆盖一个随机选择的时间点，所以这种“按时间长度加权”的采样方式会倾向于选择更长的间隔。这被称为“检查悖论”或“长度偏倚抽样”。
+
+**English reasoning:**
+In (a), we randomly select a specific interarrival interval (the nth interval), and its expected length is $1/\lambda$. In (b), we randomly select a time point t, and then measure the interval that contains this point. Because longer intervals are more likely to cover a randomly chosen time point, this "length-biased" sampling tends to select longer intervals. This is known as the "inspection paradox" or "length-biased sampling".
+
+**2. 计算过程 / Working:**
+(a) 的答案是 $1/\lambda$，而 (b) 的答案是 $2/\lambda$。显然 $2/\lambda > 1/\lambda$。
+直观上，如果我们随机地“检查”一个过程，我们更有可能落在一个较长的间隔中，而不是一个较短的间隔中。因此，被检查到的间隔的期望长度会大于所有间隔的平均长度。
+
+**Explanation of working / 过程解释:**
+(a) 的答案是 $1/\lambda$，而 (b) 的答案是 $2/\lambda$。显然 $2/\lambda > 1/\lambda$。直观上，如果我们随机地“检查”一个过程，我们更有可能落在一个较长的间隔中，而不是一个较短的间隔中。因此，被检查到的间隔的期望长度会大于所有间隔的平均长度。
+
+**Final Answer / 最终答案:**
+第二个答案更大，因为随机时间点 t 更有可能落在一个较长的到达间隔内，这是一种长度偏倚抽样。 / The second answer is larger because a random time point t is more likely to fall within a longer interarrival interval, which is a length-biased sampling.
 
 **Key Insight / 解题要点:**
-The memoryless property of the exponential distribution is key, but the inspection paradox shows that conditioning on a fixed time $t$ introduces a length bias, making the expected interval containing $t$ twice as long as a typical inter-arrival interval.
+- 泊松过程的到达间隔是独立同分布的指数分布。
+- 检查悖论：随机时间点所在的间隔的期望长度是平均间隔长度的两倍。
+- 无记忆性使得 $X_t$ 和 $S_t$ 都服从指数分布。
 
 ---
 
 ### Question 2 / 第2题
 
 **Problem / 题目原文:**
-Let 𝑋(𝑡) be a Poisson process with rate 𝜆, and mark each arrival independently with probability 𝑝.
+2. Let 𝑋(𝑡) be a Poisson process with rate 𝜆, and mark each arrival independently with probability 𝑝.
 Use the infinitesimals definition to show that the marked process is a Poisson process with rate 𝑝𝜆.
 
-**中文翻译:**
-设 𝑋(𝑡) 是一个速率为 𝜆 的泊松过程，并且独立地以概率 𝑝 标记每次到达。使用无穷小定义来证明标记过程是一个速率为 𝑝𝜆 的泊松过程。
+**中文翻译 / Chinese Translation:**
+2. 设 𝑋(𝑡) 是一个速率为 𝜆 的泊松过程，并以概率 𝑝 独立地对每次到达进行标记。使用无穷小量定义来证明这个标记过程是一个速率为 𝑝𝜆 的泊松过程。
 
 **Knowledge Points / 考查知识点:**
-- Definition of a Poisson process via infinitesimal probabilities
-- Thinning of a Poisson process
-- Independence of increments
+- 泊松过程的无穷小量定义 (Infinitesimal definition of a Poisson process)
+- 随机稀疏化 (Random thinning of a Poisson process)
+- 独立增量性 (Independent increments)
 
 **Step-by-Step Solution / 逐步解答:**
 
-*Step 1: State the infinitesimal definition of a Poisson process.*
-A counting process $N(t)$ is a Poisson process with rate $\lambda$ if:
-1.  $N(0) = 0$.
-2.  It has independent increments.
-3.  For a small time interval $\Delta t$:
-    - $\mathbb{P}(N(t+\Delta t) - N(t) = 0) = 1 - \lambda \Delta t + o(\Delta t)$
-    - $\mathbb{P}(N(t+\Delta t) - N(t) = 1) = \lambda \Delta t + o(\Delta t)$
-    - $\mathbb{P}(N(t+\Delta t) - N(t) \ge 2) = o(\Delta t)$
+**1. 中文思路 / Chinese reasoning:**
+为了证明标记过程 $Y(t)$ 是一个泊松过程，我们需要验证它满足泊松过程的无穷小量定义。这包括三个条件：(i) $Y(0)=0$；(ii) $Y(t)$ 具有独立增量；(iii) 在任意小的时间区间 $(t, t+h]$ 内，发生一次事件的概率约为 $\lambda p h$，发生多于一次事件的概率是 $o(h)$。我们需要从原始过程 $X(t)$ 的性质出发来推导这些条件。
 
-*Step 2: Define the marked process.*
-Let $Y(t)$ be the number of marked arrivals up to time $t$. We want to show $Y(t)$ is a Poisson process with rate $p\lambda$.
+**English reasoning:**
+To prove that the marked process $Y(t)$ is a Poisson process, we need to verify that it satisfies the infinitesimal definition of a Poisson process. This involves three conditions: (i) $Y(0)=0$; (ii) $Y(t)$ has independent increments; (iii) in any small time interval $(t, t+h]$, the probability of one event is approximately $\lambda p h$, and the probability of more than one event is $o(h)$. We need to derive these conditions from the properties of the original process $X(t)$.
 
-*Step 3: Verify condition 1 (Initial condition).*
-Since $X(0) = 0$, there are no arrivals at time 0, and therefore no marked arrivals. So $Y(0) = 0$. Condition 1 is satisfied.
+**2. 计算过程 / Working:**
 
-*Step 4: Verify condition 2 (Independent increments).*
-The original process $X(t)$ has independent increments. The marking of each arrival is independent of everything else. Therefore, the number of marked arrivals in disjoint time intervals depends only on the number of original arrivals in those intervals, which are independent. Since the marking is independent, the increments of $Y(t)$ are also independent. Condition 2 is satisfied.
+**步骤 1: 验证 $Y(0)=0$**
+由于 $X(0)=0$，在时间 0 之前没有到达，因此也没有标记事件。所以 $Y(0)=0$。
 
-*Step 5: Verify condition 3 (Infinitesimal probabilities).*
-Consider a small time interval $[t, t+\Delta t)$. Let $\Delta X = X(t+\Delta t) - X(t)$ and $\Delta Y = Y(t+\Delta t) - Y(t)$.
+**步骤 2: 验证独立增量性**
+考虑任意不相交的时间区间 $(t_1, t_2]$ 和 $(t_3, t_4]$。原始过程 $X(t)$ 在这些区间上的增量 $X(t_2)-X(t_1)$ 和 $X(t_4)-X(t_3)$ 是独立的。标记过程 $Y(t)$ 的增量 $Y(t_2)-Y(t_1)$ 和 $Y(t_4)-Y(t_3)$ 分别只依赖于 $X(t_2)-X(t_1)$ 和 $X(t_4)-X(t_3)$ 以及独立的标记。由于这些原始增量是独立的，且标记是独立进行的，因此 $Y(t)$ 的增量也是独立的。
 
-*Step 5a: Calculate $\mathbb{P}(\Delta Y = 0)$.*
-$\Delta Y = 0$ if either there are no arrivals in the interval ($\Delta X = 0$), or there are arrivals but none of them are marked.
-$\mathbb{P}(\Delta Y = 0) = \mathbb{P}(\Delta X = 0) + \mathbb{P}(\Delta X = 1 \text{ and it is not marked}) + \mathbb{P}(\Delta X \ge 2 \text{ and none are marked})$.
-Using the infinitesimal properties of $X(t)$:
-$\mathbb{P}(\Delta X = 0) = 1 - \lambda \Delta t + o(\Delta t)$.
-$\mathbb{P}(\Delta X = 1) = \lambda \Delta t + o(\Delta t)$. The probability this single arrival is not marked is $1-p$. So $\mathbb{P}(\Delta X = 1 \text{ and not marked}) = (1-p)\lambda \Delta t + o(\Delta t)$.
-The probability of $\Delta X \ge 2$ is $o(\Delta t)$. Even if all are unmarked, the probability is at most $o(\Delta t)$.
-Therefore,
-$\mathbb{P}(\Delta Y = 0) = (1 - \lambda \Delta t) + (1-p)\lambda \Delta t + o(\Delta t) = 1 - p\lambda \Delta t + o(\Delta t)$.
+**步骤 3: 验证无穷小增量概率**
+考虑一个小区间 $(t, t+h]$。原始过程 $X(t)$ 在该区间内发生一次事件的概率为 $\mathbb{P}(X(t+h)-X(t)=1) = \lambda h + o(h)$。发生多于一次事件的概率为 $\mathbb{P}(X(t+h)-X(t) \ge 2) = o(h)$。
+对于标记过程 $Y(t)$，在 $(t, t+h]$ 内发生一次事件，意味着原始过程发生了一次事件，并且这次事件被标记了。因此：
+$$\mathbb{P}(Y(t+h)-Y(t)=1) = \mathbb{P}(X(t+h)-X(t)=1 \text{ and the arrival is marked})$$
+由于标记是独立进行的，这个概率等于：
+$$\mathbb{P}(X(t+h)-X(t)=1) \times p = (\lambda h + o(h)) \times p = \lambda p h + o(h)$$
+接下来，考虑在 $(t, t+h]$ 内发生多于一次标记事件。这有两种可能：要么原始过程发生了多于一次事件（无论是否标记），要么原始过程恰好发生了一次事件，但这次事件被标记了，同时还有另一次事件（概率为 $o(h)$）。更严格地说：
+$$\mathbb{P}(Y(t+h)-Y(t) \ge 2) \le \mathbb{P}(X(t+h)-X(t) \ge 2) + \mathbb{P}(X(t+h)-X(t)=1 \text{ and it's marked and something else})$$
+但更简单的说法是，如果 $Y(t)$ 有两次或更多次事件，那么 $X(t)$ 也必须有两次或更多次事件（因为每次标记事件都对应一次原始事件）。因此：
+$$\mathbb{P}(Y(t+h)-Y(t) \ge 2) \le \mathbb{P}(X(t+h)-X(t) \ge 2) = o(h)$$
+所以 $\mathbb{P}(Y(t+h)-Y(t) \ge 2) = o(h)$。
 
-*Step 5b: Calculate $\mathbb{P}(\Delta Y = 1)$.*
-$\Delta Y = 1$ if there is exactly one arrival in the interval AND it is marked, OR there are two or more arrivals and exactly one of them is marked.
-$\mathbb{P}(\Delta Y = 1) = \mathbb{P}(\Delta X = 1 \text{ and it is marked}) + \mathbb{P}(\Delta X \ge 2 \text{ and exactly one is marked})$.
-$\mathbb{P}(\Delta X = 1 \text{ and marked}) = p \cdot \mathbb{P}(\Delta X = 1) = p(\lambda \Delta t + o(\Delta t)) = p\lambda \Delta t + o(\Delta t)$.
-The probability of $\Delta X \ge 2$ is $o(\Delta t)$. The probability that exactly one of these is marked is at most the probability of $\Delta X \ge 2$, which is $o(\Delta t)$.
-Therefore,
-$\mathbb{P}(\Delta Y = 1) = p\lambda \Delta t + o(\Delta t)$.
-
-*Step 5c: Calculate $\mathbb{P}(\Delta Y \ge 2)$.*
-$\Delta Y \ge 2$ implies that $\Delta X \ge 2$ (you can't have more marked arrivals than total arrivals).
-$\mathbb{P}(\Delta Y \ge 2) \le \mathbb{P}(\Delta X \ge 2) = o(\Delta t)$.
-Therefore, $\mathbb{P}(\Delta Y \ge 2) = o(\Delta t)$.
-
-*Step 6: Conclusion.*
-The process $Y(t)$ satisfies all three conditions of the infinitesimal definition of a Poisson process with rate $p\lambda$. Therefore, the marked process is a Poisson process with rate $p\lambda$.
+**Explanation of working / 过程解释:**
+我们逐步验证了泊松过程的无穷小量定义的三个条件。
+- 条件 (i) 是显然的。
+- 条件 (ii) 利用了原始过程的独立增量性和标记的独立性。因为不相交区间上的原始事件数是独立的，而每个事件是否被标记也是独立于其他事件的，所以这些区间上的标记事件数也是独立的。
+- 条件 (iii) 是核心。在小区间内，原始过程发生一次事件的概率是 $\lambda h + o(h)$。为了得到一个标记事件，我们需要这次原始事件被标记，其概率为 $p$。由于 $h$ 很小，我们可以忽略高阶项，得到 $\lambda p h$。同时，在小区间内发生多于一次标记事件的概率，不会超过原始过程发生多于一次事件的概率，而后者是 $o(h)$。因此，标记过程满足速率为 $\lambda p$ 的泊松过程的定义。
 
 **Final Answer / 最终答案:**
-The marked process $Y(t)$ satisfies the infinitesimal definition of a Poisson process with rate $p\lambda$, as shown by verifying the initial condition, independent increments, and the infinitesimal probabilities $\mathbb{P}(\Delta Y = 0) = 1 - p\lambda \Delta t + o(\Delta t)$, $\mathbb{P}(\Delta Y = 1) = p\lambda \Delta t + o(\Delta t)$, and $\mathbb{P}(\Delta Y \ge 2) = o(\Delta t)$. $\boxed{\text{The marked process is a Poisson process with rate } p\lambda.}$
+标记过程 $Y(t)$ 是一个速率为 $\lambda p$ 的泊松过程。 / The marked process $Y(t)$ is a Poisson process with rate $\lambda p$.
 
 **Key Insight / 解题要点:**
-The proof relies on the "thinning" property: independently selecting events from a Poisson process results in another Poisson process whose rate is the original rate multiplied by the selection probability.
+- 随机稀疏化（独立地以概率 p 保留事件）将一个速率为 λ 的泊松过程转化为一个速率为 λp 的泊松过程。
+- 证明的关键是利用原始泊松过程的无穷小量性质，并结合标记的独立性。
 
 ---
 
 ### Question 3 / 第3题
 
 **Problem / 题目原文:**
-Let (𝑋(𝑡)) be a simple birth process with rates 𝜆𝑗 = 𝜆𝑗 starting from 𝑋(0) = 1. Let 𝑝𝑗(𝑡) = ℙ(𝑋(𝑡) = 𝑗).
-(a) Write down the Kolmogorov forward equations for 𝑝𝑗(𝑡). You should have separate equations for 𝑗 = 1 and 𝑗 ≥ 2. Remember to include the initial conditions 𝑝𝑗(0).
-(b) Show that 𝑋(𝑡) follows a geometric distribution 𝑋(𝑡) ∼ Geom(𝑒^{−𝜆𝑡}). That is, show that
-𝑝𝑗(𝑡) = (1−𝑒^{−𝜆𝑡})^{𝑗−1}𝑒^{−𝜆𝑡}
+3. Let (𝑋(𝑡)) be a simple birth process with rates 𝜆𝑗= 𝜆𝑗 starting from 𝑋(0) = 1. Let 𝑝𝑗(𝑡) = ℙ(𝑋(𝑡) = 𝑗).
+(a) Write down the Kolmogorov forward equations for 𝑝𝑗(𝑡). You should have separate equations for 𝑗= 1 and 𝑗≥2. Remember to include the initial conditions 𝑝𝑗(0).
+(b) Show that 𝑋(𝑡) follows a geometric distribution 𝑋(𝑡) ∼Geom(𝑒−𝜆𝑡). That is, show that
+𝑝𝑗(𝑡) = (1 −𝑒−𝜆𝑡)𝑗−1𝑒−𝜆𝑡
 satisfies the forward equation.
 (c) Hence, calculate 𝔼𝑋(𝑡), the expected population size at time 𝑡.
 
-**中文翻译:**
-设 (𝑋(𝑡)) 是一个简单生灭过程，其出生率为 𝜆𝑗 = 𝜆𝑗，从 𝑋(0) = 1 开始。设 𝑝𝑗(𝑡) = ℙ(𝑋(𝑡) = 𝑗)。
-(a) 写出 𝑝𝑗(𝑡) 的 Kolmogorov 向前方程。你应该为 𝑗 = 1 和 𝑗 ≥ 2 分别写出方程。记得包括初始条件 𝑝𝑗(0)。
-(b) 证明 𝑋(𝑡) 服从几何分布 𝑋(𝑡) ∼ Geom(𝑒^{−𝜆𝑡})。即，证明
-𝑝𝑗(𝑡) = (1−𝑒^{−𝜆𝑡})^{𝑗−1}𝑒^{−𝜆𝑡}
+**中文翻译 / Chinese Translation:**
+3. 设 (𝑋(𝑡)) 是一个简单生灭过程，其出生率为 𝜆𝑗= 𝜆𝑗，从 𝑋(0) = 1 开始。令 𝑝𝑗(𝑡) = ℙ(𝑋(𝑡) = 𝑗)。
+(a) 写出 𝑝𝑗(𝑡) 的 Kolmogorov 向前方程。你应该为 𝑗=1 和 𝑗≥2 分别写出方程。记得包括初始条件 𝑝𝑗(0)。
+(b) 证明 𝑋(𝑡) 服从几何分布 𝑋(𝑡) ∼Geom(𝑒−𝜆𝑡)。即证明
+𝑝𝑗(𝑡) = (1 −𝑒−𝜆𝑡)𝑗−1𝑒−𝜆𝑡
 满足向前方程。
-(c) 由此计算 𝔼𝑋(𝑡)，即时间 𝑡 时的期望种群大小。
+(c) 由此，计算 𝔼𝑋(𝑡)，即时间 𝑡 时的期望种群大小。
 
 **Knowledge Points / 考查知识点:**
-- Simple birth process (Yule process)
-- Kolmogorov forward equations
-- Solving differential-difference equations
-- Geometric distribution and its expectation
+- 简单生灭过程 (Simple birth process / Yule process)
+- Kolmogorov 向前方程 (Kolmogorov forward equations)
+- 几何分布 (Geometric distribution)
+- 期望值计算 (Expectation calculation)
 
 **Step-by-Step Solution / 逐步解答:**
 
-**(a) Kolmogorov Forward Equations**
+#### (a) Kolmogorov 向前方程
 
-*Step 1: General form of forward equations for a birth process.*
-For a birth process with birth rates $\lambda_n$, the forward equation for $p_j(t)$ is:
-$p_j'(t) = -\lambda_j p_j(t) + \lambda_{j-1} p_{j-1}(t)$ for $j \ge 1$, with the convention that $\lambda_0 = 0$ and $p_0(t) = 0$.
+**1. 中文思路 / Chinese reasoning:**
+Kolmogorov 向前方程描述了在时间 t 时处于状态 j 的概率 $p_j(t)$ 随时间的变化率。对于简单生灭过程，状态只能通过出生事件增加。从状态 j 出发，出生事件以速率 $\lambda_j = \lambda j$ 发生，使系统进入状态 j+1。因此，$p_j(t)$ 的变化率由两部分组成：从状态 j-1 进入状态 j 的速率，以及从状态 j 离开到状态 j+1 的速率。我们需要为 j=1 和 j≥2 分别写出方程，因为当 j=1 时，没有状态 0 可以进入。
 
-*Step 2: Apply the specific birth rates.*
-Here, $\lambda_j = \lambda j$ for $j \ge 1$.
+**English reasoning:**
+The Kolmogorov forward equations describe the rate of change of the probability $p_j(t)$ of being in state j at time t. For a simple birth process, the state can only increase through birth events. From state j, a birth event occurs at rate $\lambda_j = \lambda j$, moving the system to state j+1. Therefore, the rate of change of $p_j(t)$ consists of two parts: the rate of entering state j from state j-1, and the rate of leaving state j to state j+1. We need separate equations for j=1 and j≥2 because when j=1, there is no state 0 to enter from.
 
-*Step 3: Write the equation for $j = 1$.*
-For $j=1$, the term $\lambda_{j-1} p_{j-1}(t) = \lambda_0 p_0(t) = 0$.
-So, $p_1'(t) = -\lambda_1 p_1(t) = -\lambda \cdot 1 \cdot p_1(t) = -\lambda p_1(t)$.
+**2. 计算过程 / Working:**
+对于 $j \ge 2$，向前方程为：
+$$\frac{d}{dt} p_j(t) = -\lambda_j p_j(t) + \lambda_{j-1} p_{j-1}(t) = -\lambda j p_j(t) + \lambda (j-1) p_{j-1}(t)$$
+对于 $j=1$，由于没有状态 0，所以没有从状态 0 进入的项：
+$$\frac{d}{dt} p_1(t) = -\lambda_1 p_1(t) = -\lambda \cdot 1 \cdot p_1(t) = -\lambda p_1(t)$$
+初始条件为 $X(0)=1$，所以：
+$$p_1(0) = 1, \quad p_j(0) = 0 \text{ for } j \ge 2$$
 
-*Step 4: Write the equation for $j \ge 2$.*
-For $j \ge 2$, both terms are present:
-$p_j'(t) = -\lambda_j p_j(t) + \lambda_{j-1} p_{j-1}(t) = -\lambda j p_j(t) + \lambda (j-1) p_{j-1}(t)$.
-
-*Step 5: State the initial conditions.*
-The process starts from $X(0) = 1$. Therefore:
-$p_1(0) = \mathbb{P}(X(0) = 1) = 1$.
-$p_j(0) = \mathbb{P}(X(0) = j) = 0$ for all $j \ge 2$.
-
-**Intermediate Result:**
-The forward equations are:
-$p_1'(t) = -\lambda p_1(t)$, with $p_1(0) = 1$.
-$p_j'(t) = -\lambda j p_j(t) + \lambda (j-1) p_{j-1}(t)$, for $j \ge 2$, with $p_j(0) = 0$.
-
-**(b) Verification of the Geometric Distribution Solution**
-
-*Step 1: State the proposed solution.*
-We want to show that $p_j(t) = (1 - e^{-\lambda t})^{j-1} e^{-\lambda t}$ satisfies the forward equations.
-
-*Step 2: Verify the initial condition.*
-At $t=0$, $e^{-\lambda \cdot 0} = 1$, so $1 - e^{-\lambda \cdot 0} = 0$.
-For $j=1$: $p_1(0) = (1-1)^{0} \cdot 1 = 1$. Correct.
-For $j \ge 2$: $p_j(0) = (1-1)^{j-1} \cdot 1 = 0$. Correct.
-
-*Step 3: Verify the equation for $j=1$.*
-First, find the derivative of $p_1(t) = e^{-\lambda t}$.
-$p_1'(t) = -\lambda e^{-\lambda t}$.
-The right-hand side of the forward equation for $j=1$ is $-\lambda p_1(t) = -\lambda e^{-\lambda t}$.
-Since $p_1'(t) = -\lambda e^{-\lambda t}$, the equation holds.
-
-*Step 4: Verify the equation for a general $j \ge 2$.*
-Let $q(t) = 1 - e^{-\lambda t}$. Then $p_j(t) = q(t)^{j-1} e^{-\lambda t}$.
-First, find the derivative $p_j'(t)$.
-$q'(t) = \lambda e^{-\lambda t}$.
-Using the product rule:
-$p_j'(t) = (j-1) q(t)^{j-2} q'(t) e^{-\lambda t} + q(t)^{j-1} (-\lambda e^{-\lambda t})$
-$p_j'(t) = (j-1) q(t)^{j-2} (\lambda e^{-\lambda t}) e^{-\lambda t} - \lambda q(t)^{j-1} e^{-\lambda t}$
-$p_j'(t) = \lambda (j-1) q(t)^{j-2} e^{-2\lambda t} - \lambda q(t)^{j-1} e^{-\lambda t}$.
-
-*Step 5: Compute the right-hand side (RHS) of the forward equation.*
-RHS $= -\lambda j p_j(t) + \lambda (j-1) p_{j-1}(t)$.
-First term: $-\lambda j p_j(t) = -\lambda j q(t)^{j-1} e^{-\lambda t}$.
-Second term: $\lambda (j-1) p_{j-1}(t) = \lambda (j-1) q(t)^{j-2} e^{-\lambda t}$.
-
-*Step 6: Show LHS = RHS.*
-We need to show:
-$\lambda (j-1) q(t)^{j-2} e^{-2\lambda t} - \lambda q(t)^{j-1} e^{-\lambda t} = -\lambda j q(t)^{j-1} e^{-\lambda t} + \lambda (j-1) q(t)^{j-2} e^{-\lambda t}$.
-
-Let's rearrange the RHS to match the LHS. Factor out $\lambda (j-1) q(t)^{j-2} e^{-\lambda t}$ from the RHS where possible.
-RHS $= \lambda (j-1) q(t)^{j-2} e^{-\lambda t} - \lambda j q(t)^{j-1} e^{-\lambda t}$.
-
-Now, look at the LHS. The first term is $\lambda (j-1) q(t)^{j-2} e^{-2\lambda t} = \lambda (j-1) q(t)^{j-2} e^{-\lambda t} \cdot e^{-\lambda t}$.
-The second term is $-\lambda q(t)^{j-1} e^{-\lambda t}$.
-
-Let's try to manipulate the RHS to see if it equals the LHS.
-RHS $= \lambda (j-1) q(t)^{j-2} e^{-\lambda t} - \lambda j q(t)^{j-1} e^{-\lambda t}$
-$= \lambda (j-1) q(t)^{j-2} e^{-\lambda t} - \lambda (j-1+1) q(t)^{j-1} e^{-\lambda t}$
-$= \lambda (j-1) q(t)^{j-2} e^{-\lambda t} - \lambda (j-1) q(t)^{j-1} e^{-\lambda t} - \lambda q(t)^{j-1} e^{-\lambda t}$
-$= \lambda (j-1) q(t)^{j-2} e^{-\lambda t} (1 - q(t)) - \lambda q(t)^{j-1} e^{-\lambda t}$.
-
-Since $q(t) = 1 - e^{-\lambda t}$, we have $1 - q(t) = e^{-\lambda t}$.
-Substitute this into the expression:
-RHS $= \lambda (j-1) q(t)^{j-2} e^{-\lambda t} \cdot e^{-\lambda t} - \lambda q(t)^{j-1} e^{-\lambda t}$
-RHS $= \lambda (j-1) q(t)^{j-2} e^{-2\lambda t} - \lambda q(t)^{j-1} e^{-\lambda t}$.
-
-This is exactly the LHS we calculated. Therefore, the proposed solution satisfies the forward equation.
-
-**(c) Expected Population Size**
-
-*Step 1: Identify the distribution.*
-We have shown that $X(t) \sim \text{Geom}(e^{-\lambda t})$, where the geometric distribution is defined as the number of trials until the first success. In this parameterization, $p_j(t) = \mathbb{P}(X(t) = j) = (1-p)^{j-1} p$, where $p = e^{-\lambda t}$ is the "success" probability.
-
-*Step 2: Recall the expectation of a geometric distribution.*
-For a geometric random variable $Y$ with success probability $p$ (i.e., $\mathbb{P}(Y=k) = (1-p)^{k-1}p$ for $k=1,2,\dots$), the expectation is $\mathbb{E}[Y] = 1/p$.
-
-*Step 3: Apply to our process.*
-Here, $p = e^{-\lambda t}$. Therefore,
-$\mathbb{E}[X(t)] = \frac{1}{e^{-\lambda t}} = e^{\lambda t}$.
+**Explanation of working / 过程解释:**
+方程 $\frac{d}{dt} p_j(t) = -\lambda_j p_j(t) + \lambda_{j-1} p_{j-1}(t)$ 是标准的 Kolmogorov 向前方程形式。第一项 $-\lambda_j p_j(t)$ 表示从状态 j 离开的速率（乘以处于状态 j 的概率），第二项 $\lambda_{j-1} p_{j-1}(t)$ 表示从状态 j-1 进入状态 j 的速率。对于 j=1，没有状态 0，所以第二项不存在。初始条件直接来自问题陈述：在时间 0 时，种群大小为 1，所以 $p_1(0)=1$，其他状态的概率为 0。
 
 **Final Answer / 最终答案:**
-(a) $p_1'(t) = -\lambda p_1(t), p_1(0)=1$; $p_j'(t) = -\lambda j p_j(t) + \lambda (j-1) p_{j-1}(t), p_j(0)=0$ for $j \ge 2$.
-(b) The proposed $p_j(t)$ satisfies the initial conditions and the forward equations, as shown by direct substitution and algebraic manipulation.
-(c) $\boxed{\mathbb{E}[X(t)] = e^{\lambda t}}$
+对于 $j=1$: $\frac{d}{dt} p_1(t) = -\lambda p_1(t)$，初始条件 $p_1(0)=1$。
+对于 $j \ge 2$: $\frac{d}{dt} p_j(t) = -\lambda j p_j(t) + \lambda (j-1) p_{j-1}(t)$，初始条件 $p_j(0)=0$。
 
-**Key Insight / 解题要点:**
-The simple birth process (Yule process) leads to a geometric distribution at each time $t$, and its expectation grows exponentially, reflecting the multiplicative nature of the birth rates $\lambda_n = \lambda n$.
+#### (b) 证明几何分布
 
----
+**1. 中文思路 / Chinese reasoning:**
+我们需要验证给定的 $p_j(t) = (1 - e^{-\lambda t})^{j-1} e^{-\lambda t}$ 满足 (a) 部分中的向前方程。这需要计算 $p_j(t)$ 对时间 t 的导数，并将其代入方程，同时也要验证 $p_{j-1}(t)$ 的表达式。我们分别对 j=1 和 j≥2 进行验证。
 
-### Question 4 / 第4题
+**English reasoning:**
+We need to verify that the given $p_j(t) = (1 - e^{-\lambda t})^{j-1} e^{-\lambda t}$ satisfies the forward equations from part (a). This involves calculating the derivative of $p_j(t)$ with respect to time t, substituting it into the equation, and also using the expression for $p_{j-1}(t)$. We will verify for j=1 and j≥2 separately.
 
-**Problem / 题目原文:**
-Let (𝑋(𝑡)) be a simple birth process with rates 𝜆𝑛 = 𝜆𝑛 starting from 𝑋(0) = 1. Let 𝑇𝑛 ∼ Exp(𝜆𝑛) be the 𝑛th holding time, and let 𝐽𝑛 = 𝑇1 + 𝑇2 + ⋯ + 𝑇𝑛 be the time of the 𝑛th birth.
-(a) Write down 𝔼𝑇𝑛 and Var(𝑇𝑛).
-(b) Show that, as 𝑛 → ∞, the expectation 𝔼𝐽𝑛 tends to infinity, but the variance Var(𝐽𝑛) is bounded.
+**2. 计算过程 / Working:**
 
-**中文翻译:**
-设 (𝑋(𝑡)) 是一个简单生灭过程，其出生率为 𝜆𝑛 = 𝜆𝑛，从 𝑋(0) = 1 开始。设 𝑇𝑛 ∼ Exp(𝜆𝑛) 是第 𝑛 次停留时间，并设 𝐽𝑛 = 𝑇1 + 𝑇2 + ⋯ + 𝑇𝑛 是第 𝑛 次出生的时间。
-(a) 写出 𝔼𝑇𝑛 和 Var(𝑇𝑛)。
-(b) 证明，当 𝑛 → ∞ 时，期望 𝔼𝐽𝑛 趋于无穷大，但方差 Var(𝐽𝑛) 是有界的。
+**验证 j=1:**
+给定 $p_1(t) = (1 - e^{-\lambda t})^{0} e^{-\lambda t} = e^{-\lambda t}$。
+计算导数：$\frac{d}{dt} p_1(t) = \frac{d}{dt} e^{-\lambda t} = -\lambda e^{-\lambda t} = -\lambda p_1(t)$。
+这正好是 (a) 中对于 j=1 的方程。所以成立。
 
-**Knowledge Points / 考查知识点:**
-- Holding times in a birth process
-- Expectation and variance of exponential distribution
-- Expectation and variance of sum of independent random variables
-- Harmonic series and its divergence
-- Basel problem (sum of reciprocals of squares)
+**验证 j≥2:**
+给定 $p_j(t) = (1 - e^{-\lambda t})^{j-1} e^{-\lambda t}$。
+我们需要计算 $\frac{d}{dt} p_j(t)$。
+令 $u = 1 - e^{-\lambda t}$，则 $p_j(t) = u^{j-1} e^{-\lambda t}$。
+首先，$\frac{du}{dt} = \lambda e^{-\lambda t}$。
+然后，使用乘积法则和链式法则：
+$$\frac{d}{dt} p_j(t) = \frac{d}{dt} \left( u^{j-1} e^{-\lambda t} \right) = (j-1) u^{j-2} \frac{du}{dt} e^{-\lambda t} + u^{j-1} (-\lambda e^{-\lambda t})$$
+代入 $\frac{du}{dt} = \lambda e^{-\lambda t}$：
+$$\frac{d}{dt} p_j(t) = (j-1) u^{j-2} (\lambda e^{-\lambda t}) e^{-\lambda t} - \lambda u^{j-1} e^{-\lambda t}$$
+$$= \lambda e^{-\lambda t} \left[ (j-1) u^{j-2} e^{-\lambda t} - u^{j-1} \right]$$
+现在，将 $u = 1 - e^{-\lambda t}$ 代回，并尝试将表达式写成 $-\lambda j p_j(t) + \lambda (j-1) p_{j-1}(t)$ 的形式。
+首先，$p_j(t) = u^{j-1} e^{-\lambda t}$。
+其次，$p_{j-1}(t) = (1 - e^{-\lambda t})^{(j-1)-1} e^{-\lambda t} = u^{j-2} e^{-\lambda t}$。
+现在计算 $-\lambda j p_j(t) + \lambda (j-1) p_{j-1}(t)$：
+$$-\lambda j u^{j-1} e^{-\lambda t} + \lambda (j-1) u^{j-2} e^{-\lambda t}$$
+$$= \lambda e^{-\lambda t} \left[ -j u^{j-1} + (j-1) u^{j-2} \right]$$
+$$= \lambda e^{-\lambda t} \left[ (j-1) u^{j-2} - j u^{j-1} \right]$$
+我们需要证明这个表达式等于我们之前计算的导数 $\frac{d}{dt} p_j(t)$。
+我们之前计算的导数是：
+$$\frac{d}{dt} p_j(t) = \lambda e^{-\lambda t} \left[ (j-1) u^{j-2} e^{-\lambda t} - u^{j-1} \right]$$
+注意 $e^{-\lambda t} = 1 - u$。所以：
+$$\frac{d}{dt} p_j(t) = \lambda e^{-\lambda t} \left[ (j-1) u^{j-2} (1-u) - u^{j-1} \right]$$
+$$= \lambda e^{-\lambda t} \left[ (j-1) u^{j-2} - (j-1) u^{j-1} - u^{j-1} \right]$$
+$$= \lambda e^{-\lambda t} \left[ (j-1) u^{j-2} - j u^{j-1} \right]$$
+这正好等于 $-\lambda j p_j(t) + \lambda (j-1) p_{j-1}(t)$。因此，给定的 $p_j(t)$ 满足向前方程。
 
-**Step-by-Step Solution / 逐步解答:**
+**Explanation of working / 过程解释:**
+我们通过直接求导和代数运算验证了 $p_j(t)$ 满足微分方程。关键步骤是使用链式法则求导，然后将 $e^{-\lambda t}$ 用 $1-u$ 替换，最终将导数表达式化简为与向前方程右侧完全相同的形式。这证明了 $p_j(t) = (1 - e^{-\lambda t})^{j-1} e^{-\lambda t}$ 确实是向前方程的解。这个概率质量函数正是参数为 $p = e^{-\lambda t}$ 的几何分布（定义在 $\{1, 2, 3, \ldots\}$ 上，即首次成功所需的试验次数）。
 
-**(a) Expectation and Variance of the nth Holding Time**
+**Final Answer / 最终答案:**
+已证明 $p_j(t) = (1 - e^{-\lambda t})^{j-1} e^{-\lambda t}$ 满足 Kolmogorov 向前方程。 / It has been shown that $p_j(t) = (1 - e^{-\lambda t})^{j-1} e^{-\lambda t}$ satisfies the Kolmogorov forward equations.
 
-*Step 1: State the distribution of $T_n$.*
-$T_n \sim \text{Exp}(\lambda_n)$, where $\lambda_n = \lambda n$.
+#### (c) 计算期望种群大小
 
-*Step 2: Recall the expectation of an exponential random variable.*
-If $X \sim \text{Exp}(\mu)$, then $\mathbb{E}[X] = 1/\mu$.
-Therefore, $\mathbb{E}[T_n] = 1/\lambda_n = 1/(\lambda n)$.
-
-*Step 3: Recall the variance of an exponential random variable.*
-If $X \sim \text{Exp}(\mu)$, then $\text{Var}(X) = 1/\mu^2$.
-Therefore, $\text{Var}(T_n) = 1/\lambda_n^2 = 1/(\lambda^2 n^2)$.
-
-**Intermediate Result:**
-$\mathbb{E}[T_n] = \frac{1}{\lambda n}$, $\text{Var}(T_n) = \frac{1}{\lambda^2 n^2
+**1. 中文思路 / Chinese reasoning:**
+既然我们已经知道 $X(t)$ 服从参数为 $p = e^{-\lambda t}$ 的几何分布

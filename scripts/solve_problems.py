@@ -177,7 +177,7 @@ class ProblemSolver:
         if len(problem_text) > max_chars:
             problem_text = problem_text[:max_chars] + "\n\n[Content truncated]"
 
-        prompt = f"""You are a university tutor creating detailed solutions for a Problem Sheet from the course {self.course_code}: Stochastic Processes.
+        prompt = f"""You are a university tutor creating detailed bilingual (Chinese/English) solutions for a Problem Sheet from the course {self.course_code}: Stochastic Processes.
 
 Below is the problem sheet content. Your task: generate COMPLETE, STEP-BY-STEP solutions for EVERY question.
 
@@ -193,43 +193,47 @@ For EACH question, provide:
 **Problem / 题目原文:**
 (Copy the original English problem statement)
 
-**中文翻译:**
-(Chinese translation of the problem)
+**中文翻译 / Chinese Translation:**
+(Full Chinese translation of the problem — NOT a one-line summary, translate the ENTIRE problem statement)
 
 **Knowledge Points / 考查知识点:**
-- Which sections/concepts from the course this tests
+- Which sections/concepts from the course this tests (bilingual: Chinese explanation + English terms)
 
 **Step-by-Step Solution / 逐步解答:**
 
-For EACH step:
-1. State what we're doing in this step
-2. Show the mathematical working
-3. Explain WHY we do this
-4. Intermediate result
+⚠️ CRITICAL: Every step MUST have BOTH Chinese and English explanations of comparable depth.
 
-Use proper mathematical notation.
-Explain every formula and every symbol.
+For EACH step:
+1. **中文思路 / Chinese reasoning:** Explain in Chinese what we're doing in this step, why we do it, and what the strategy is
+2. **English reasoning:** Same explanation in English with proper technical terms
+3. **计算过程 / Working:** Show the mathematical working in clear LaTeX
+4. **Explanation of working / 过程解释:** Explain the math in Chinese — every formula, every symbol, every algebraic manipulation
+
+Use proper mathematical notation (LaTeX).
+**CRITICAL: All matrices MUST use LaTeX `\\begin{pmatrix}...\\end{pmatrix}` — NEVER use Unicode box-drawing characters.**
 For derivations, show ALL algebraic steps.
 For probability questions, explicitly state which probability rules are used.
 
 **Final Answer / 最终答案:**
-Box the final answer clearly.
+Box the final answer clearly. Include BOTH Chinese and English statement of the result.
 
 **Key Insight / 解题要点:**
-One sentence summary of the most important idea.
+Bilingual summary of the most important idea from this question.
 
 ---
 
-RULES:
+⚠️ BILINGUAL RULES (MUST FOLLOW):
 1. Solve EVERY question completely - no skipping
 2. Show ALL working - partial credit matters in exams
-3. Use bilingual format: English math + Chinese explanations
-4. Reference course sections when using theorems
-5. For proof questions, explain the logical structure
-6. Double-check all calculations"""
+3. Every explanation MUST be in BOTH Chinese and English, with comparable depth
+4. Chinese explanations go FIRST, followed by English
+5. Reference course sections when using theorems
+6. For proof questions, explain the logical structure in Chinese then English
+7. Double-check all calculations
+8. NEVER write English-only steps — each step needs Chinese explanation too"""
 
         response = call_llm_with_prompts(
-            "You are a university mathematics tutor specializing in stochastic processes. You create detailed, step-by-step solutions with bilingual (Chinese/English) explanations. You never skip steps and always explain the reasoning.",
+            "You are a university mathematics tutor specializing in stochastic processes. You create truly bilingual (Chinese/English) detailed step-by-step solutions — every explanation step has substantial content in BOTH languages, Chinese first then English. You never write English-only steps. You never skip steps and always explain the reasoning.",
             prompt,
             temperature=GENERATION_TEMPERATURE,
             max_tokens=GENERATION_MAX_TOKENS,

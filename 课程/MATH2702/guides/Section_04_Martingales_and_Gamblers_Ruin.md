@@ -1,279 +1,432 @@
-# Section 4: Martingales and Gambler's Ruin
+# Section 4: Martingales and Gambler’s ruin
 
-> MATH2702 Stochastic Processes - 自学教材
-> 生成时间: 2026-07-17 14:45
+> MATH2702 - 自学教材 / Self-Study Guide
+> 生成时间: 2026-07-20 15:37
 > 来源页: 22-29
 
 ---
 
-当然可以。作为一名大学教授，我将为您将这份关于“鞅与赌徒破产”的原始课程材料，转化为一份详尽、自包含的中英双语自学指南。这份指南将确保您即使在没有讲座的情况下，也能独立、深入地掌握所有内容。
+# MATH2702: Stochastic Processes / 随机过程
+
+## Section 4: Martingales and Gambler's Ruin / 鞅与赌徒破产问题
 
 ---
 
 ### 📋 Section Overview / 章节概览
 
-This section introduces **Martingales (鞅)** , a fundamental class of stochastic processes that model "fair games" where the expected future value equals the current value. We then apply this powerful concept to analyze the classic **Gambler's Ruin (赌徒破产)** problem, a Markov chain that models a simple gambling game. Using martingales and the **Optional Stopping Theorem (可选停止定理)** , we will derive elegant formulas for two key questions: the probability that a gambler goes bankrupt, and the expected duration of the game.
+**中文解释：** 本章节将介绍两个重要的随机过程概念：鞅（Martingale）和赌徒破产问题（Gambler's Ruin）。鞅是一种特殊的随机过程，其核心性质是"公平游戏"——给定当前信息，未来一步的期望值等于当前值。赌徒破产问题则是一个经典的马尔可夫链模型，研究两个赌徒之间的赌博游戏，直到一方输光所有资金为止。我们将使用鞅理论来优雅地解决赌徒破产问题中的两个关键问题：破产概率和游戏期望持续时间。
 
-**Why it matters (为什么重要):** Martingales are a cornerstone of modern probability theory and have profound applications in finance (option pricing), statistics (sequential analysis), and physics. The Gambler's Ruin problem provides a clear, intuitive example of how martingales can be used to solve practical problems, illustrating the power of this theoretical framework. The insights about "certain ruin" even against a fair casino are both surprising and profound.
+**English explanation:** This section introduces two important concepts in stochastic processes: martingales and the gambler's ruin problem. A martingale is a special type of stochastic process with the key property of a "fair game" — given current information, the expected value of the next step equals the current value. The gambler's ruin problem is a classic Markov chain model that studies a gambling game between two players until one loses all their money. We will use martingale theory to elegantly solve two key questions in the gambler's ruin problem: the probability of ruin and the expected duration of the game.
+
+---
 
 ### 🎯 Learning Objectives / 学习目标
 
-By the end of this section, you will be able to:
+完成本章学习后，你应该能够：
 
-1.  **Define (定义)** a discrete-time martingale and verify if a given stochastic process is a martingale with respect to another process.
-2.  **Identify (识别)** the Gambler's Ruin Markov chain, its state space, and transition probabilities.
-3.  **Derive (推导)** the probability of ruin for Alice using a cleverly chosen martingale and the Optional Stopping Theorem.
-4.  **Derive (推导)** the expected duration of the Gambler's Ruin game using another martingale.
-5.  **Define (定义)** a stopping time and determine whether a given random time is a stopping time.
-6.  **State (陈述)** the conditions of the Optional Stopping Theorem and explain why they are necessary.
+1. **定义鞅**并理解其作为"公平游戏"模型的直观含义
+2. **识别**一个随机过程是否为鞅，并能够构造鞅
+3. **理解**赌徒破产马尔可夫链的转移概率和状态空间
+4. **计算**赌徒破产问题中的破产概率，使用鞅方法和差分方程方法
+5. **计算**赌徒破产问题的期望持续时间
+6. **理解**停时（stopping time）的概念和可选停时定理（Optional Stopping Theorem）
+
+After completing this section, you should be able to:
+
+1. **Define a martingale** and understand its intuitive meaning as a "fair game" model
+2. **Identify** whether a stochastic process is a martingale, and be able to construct martingales
+3. **Understand** the transition probabilities and state space of the gambler's ruin Markov chain
+4. **Calculate** the probability of ruin in the gambler's ruin problem, using martingale methods and difference equation methods
+5. **Calculate** the expected duration of the gambler's ruin game
+6. **Understand** the concept of stopping time and the Optional Stopping Theorem
+
+---
 
 ### 📚 Prerequisites / 前置知识
 
-Before starting this section, you should be comfortable with the following concepts:
+在开始本章之前，你应该熟悉以下概念：
 
-*   **Probability Theory (概率论):** Conditional expectation `𝔼(X | Y)`, random variables, expectation `𝔼[X]`.
-*   **Stochastic Processes (随机过程):** Basic understanding of a stochastic process as a collection of random variables indexed by time.
-*   **Markov Chains (马尔可夫链):** The Markov property, state space, transition probabilities.
-*   **Simple Random Walk (简单随机游走):** A process where `X_n = X_0 + Z_1 + ... + Z_n`, and `Z_i` are independent increments (e.g., +1 or -1).
-*   **Geometric Distribution (几何分布):** The distribution of the number of trials until the first success.
+**中文解释：**
+- **条件期望（Conditional Expectation）：** 理解 𝔼(𝑋|𝑌) 的含义，即给定随机变量 𝑌 时 𝑋 的期望值。条件期望本身是一个随机变量。
+- **马尔可夫链（Markov Chain）：** 理解马尔可夫性质——给定当前状态，未来与过去独立。
+- **简单随机游走（Simple Random Walk）：** 理解 𝑋ₙ = 𝑋₀ + ∑ᵢ₌₁ⁿ 𝑍ᵢ，其中 𝑍ᵢ 是独立同分布的 ±1 随机变量。
+- **概率论基础：** 期望值、方差、条件概率。
 
-### 📖 Core Content / 核心内容
-
----
-
-#### Topic 1: Martingales (鞅)
-
-**Intuition / 直觉理解**
-
-Imagine you are playing a fair game. Your total winnings after each round form a sequence. A **martingale** is a mathematical model for such a "fair game". The key idea is that, given all the information up to the current round (your current winnings and the history of the game), your *expected* winnings in the *next* round are exactly equal to your current winnings. You don't expect to gain or lose money on average. The name "martingale" comes from a French gambling strategy, but the mathematical concept is much broader.
-
-**Formal Definition / 形式化定义**
-
-**Definition 4.1 (Martingale / 鞅).** A discrete-time stochastic process `(M_n)_{n≥0}` on a state space `𝒮` (not necessarily discrete) is a **martingale** with respect to another discrete-time stochastic process `(X_n)_{n≥0}` if, for all `n ≥ 0`:
-
-1.  **Integrability (可积性):** `𝔼|M_n| < ∞`. (The expected absolute value of `M_n` is finite. This is a technical condition ensuring the expectation exists.)
-2.  **Martingale Property (鞅性质):** `𝔼(M_{n+1} | X_0, X_1, ..., X_n) = M_n`. (The conditional expectation of the next value, given the entire history of the `X` process up to time `n`, is equal to the current value `M_n`.)
-
-**Explanation of Symbols (符号解释):**
-*   `(M_n)`: The process we are checking to see if it's a martingale.
-*   `(X_n)`: The process that provides the "information" or "history". Often, `M_n` is a function of `X_n`.
-*   `𝔼(·|·)`: Conditional expectation.
-*   `M_n`: The value of the martingale at time `n`.
-*   `M_{n+1}`: The value of the martingale at the next time step.
-*   `X_0, X_1, ..., X_n`: The history of the `X` process up to time `n`.
-
-**Important Note (重要说明):** The equality `𝔼(M_{n+1} | X_0, X_1, ..., X_n) = M_n` holds **almost surely (几乎必然地)** , meaning with probability 1. Conditional expectations are random variables, and the equality is a statement about their distributions.
-
-**Key Properties / 关键性质**
-
-*   **Fair Game Interpretation (公平游戏解释):** A martingale models a game where, given your current fortune, the expected change in your fortune in the next round is zero: `𝔼(M_{n+1} - M_n | history) = 0`.
-*   **Not Necessarily Markov (不一定是马尔可夫链):** A martingale does not have to be a Markov chain. The example in the text describes a random walk that "remembers" the previous two steps to decide if it must stay put. This process is a martingale but not a Markov chain, because its future depends on more than just the current state.
-*   **Construction from Other Processes (从其他过程构造):** A common theme is to find a function `f` such that `M_n = f(X_n, n)` is a martingale. For example, for a simple random walk `X_n` with step probabilities `p` and `q`, the process `M_n = X_n - n(p-q)` is a martingale.
-
-**Worked Examples / 例题**
-
-**Example 4.1: Is the Simple Random Walk a Martingale? (简单随机游走是鞅吗？)**
-
-Let `X_n` be a simple random walk starting at `X_0`. It is defined as `X_n = X_0 + Σ_{i=1}^n Z_i`, where `Z_i` are independent increments with `ℙ(Z_i = +1) = p` and `ℙ(Z_i = -1) = q = 1-p`.
-
-**Step 1: Check Integrability (检查可积性).**
-`𝔼|X_n| ≤ 𝔼|X_0| + Σ_{i=1}^n 𝔼|Z_i| = |X_0| + n * 1 = |X_0| + n < ∞`. This condition is satisfied.
-
-**Step 2: Check the Martingale Property (检查鞅性质).**
-We need to compute `𝔼(X_{n+1} | X_0, Z_1, ..., Z_n)`.
-We know `X_{n+1} = X_n + Z_{n+1}`.
-So, `𝔼(X_{n+1} | X_0, Z_1, ..., Z_n) = 𝔼(X_n + Z_{n+1} | X_0, Z_1, ..., Z_n)`.
-Since `X_n` is known given the history, `𝔼(X_n | ...) = X_n`.
-Since `Z_{n+1}` is independent of the history, `𝔼(Z_{n+1} | ...) = 𝔼(Z_{n+1}) = p*(+1) + q*(-1) = p - q`.
-Therefore, `𝔼(X_{n+1} | X_0, Z_1, ..., Z_n) = X_n + (p - q)`.
-
-**Conclusion (结论):**
-*   If `p = q = 1/2`, then `p - q = 0`, so `𝔼(X_{n+1} | ...) = X_n`. The simple symmetric random walk **is** a martingale with respect to its increments `(Z_n)`.
-*   If `p ≠ q`, then `𝔼(X_{n+1} | ...) = X_n + (p-q) ≠ X_n`. The simple random walk **is not** a martingale.
-
-**A More General Martingale (一个更一般的鞅):**
-The process `M_n = X_n - n(p - q)` **is** a martingale for any `p ∈ [0,1]`. Let's check:
-`𝔼(M_{n+1} | ...) = 𝔼(X_{n+1} - (n+1)(p-q) | ...) = 𝔼(X_n + Z_{n+1} - n(p-q) - (p-q) | ...)`
-`= X_n - n(p-q) + 𝔼(Z_{n+1}) - (p-q) = M_n + (p-q) - (p-q) = M_n`.
+**English explanation:**
+- **Conditional Expectation:** Understand the meaning of 𝔼(𝑋|𝑌), the expected value of 𝑋 given the random variable 𝑌. Conditional expectation is itself a random variable.
+- **Markov Chain:** Understand the Markov property — given the current state, the future is independent of the past.
+- **Simple Random Walk:** Understand that 𝑋ₙ = 𝑋₀ + ∑ᵢ₌₁ⁿ 𝑍ᵢ, where 𝑍ᵢ are i.i.d. ±1 random variables.
+- **Probability Basics:** Expectation, variance, conditional probability.
 
 ---
 
-#### Topic 2: Gambler's Ruin Markov Chain (赌徒破产马尔可夫链)
+## 4.1 Martingales / 鞅
 
-**Intuition / 直觉理解**
+### Intuition / 直觉理解
 
-Alice and Bob are gambling. Alice starts with £`a`, Bob with £`b`. The total money is `m = a + b`. Each round, they bet £1. Alice wins with probability `p`, Bob wins with probability `q = 1-p`. The game ends when one player has all the money (the other is "ruined"). The amount of money Alice has after `n` rounds, `X_n`, is a stochastic process.
+**中文解释：**
 
-**Formal Definition / 形式化定义**
+想象你在玩一个"公平"的赌博游戏。假设你现在有 100 元。在公平游戏中，下一轮结束后，你期望拥有的钱数仍然是 100 元——你不期望赢钱，也不期望输钱。这就是鞅的核心思想：**给定当前的信息，未来一步的期望值等于当前值**。
 
-*   **State Space (状态空间):** `𝒮 = {0, 1, 2, ..., m}`. This represents how much money Alice has.
-*   **Initial State (初始状态):** `X_0 = a`.
-*   **Transition Probabilities (转移概率):** For `n ≥ 0`:
-    *   If `1 ≤ X_n ≤ m-1` (game is ongoing):
-        *   `X_{n+1} = X_n + 1` with probability `p` (Alice wins).
-        *   `X_{n+1} = X_n - 1` with probability `q` (Bob wins).
-    *   If `X_n = 0` (Alice is ruined):
-        *   `X_{n+1} = 0` with probability 1 (absorbing state).
-    *   If `X_n = m` (Bob is ruined):
-        *   `X_{n+1} = m` with probability 1 (absorbing state).
+鞅（Martingale）这个词与马具无关（不是"马鞅"）。它来自法语，最初指一种赌博策略，其中赌徒在输钱后加倍赌注。但在概率论中，鞅代表一种"公平游戏"的数学模型。
 
-**Key Properties / 关键性质**
+**English explanation:**
 
-*   **Markov Property (马尔可夫性质):** The next state `X_{n+1}` depends only on the current state `X_n`, not on the history. This is a Markov chain.
-*   **Absorbing Barriers (吸收壁):** States 0 and `m` are absorbing. Once the process enters one of these states, it stays there forever. This models the end of the game.
-*   **Analogy to Random Walk (与随机游走的类比):** The process is like a simple random walk started at `a`, but with absorbing barriers at 0 and `m`.
+Imagine you're playing a "fair" gambling game. Suppose you currently have 100 yuan. In a fair game, after the next round, your expected amount of money is still 100 yuan — you don't expect to win or lose. This is the core idea of a martingale: **given current information, the expected value of the next step equals the current value**.
 
-**Two Key Questions (两个关键问题):**
-1.  What is the probability that Alice is ruined (the process hits 0)?
-2.  What is the expected duration of the game (expected time to hit 0 or `m`)?
+The word "martingale" has nothing to do with horse tack. It comes from French and originally referred to a gambling strategy where the gambler doubles their bet after losing. But in probability theory, a martingale represents a mathematical model of a "fair game".
+
+**Key intuition / 关键直觉：**
+- 鞅 = 公平游戏 (fair game)
+- 你不能期望在鞅中获利或亏损
+- 鞅的"未来最佳预测"就是"现在"
 
 ---
 
-#### Topic 3: Probability of Ruin (破产概率)
+### Formal Definition / 形式化定义
 
-**Intuition / 直觉理解**
+**Definition 4.1 (Martingale / 鞅的定义).** A discrete time stochastic process (𝑀ₙ)ₙ≥₀ on a state space 𝒮 (not necessarily discrete) is a **martingale** with respect to another discrete time stochastic process (𝑋ₙ)ₙ≥₀ if, for all 𝑛 ≥ 0:
 
-Let `r_i` be the probability that Alice ends up ruined if she currently has £`i`. We know `r_0 = 1` (already ruined) and `r_m = 0` (Bob is ruined). For `1 ≤ i ≤ m-1`, we can find a relationship for `r_i` by conditioning on the first step from state `i`. If she wins (to `i+1`), her ruin probability becomes `r_{i+1}`. If she loses (to `i-1`), it becomes `r_{i-1}`. This gives `r_i = p * r_{i+1} + q * r_{i-1}`. Solving this recurrence with the boundary conditions gives the formula below. The course material uses a more elegant method with martingales.
+1. 𝔼|𝑀ₙ| < ∞ (可积性条件)
+2. 𝔼(𝑀ₙ₊₁ | 𝑋₀, 𝑋₁, …, 𝑋ₙ) = 𝑀ₙ (鞅性质)
 
-**Formal Definition / 形式化定义**
+**中文解释：**
 
-**Theorem 4.1 (Ruin Probability / 破产概率).** Let `ρ = q/p`. The probability that Alice is ruined, starting with £`a`, is:
+定义中的两个条件：
+1. **可积性条件：** 𝑀ₙ 的绝对值的期望是有限的。这确保我们能够计算条件期望。
+2. **鞅性质：** 给定直到时间 𝑛 的所有信息（即 𝑋₀, 𝑋₁, …, 𝑋ₙ），下一时刻 𝑀ₙ₊₁ 的条件期望等于当前值 𝑀ₙ。
 
-`r_a = { (ρ^a - ρ^m) / (1 - ρ^m) , if ρ ≠ 1
-       { 1 - a/m , if ρ = 1`
+注意：如果我们定义 𝑍ₙ = (𝑋₀, …, 𝑋ₙ)，那么 𝔼(𝑀ₙ₊₁ | 𝑋₀, 𝑋₁, …, 𝑋ₙ) = 𝔼(𝑀ₙ₊₁ | 𝑍ₙ)，这符合我们条件期望的定义。
 
-**Explanation of Symbols (符号解释):**
-*   `r_a`: The probability of Alice's ruin, starting from state `a`.
-*   `a`: Alice's initial fortune.
-*   `m`: Total money in the game (`a + b`).
-*   `p`: Probability Alice wins a round.
-*   `q`: Probability Bob wins a round (`= 1-p`).
-*   `ρ = q/p`: The odds ratio. If `ρ > 1`, the game is in Bob's favor. If `ρ = 1`, the game is fair. If `ρ < 1`, the game is in Alice's favor.
+**重要提醒：** 条件期望是随机变量，所以像 𝔼(𝐴|𝐵) = 𝐶 这样的等式只需要几乎必然成立（即概率为 1 地成立）。
 
-**Proof / 证明 (Using Martingales)**
+**English explanation:**
 
-This proof is a beautiful application of martingales and the Optional Stopping Theorem.
+The two conditions in the definition:
+1. **Integrability condition:** The expected absolute value of 𝑀ₙ is finite. This ensures we can compute conditional expectations.
+2. **Martingale property:** Given all information up to time 𝑛 (i.e., 𝑋₀, 𝑋₁, …, 𝑋ₙ), the conditional expectation of the next value 𝑀ₙ₊₁ equals the current value 𝑀ₙ.
 
-**Case 1: `p ≠ q` (i.e., `ρ ≠ 1`)**
+Note: If we define 𝑍ₙ = (𝑋₀, …, 𝑋ₙ), then 𝔼(𝑀ₙ₊₁ | 𝑋₀, 𝑋₁, …, 𝑋ₙ) = 𝔼(𝑀ₙ₊₁ | 𝑍ₙ), which fits our definition of conditional expectation.
 
-1.  **Construct a Martingale (构造一个鞅):** Define the process `M_n = (q/p)^{X_n} = ρ^{X_n}`.
-    *   **Check Integrability:** `𝔼|M_n| ≤ max{1, ρ^m} < ∞`. This is fine because `X_n` is bounded between 0 and `m`.
-    *   **Check Martingale Property:** We need to show `𝔼(M_{n+1} | Z_1, ..., Z_n) = M_n`.
-        *   If `X_n = 0` or `X_n = m` (game over), then `M_{n+1} = M_n`, so the property holds trivially.
-        *   If `0 < X_n < m` (game ongoing), then `X_{n+1} = X_n + Z_{n+1}`, where `Z_{n+1}` is +1 with prob `p` and -1 with prob `q`.
-        `𝔼(M_{n+1} | Z_1, ..., Z_n) = 𝔼(ρ^{X_n + Z_{n+1}} | ...) = ρ^{X_n} * 𝔼(ρ^{Z_{n+1}} | ...)`.
-        Since `Z_{n+1}` is independent of the past, `𝔼(ρ^{Z_{n+1}}) = p * ρ^{+1} + q * ρ^{-1} = p*(q/p) + q*(p/q) = q + p = 1`.
-        Therefore, `𝔼(M_{n+1} | ...) = ρ^{X_n} * 1 = M_n`. So `(M_n)` is a martingale.
-
-2.  **Define a Stopping Time (定义一个停止时间):** Let `T` be the first time the process hits either 0 or `m`. This is a stopping time because at any time `n`, we know if `T=n` by looking at `X_0, ..., X_n`.
-
-3.  **Apply the Optional Stopping Theorem (应用可选停止定理):** The theorem states that under certain conditions, `𝔼(M_T) = 𝔼(M_0)`. We will justify this later. Assuming it holds:
-    *   `𝔼(M_0) = 𝔼(ρ^{X_0}) = ρ^a`.
-    *   `M_T` is the value of the martingale at the stopping time. It can only be one of two values:
-        *   If Alice is ruined (hits 0), `M_T = ρ^0 = 1`. This happens with probability `r_a`.
-        *   If Bob is ruined (hits `m`), `M_T = ρ^m`. This happens with probability `1 - r_a`.
-    *   So, `𝔼(M_T) = 1 * r_a + ρ^m * (1 - r_a)`.
-
-4.  **Solve for `r_a` (解出 `r_a`):**
-    `ρ^a = r_a + ρ^m * (1 - r_a)`
-    `ρ^a = r_a + ρ^m - ρ^m * r_a`
-    `ρ^a - ρ^m = r_a * (1 - ρ^m)`
-    `r_a = (ρ^a - ρ^m) / (1 - ρ^m)`
-
-**Case 2: `p = q = 1/2` (i.e., `ρ = 1`)**
-
-1.  **Construct a Martingale (构造一个鞅):** In this case, `(X_n)` itself is a martingale (as shown in Example 4.1).
-
-2.  **Apply the Optional Stopping Theorem (应用可选停止定理):** Assuming `𝔼(X_T) = 𝔼(X_0)`:
-    *   `𝔼(X_0) = a`.
-    *   `X_T` is either 0 (with prob `r_a`) or `m` (with prob `1 - r_a`).
-    *   So, `𝔼(X_T) = 0 * r_a + m * (1 - r_a) = m * (1 - r_a)`.
-
-3.  **Solve for `r_a` (解出 `r_a`):**
-    `a = m * (1 - r_a)`
-    `1 - r_a = a/m`
-    `r_a = 1 - a/m`
-
-**Important Insight (重要见解): Playing Against a Casino (与赌场对赌)**
-
-Imagine Alice plays against a large casino, so `m` is very large. We take the limit as `m → ∞`.
-
-*   **Unfair Game (不公平游戏, `q > p`, `ρ > 1`):**
-    `lim_{m→∞} r_a = lim_{m→∞} (ρ^a - ρ^m) / (1 - ρ^m) = 1`. Alice is ruined with certainty.
-*   **Fair Game (公平游戏, `p = q = 1/2`, `ρ = 1`):**
-    `lim_{m→∞} r_a = lim_{m→∞} (1 - a/m) = 1`. Alice is still ruined with certainty!
-
-This leads to the quote: “Millionaires should always gamble, poor men never” - J.M. Keynes. The rich can withstand the inevitable losing streaks, while the poor will eventually be wiped out.
+**Important reminder:** Conditional expectations are random variables, so equalities like 𝔼(𝐴|𝐵) = 𝐶 need only hold almost surely (i.e., with probability 1).
 
 ---
 
-#### Topic 4: Expected Duration of the Game (游戏期望时长)
+### Symbol Table / 符号表
 
-**Intuition / 直觉理解**
-
-Let `d_i` be the expected number of steps remaining in the game when Alice has £`i`. We know `d_0 = d_m = 0`. The formula for `d_a` can be derived using another cleverly chosen martingale.
-
-**Formal Definition / 形式化定义**
-
-**Theorem 4.2 (Expected Duration / 期望时长).** The expected duration of the game, `d_a`, is given by:
-
-`d_a = { (1/(q-p)) * (a - m * (1 - ρ^a) / (1 - ρ^m)) , if ρ ≠ 1
-       { a * (m - a) , if ρ = 1`
-
-**Proof / 证明 (Outline, as it is an exercise)**
-
-The proof uses the Optional Stopping Theorem with different martingales.
-
-*   **Case `p ≠ q`:** Find a constant `c` such that `M_n = X_n + n*c` is a martingale.
-    *   `𝔼(M_{n+1} | ...) = 𝔼(X_n + Z_{n+1} + (n+1)*c | ...) = X_n + (p-q) + n*c + c = M_n + (p-q) + c`.
-    *   For this to be `M_n`, we need `c = -(p-q) = q-p`.
-    *   So, `M_n = X_n + n*(q-p)` is a martingale.
-    *   Apply OST: `𝔼(M_T) = 𝔼(M_0)`. `𝔼(M_0) = a`. `𝔼(M_T) = 𝔼(X_T) + 𝔼(T)*(q-p) = [0*r_a + m*(1-r_a)] + d_a*(q-p)`.
-    *   Solve for `d_a` using the expression for `r_a` from Theorem 4.1 to get the formula.
-
-*   **Case `p = q`:** Show that `M_n = X_n^2 - n` is a martingale.
-    *   `𝔼(M_{n+1} | ...) = 𝔼((X_n + Z_{n+1})^2 - (n+1) | ...) = 𝔼(X_n^2 + 2X_n Z_{n+1} + Z_{n+1}^2 - n - 1 | ...)`.
-    *   Since `Z_{n+1}` is independent and `𝔼(Z_{n+1})=0`, `𝔼(Z_{n+1}^2)=1` (because `Z = ±1`).
-    *   This equals `X_n^2 + 2X_n*0 + 1 - n - 1 = X_n^2 - n = M_n`.
-    *   Apply OST: `𝔼(M_T) = 𝔼(M_0)`. `𝔼(M_0) = a^2 - 0 = a^2`. `𝔼(M_T) = 𝔼(X_T^2) - 𝔼(T) = [0^2 * r_a + m^2 * (1-r_a)] - d_a`.
-    *   Using `r_a = 1 - a/m`, we get `a^2 = m^2 * (a/m) - d_a = a*m - d_a`.
-    *   Therefore, `d_a = a*m - a^2 = a*(m-a)`.
-
-**Important Insight (重要见解): Playing Against a Casino (与赌场对赌)**
-
-*   **Unfair Game (不公平游戏, `q > p`, `ρ > 1`):** As `m → ∞`, `d_a → a/(q-p)`. Alice is ruined with certainty, and it takes a finite expected time.
-*   **Fair Game (公平游戏, `p = q`):** As `m → ∞`, `d_a → ∞`. Alice is ruined with certainty, but the expected time is infinite! The game can go on for a very, very long time.
+| Symbol | Meaning (English) | 含义（中文） |
+|--------|-------------------|--------------|
+| 𝑀ₙ | The martingale process at time n | 鞅过程在时间 n 的值 |
+| 𝑋ₙ | Another stochastic process (the "information" process) | 另一个随机过程（"信息"过程） |
+| 𝒮 | State space | 状态空间 |
+| 𝔼(·) | Expectation operator | 期望算子 |
+| 𝔼(·|·) | Conditional expectation | 条件期望 |
+| ℤ⁺ | Non-negative integers {0, 1, 2, ...} | 非负整数集合 |
 
 ---
 
-#### Topic 5: The Optional Stopping Theorem (可选停止定理)
+### Example 4.1: Simple Random Walk as a Martingale / 简单随机游走作为鞅
 
-**Intuition / 直觉理解**
+**Question / 问题：** Is the simple random walk a martingale? If so, with respect to what process?
 
-The Optional Stopping Theorem (OST) tells us when the martingale property at a fixed time `n` (`𝔼(M_n) = 𝔼(M_0)`) also holds at a random stopping time `T` (`𝔼(M_T) = 𝔼(M_0)`). This is not always true, especially if the stopping time can be very large. The theorem provides conditions under which it is safe to "stop" the martingale.
+**中文解释：**
 
-**Formal Definition / 形式化定义**
+考虑简单随机游走：𝑋ₙ = 𝑋₀ + ∑ᵢ₌₁ⁿ 𝑍ᵢ，其中 𝑍ᵢ 是独立同分布的随机变量：
+- ℙ(𝑍ᵢ = +1) = 𝑝
+- ℙ(𝑍ᵢ = -1) = 𝑞 = 1 - 𝑝
 
-**Definition 4.2 (Stopping Time / 停止时间).** Let `(X_n)_{n≥0}` be a stochastic process. A random time `T` (taking values in `{0, 1, 2, ...} ∪ {∞}`) is a **stopping time** if for every `n`, the event `{T = n}` is completely determined by the random variables `X_0, X_1, ..., X_n`.
+**Step 1: Check integrability / 检查可积性**
+𝔼|𝑋ₙ| ≤ |𝑋₀| + 𝑛 < ∞ ✓
 
-**Examples (例子):**
-*   **Is a stopping time:** "The first visit to state `i`". You know it when you arrive.
-*   **Is a stopping time:** "Three time-steps after the second visit to `j`". You can count from the second visit.
-*   **Is NOT a stopping time:** "The time-step before the first visit to `i`". You need to see the future to know if the next step is the first visit.
-*   **Is NOT a stopping time:** "The final visit to `j`". You need to see the entire future to know if you'll ever come back.
+**Step 2: Check martingale property / 检查鞅性质**
+𝔼(𝑋ₙ₊₁ | 𝑋₀, 𝑍₁, …, 𝑍ₙ) = 𝔼(𝑋ₙ + 𝑍ₙ₊₁ | 𝑋₀, 𝑍₁, …, 𝑍ₙ)
+= 𝑋ₙ + 𝔼(𝑍ₙ₊₁)  (因为 𝑍ₙ₊₁ 与过去独立)
+= 𝑋ₙ + (𝑝 - 𝑞)
 
-**Theorem 4.3 (Optional Stopping Theorem / 可选停止定理).** Let `(M_n)_{n≥0}` be a martingale with respect to `(X_n)_{n≥0}`, and let `T` be a stopping time. Then `𝔼(M_T) = 𝔼(M_0)` holds if **at least one** of the following conditions is satisfied:
+**Conclusion / 结论：**
+- 如果 𝑝 = 𝑞（对称随机游走），则 𝔼(𝑋ₙ₊₁ | ·) = 𝑋ₙ，所以 (𝑋ₙ) 是关于 (𝑍ₙ) 的鞅。
+- 如果 𝑝 ≠ 𝑞，则 (𝑋ₙ) 不是鞅。
 
-1.  **Bounded Stopping Time (有界停止时间):** `T` is bounded, i.e., `ℙ(T ≤ N) = 1` for some finite `N`.
-2.  **Bounded Martingale (有界鞅):** `ℙ(T < ∞) = 1` (the stopping time is almost surely finite) AND `(M_n)` is bounded, i.e., `|M_n| ≤ K` for all `n` and some constant `K`.
-3.  **Finite Expected Stopping Time & Bounded Increments (有限期望停止时间与有界增量):** `𝔼(T) < ∞` AND `(M_n)` has bounded increments, i.e., `|M_{n+1} - M_n| ≤ K` for all `n` and some constant `K`.
+**Generalization / 推广：**
+更一般地，𝑀ₙ = 𝑋ₙ - 𝑛(𝑝 - 𝑞) 是关于 (𝑍ₙ) 的鞅，对任意 𝑝 ∈ [0, 1] 都成立。
 
-**Justification for Gambler's Ruin (对赌徒破产问题的证明)**
+验证：𝔼(𝑀ₙ₊₁ | ·) = 𝔼(𝑋ₙ₊₁ - (𝑛+1)(𝑝-𝑞) | ·)
+= 𝔼(𝑋ₙ + 𝑍ₙ₊₁ - 𝑛(𝑝-𝑞) - (𝑝-𝑞) | ·)
+= 𝑋ₙ - 𝑛(𝑝-𝑞) + 𝔼(𝑍ₙ₊₁) - (𝑝-𝑞)
+= 𝑀ₙ + (𝑝-𝑞) - (𝑝-𝑞) = 𝑀ₙ ✓
 
-In the Gambler's Ruin problem, we applied OST. Let's see how we justify it.
+**English explanation:**
 
-*   **Martingale `M_n = ρ^{X_n}`:** This martingale is not bounded (it can be as large as `ρ^m`). Condition 2 doesn't directly apply. Condition 3 requires `𝔼(T) < ∞`, which is what we are trying to find! This is circular.
-*   **The "Stopped Martingale" Trick (停止鞅技巧):** To fix this, we define a **stopped martingale**:
-    `M_n^T = { M_n , if n ≤ T
-              { M_T , if n > T`
-    This process `M_n^T` is a martingale. Crucially, for the Gambler's Ruin, `X_n` is bounded between 0 and `m` for `n ≤ T`. Therefore, `M
+Consider the simple random walk: 𝑋ₙ = 𝑋₀ + ∑ᵢ₌₁ⁿ 𝑍ᵢ, where 𝑍ᵢ are i.i.d. random variables:
+- ℙ(𝑍ᵢ = +1) = 𝑝
+- ℙ(𝑍ᵢ = -1) = 𝑞 = 1 - 𝑝
+
+**Step 1: Check integrability**
+𝔼|𝑋ₙ| ≤ |𝑋₀| + 𝑛 < ∞ ✓
+
+**Step 2: Check martingale property**
+𝔼(𝑋ₙ₊₁ | 𝑋₀, 𝑍₁, …, 𝑍ₙ) = 𝔼(𝑋ₙ + 𝑍ₙ₊₁ | 𝑋₀, 𝑍₁, …, 𝑍ₙ)
+= 𝑋ₙ + 𝔼(𝑍ₙ₊₁)  (since 𝑍ₙ₊₁ is independent of the past)
+= 𝑋ₙ + (𝑝 - 𝑞)
+
+**Conclusion:**
+- If 𝑝 = 𝑞 (symmetric random walk), then 𝔼(𝑋ₙ₊₁ | ·) = 𝑋ₙ, so (𝑋ₙ) is a martingale with respect to (𝑍ₙ).
+- If 𝑝 ≠ 𝑞, then (𝑋ₙ) is not a martingale.
+
+**Generalization:**
+More generally, 𝑀ₙ = 𝑋ₙ - 𝑛(𝑝 - 𝑞) is a martingale with respect to (𝑍ₙ) for any 𝑝 ∈ [0, 1].
+
+Verification: 𝔼(𝑀ₙ₊₁ | ·) = 𝔼(𝑋ₙ₊₁ - (𝑛+1)(𝑝-𝑞) | ·)
+= 𝔼(𝑋ₙ + 𝑍ₙ₊₁ - 𝑛(𝑝-𝑞) - (𝑝-𝑞) | ·)
+= 𝑋ₙ - 𝑛(𝑝-𝑞) + 𝔼(𝑍ₙ₊₁) - (𝑝-𝑞)
+= 𝑀ₙ + (𝑝-𝑞) - (𝑝-𝑞) = 𝑀ₙ ✓
+
+---
+
+### Important Observation / 重要观察
+
+**中文解释：**
+
+鞅不一定是马尔可夫链。考虑一个例子：对称随机游走，以 1/2 概率向上或向下移动，但如果连续两次向上或向下移动，则下一步必须停留在原地。你可以验证这是一个鞅，但不是马尔可夫链（其转移依赖于前两步，而不仅仅是前一步）。
+
+**常见主题：** 我们可以通过对随机过程应用适当的函数来找到/构造鞅。例如，上面的例子中函数是 𝑓(𝑥) = 𝑥 - 𝑛(𝑝-𝑞)。
+
+**English explanation:**
+
+Martingales are not necessarily Markov chains. Consider an example: a symmetric random walk that moves up/down with probability 1/2, except that if it moves upwards or downwards twice in a row, then on the next step it has to stay where it is. You can check this is a martingale but not a Markov chain (its transitions depend on the previous two steps, not just on the previous step).
+
+**Common theme:** We can find/construct a martingale from a stochastic process by applying the right function to it. For example, in the above case the function was 𝑓(𝑥) = 𝑥 - 𝑛(𝑝-𝑞).
+
+---
+
+## 4.2 Gambler's Ruin Markov Chain / 赌徒破产马尔可夫链
+
+### Problem Setup / 问题设定
+
+**中文解释：**
+
+Alice 和 Bob 在赌博。游戏规则如下：
+- Alice 初始有 £𝑎，Bob 初始有 £𝑏
+- 总金额 𝑚 = 𝑎 + 𝑏，所以 Bob 有 £(𝑚 - 𝑎)
+- 每轮游戏，两人各下注 £1
+- Alice 以概率 𝑝 赢得 Bob 的 £1
+- Bob 以概率 𝑞 赢得 Alice 的 £1（其中 𝑝 + 𝑞 = 1）
+- 游戏持续到一方输光所有钱（即"破产"）
+
+**English explanation:**
+
+Alice is gambling against Bob. The game rules are as follows:
+- Alice starts with £𝑎, Bob starts with £𝑏
+- Total amount 𝑚 = 𝑎 + 𝑏, so Bob has £(𝑚 - 𝑎)
+- At each step, both players bet £1
+- Alice wins £1 from Bob with probability 𝑝
+- Bob wins £1 from Alice with probability 𝑞 (where 𝑝 + 𝑞 = 1)
+- The game continues until one player is out of money (i.e., "ruined")
+
+---
+
+### Mathematical Formulation / 数学表述
+
+**中文解释：**
+
+令 𝑋ₙ 表示 Alice 在 n 步后的钱数。这是一个离散时间随机过程，时间 𝑛 ∈ {0, 1, 2, ...} = ℤ⁺，状态空间 𝒮 = {0, 1, ..., 𝑚}。
+
+初始条件：𝑋₀ = 𝑎
+
+转移规则：
+- 当 1 ≤ 𝑋ₙ ≤ 𝑚-1 时（游戏进行中）：
+  - 𝑋ₙ₊₁ = 𝑋ₙ + 1 以概率 𝑝
+  - 𝑋ₙ₊₁ = 𝑋ₙ - 1 以概率 𝑞
+- 当 𝑋ₙ = 0 时（Alice 已破产）：𝑋ₙ₊₁ = 0
+- 当 𝑋ₙ = 𝑚 时（Bob 已破产）：𝑋ₙ₊₁ = 𝑚
+
+**English explanation:**
+
+Let 𝑋ₙ denote how much money Alice has after n steps. This is a discrete-time stochastic process with time 𝑛 ∈ {0, 1, 2, ...} = ℤ⁺ and discrete state space 𝒮 = {0, 1, ..., 𝑚}.
+
+Initial condition: 𝑋₀ = 𝑎
+
+Transition rules:
+- When 1 ≤ 𝑋ₙ ≤ 𝑚-1 (game in progress):
+  - 𝑋ₙ₊₁ = 𝑋ₙ + 1 with probability 𝑝
+  - 𝑋ₙ₊₁ = 𝑋ₙ - 1 with probability 𝑞
+- When 𝑋ₙ = 0 (Alice is ruined): 𝑋ₙ₊₁ = 0
+- When 𝑋ₙ = 𝑚 (Bob is ruined): 𝑋ₙ₊₁ = 𝑚
+
+---
+
+### Markov Property / 马尔可夫性质
+
+**中文解释：**
+
+赌徒破产过程 (𝑋ₙ) 显然满足马尔可夫性质：下一步 𝑋ₙ₊₁ 只依赖于当前位置 𝑋ₙ，给定当前位置后，不依赖于过去的历史。
+
+赌徒破产过程就像一个从 𝑋₀ = 𝑎 开始的简单随机游走，但在 0 和 𝑚 处有吸收壁（absorbing barriers），随机游走在此停止，因为一方已经破产。
+
+**注意：** 也可以考虑反射壁（reflecting barriers），将随机游走弹回状态空间，或混合壁（mixed barriers），随机地吸收或反射。
+
+**English explanation:**
+
+The gambler's ruin process (𝑋ₙ) clearly satisfies the Markov property: the next step 𝑋ₙ₊₁ depends only on the current position 𝑋ₙ, and given that, does not depend on how we got here.
+
+The gambler's ruin process is exactly like a simple random walk started from 𝑋₀ = 𝑎 except that we have absorbing barriers at 0 and 𝑚, where the random walk stops because one of the players is ruined.
+
+**Note:** One could also consider random walks with reflecting barriers (that bounce the random walk back into the state space) or mixed barriers (that are absorbing or reflecting at random).
+
+---
+
+### Two Key Questions / 两个关键问题
+
+**中文解释：**
+
+关于赌徒破产问题，我们将回答两个问题：
+
+1. **破产概率：** 游戏以 Alice 破产告终的概率是多少？
+2. **期望持续时间：** 游戏平均持续多长时间？
+
+**English explanation:**
+
+There are two questions about gambler's ruin that we will answer:
+
+1. **Probability of ruin:** What is the probability that the game ends by Alice ruining?
+2. **Expected duration:** How long does the game last on average?
+
+---
+
+## 4.3 Probability of Ruin / 破产概率
+
+### Setting Up the Problem / 问题设定
+
+**中文解释：**
+
+令 𝑟ᵢ 表示当 Alice 当前有 £𝑖 时，她最终破产的概率。那么整个游戏的破产概率就是 𝑟ₐ，因为 Alice 初始有 £𝑎。
+
+Bob 最终破产的概率是 1 - 𝑟ₐ，因为总有一方会输。
+
+**边界条件：**
+- 𝑟₀ = 1：当 Alice 有 £0 时，她已经破产了
+- 𝑟ₘ = 0：当 Alice 有 £𝑚 时，她赢了所有钱，Bob 破产了
+
+**English explanation:**
+
+Let 𝑟ᵢ denote the probability that Alice ends up ruined if she currently has £𝑖. Then the probability of ruin for the whole game is 𝑟ₐ, since Alice initially starts with £𝑎.
+
+The probability Bob will end up ruined is 1 - 𝑟ₐ, since one of the players must lose.
+
+**Boundary conditions:**
+- 𝑟₀ = 1: When Alice has £0, she is already ruined
+- 𝑟ₘ = 0: When Alice has £𝑚, she has won all the money, Bob is ruined
+
+---
+
+### Theorem 4.1: Ruin Probability / 破产概率定理
+
+**Theorem 4.1.** Set 𝜌 = 𝑞/𝑝. Then the ruin probability is given by:
+
+$$r_a = \begin{cases} \frac{\rho^a - \rho^m}{1 - \rho^m} & \text{if } \rho \neq 1, \\ 1 - \frac{a}{m} & \text{if } \rho = 1. \end{cases}$$
+
+**中文解释：**
+
+这个公式给出了 Alice 从 £𝑎 开始最终破产的概率。
+
+- 当 𝜌 ≠ 1 时（即 𝑝 ≠ 𝑞），公式为 𝑟ₐ = (𝜌ᵃ - 𝜌ᵐ)/(1 - 𝜌ᵐ)
+- 当 𝜌 = 1 时（即 𝑝 = 𝑞 = 1/2，对称情况），公式为 𝑟ₐ = 1 - 𝑎/𝑚
+
+注意：𝜌 = 1 等同于对称条件 𝑝 = 𝑞 = 1/2。
+
+**English explanation:**
+
+This formula gives the probability that Alice, starting with £𝑎, will eventually be ruined.
+
+- When 𝜌 ≠ 1 (i.e., 𝑝 ≠ 𝑞), the formula is 𝑟ₐ = (𝜌ᵃ - 𝜌ᵐ)/(1 - 𝜌ᵐ)
+- When 𝜌 = 1 (i.e., 𝑝 = 𝑞 = 1/2, symmetric case), the formula is 𝑟ₐ = 1 - 𝑎/𝑚
+
+Note that 𝜌 = 1 is the same as the symmetric condition 𝑝 = 𝑞 = 1/2.
+
+---
+
+### Derivation via Conditioning / 通过条件推导
+
+**中文解释：**
+
+我们可以通过对第一步进行条件化并使用马尔可夫性质来推导 𝑟ᵢ 满足的关系式：
+
+$$r_i = p \cdot r_{i+1} + q \cdot r_{i-1}$$
+
+**推导过程：**
+- 从状态 𝑖 开始，第一步有两种可能：
+  - 以概率 𝑝 移动到 𝑖+1，然后从那里开始，破产概率为 𝑟ᵢ₊₁
+  - 以概率 𝑞 移动到 𝑖-1，然后从那里开始，破产概率为 𝑟ᵢ₋₁
+- 根据全概率公式：𝑟ᵢ = 𝑝·𝑟ᵢ₊₁ + 𝑞·𝑟ᵢ₋₁
+
+**边界条件：** 𝑟₀ = 1, 𝑟ₘ = 0
+
+这个差分方程的解就是定理 4.1 给出的公式。
+
+**English explanation:**
+
+We can derive a relation for 𝑟ᵢ by conditioning on the first step and using the Markov property:
+
+$$r_i = p \cdot r_{i+1} + q \cdot r_{i-1}$$
+
+**Derivation:**
+- Starting from state 𝑖, the first step has two possibilities:
+  - With probability 𝑝, move to 𝑖+1, then from there, the ruin probability is 𝑟ᵢ₊₁
+  - With probability 𝑞, move to 𝑖-1, then from there, the ruin probability is 𝑟ᵢ₋₁
+- By the law of total probability: 𝑟ᵢ = 𝑝·𝑟ᵢ₊₁ + 𝑞·𝑟ᵢ₋₁
+
+**Boundary conditions:** 𝑟₀ = 1, 𝑟ₘ = 0
+
+The solution to this difference equation is the formula given in Theorem 4.1.
+
+---
+
+### Martingale Approach / 鞅方法
+
+**中文解释：**
+
+现在我们用鞅来推导破产概率。首先考虑 𝑝 ≠ 𝑞 的情况。
+
+定义：
+$$M_n = \left(\frac{q}{p}\right)^{X_n}$$
+
+我们声称 (𝑀ₙ) 是关于 (𝑍ₙ) 的鞅。
+
+**验证条件 1（可积性）：**
+𝔼|𝑀ₙ| ≤ max{1, (𝑞/𝑝)ᵐ} < ∞ ✓
+
+**验证条件 2（鞅性质）：**
+我们需要证明 𝔼(𝑀ₙ₊₁ | 𝑍₁, ..., 𝑍ₙ) = 𝑀ₙ 对所有 𝑛 成立。
+
+分情况讨论：
+- 如果 𝑋ₙ = 0 或 𝑋ₙ = 𝑚，游戏已经结束，所以 𝑀ₙ₊₁ = 𝑀ₙ
+- 如果 0 < 𝑋ₙ < 𝑚，游戏还在进行中：
+
+$$\mathbb{E}(M_{n+1} | Z_1, ..., Z_n) = \mathbb{E}\left(\left(\frac{q}{p}\right)^{X_n + Z_{n+1}} | Z_1, ..., Z_n\right)$$
+$$= \left(\frac{q}{p}\right)^{X_n} \cdot \mathbb{E}\left(\left(\frac{q}{p}\right)^{Z_{n+1}}\right)$$
+$$= \left(\frac{q}{p}\right)^{X_n} \cdot \left(p \cdot \frac{q}{p} + q \cdot \left(\frac{q}{p}\right)^{-1}\right)$$
+$$= \left(\frac{q}{p}\right)^{X_n} \cdot (q + p) = \left(\frac{q}{p}\right)^{X_n} = M_n$$
+
+所以 (𝑀ₙ) 确实是鞅。
+
+**English explanation:**
+
+Now we use martingales to derive the ruin probability. First consider the case 𝑝 ≠ 𝑞.
+
+Define:
+$$M_n = \left(\frac{q}{p}\right)^{X_n}$$
+
+We claim that (𝑀ₙ) is a martingale with respect to (𝑍ₙ).
+
+**Check condition 1 (integrability):**
+𝔼|𝑀ₙ| ≤ max{1, (𝑞/𝑝)ᵐ} < ∞ ✓
+
+**Check condition 2 (martingale property):**
+We need to show 𝔼(𝑀ₙ₊₁ | 𝑍₁, ..., 𝑍ₙ) = 𝑀ₙ for all 𝑛.
+
+Case analysis:
+- If 𝑋ₙ = 0 or 𝑋ₙ = 𝑚, the game has ended, so 𝑀ₙ₊₁ = 𝑀ₙ
+- If 0 < 𝑋ₙ < 𝑚, the game is still in progress:
+
+$$\mathbb{E}(M_{n+1} | Z_1, ..., Z_n) = \mathbb{E}\left(\left(\frac{q}{p}\right)^{X_n + Z_{n+1}} | Z_1, ..., Z_n\right)$$
+$$= \left(\frac{q}{p}\

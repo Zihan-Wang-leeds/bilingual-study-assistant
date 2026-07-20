@@ -1,498 +1,371 @@
-# Section 1: Stochastic Processes and the Markov Property
+# Section 1: Stochastic processes and the Markov property
 
-> MATH2702 Stochastic Processes - 自学教材
-> 生成时间: 2026-07-17 14:44
+> MATH2702 - 自学教材 / Self-Study Guide
+> 生成时间: 2026-07-20 15:35
 > 来源页: 10-13
 
 ---
 
-# MATH2702 Study Guide / 学习指南
+# MATH2702: Stochastic Processes / 随机过程
+
 ## Part I: Discrete Time Markov Chains / 第一部分：离散时间马尔可夫链
-### Section 1: Stochastic Processes and the Markov Property / 随机过程与马尔可夫性质
 
 ---
 
-## 📋 Section Overview / 章节概览
+### 📋 Section Overview / 章节概览
 
-This section introduces the fundamental concepts of **stochastic processes (随机过程)** and the **Markov property (马尔可夫性质)**. We begin by distinguishing between deterministic and random models, then explore the four types of stochastic processes based on time and state space. The core of this section is understanding the Markov property - the "memoryless" property that makes certain stochastic processes tractable and widely applicable.
+**中文解释：** 本章节是MATH2702课程的开篇内容，主要介绍随机过程的基本概念和马尔可夫性质。我们将从确定性模型和随机模型的区别开始，逐步理解什么是随机过程，以及为什么马尔可夫性质如此重要。这一部分为整个课程奠定了理论基础，特别是为后续学习离散时间马尔可夫链和连续时间马尔可夫跳过程做好了准备。
 
-本章介绍随机过程和马尔可夫性质的基本概念。我们从区分确定性模型和随机模型开始，然后探讨基于时间和状态空间的四种随机过程类型。本章的核心是理解马尔可夫性质——这种"无记忆性"使得某些随机过程易于处理且应用广泛。
+**English explanation:** This section is the opening content of MATH2702, introducing the fundamental concepts of stochastic processes and the Markov property. We will start from the distinction between deterministic and random models, gradually understand what a stochastic process is, and why the Markov property is so important. This part lays the theoretical foundation for the entire course, especially preparing for the subsequent study of discrete-time Markov chains and continuous-time Markov jump processes.
 
-**Why this matters (为什么这很重要)**: Markov chains are the foundation of modern probability theory and have applications in:
-- Finance (金融): Stock price modeling, option pricing
-- Engineering (工程): Queueing systems, network traffic
-- Biology (生物学): Population dynamics, genetic sequences
-- Computer Science (计算机科学): Google's PageRank algorithm, machine learning
-- Physics (物理学): Particle movement, thermodynamics
-
----
-
-## 🎯 Learning Objectives / 学习目标
-
-By the end of this section, you will be able to / 完成本章学习后，你将能够：
-
-1. **Distinguish** between deterministic and stochastic models, and identify appropriate applications for each / 区分确定性模型和随机模型，并识别各自适用的应用场景
-
-2. **Classify** stochastic processes according to their time (discrete/continuous) and state space (discrete/continuous) / 根据时间（离散/连续）和状态空间（离散/连续）对随机过程进行分类
-
-3. **Explain** the Markov property in both intuitive and formal mathematical terms / 用直观和形式化数学语言解释马尔可夫性质
-
-4. **Compute** conditional probabilities and conditional expectations for simple random variables / 计算简单随机变量的条件概率和条件期望
-
-5. **Apply** the Markov property to determine whether a given process is a Markov chain / 应用马尔可夫性质判断给定过程是否为马尔可夫链
-
-6. **Interpret** the conditional independence statement "past and future are independent given the present" / 解释"给定现在，过去和未来条件独立"这一表述
+**Why this matters / 为什么重要：**
+- 随机过程是现代概率论的核心内容，广泛应用于金融、物理、工程等领域
+- Stochastic processes are core to modern probability theory, widely applied in finance, physics, engineering, etc.
+- 马尔可夫性质是简化复杂随机系统分析的关键工具
+- The Markov property is a key tool for simplifying the analysis of complex random systems
 
 ---
 
-## 📚 Prerequisites / 前置知识
+### 🎯 Learning Objectives / 学习目标
 
-Before studying this section, you should be familiar with / 学习本章前，你应该熟悉：
+完成本章节学习后，你应该能够：
 
-### Probability Basics / 概率基础
-- **Sample space (样本空间)**: The set of all possible outcomes of an experiment
-- **Event (事件)**: A subset of the sample space
-- **Probability measure (概率测度)**: A function ℙ assigning probabilities to events
-- **Conditional probability (条件概率)**: ℙ(𝐴|𝐵) = ℙ(𝐴∩𝐵)/ℙ(𝐵) for ℙ(𝐵) > 0
+1. **区分确定性模型和随机模型** - 理解何时使用哪种模型，以及随机模型（stochastic model）的优势
+2. **定义随机过程** - 理解状态空间（state space）和指标集（index set）的概念，以及离散/连续时间的四种组合
+3. **理解马尔可夫性质** - 掌握"无记忆性"（memoryless property）的核心思想
+4. **运用条件概率和条件期望** - 复习并应用条件概率和条件期望的基本概念
+5. **形式化定义马尔可夫链** - 能够写出并解释马尔可夫性质的数学定义
 
-### Random Variables / 随机变量
-- **Random variable (随机变量)**: A function from sample space to real numbers
-- **Discrete random variable (离散随机变量)**: Takes values in a countable set
-- **Continuous random variable (连续随机变量)**: Takes values in an uncountable set
-- **Expectation (期望)**: 𝔼(𝑋) = ∑_𝑠 𝑠·ℙ(𝑋=𝑠) for discrete 𝑋
+After completing this section, you should be able to:
 
-### Independence / 独立性
-- **Independence (独立)**: Events 𝐴 and 𝐵 are independent if ℙ(𝐴∩𝐵) = ℙ(𝐴)·ℙ(𝐵)
-- **Independent random variables (独立随机变量)**: 𝑋 and 𝑌 are independent if ℙ(𝑋=𝑥, 𝑌=𝑦) = ℙ(𝑋=𝑥)·ℙ(𝑌=𝑦) for all 𝑥,𝑦
-
-### Notation Review / 符号复习
-| Symbol | Meaning | 中文含义 |
-|--------|---------|----------|
-| ℙ(𝐴) | Probability of event A | 事件A的概率 |
-| ℙ(𝐴\|𝐵) | Conditional probability of A given B | 给定B时A的条件概率 |
-| 𝔼(𝑋) | Expectation of X | X的期望 |
-| 𝔼(𝑋\|𝑌) | Conditional expectation of X given Y | 给定Y时X的条件期望 |
-| ∑ | Summation | 求和 |
-| ∈ | Element of / belongs to | 属于 |
-| ℝ | Real numbers | 实数集 |
-| ℤ⁺ | Non-negative integers {0,1,2,...} | 非负整数集 |
-| ℝ⁺ | Non-negative real numbers [0,∞) | 非负实数集 |
+1. **Distinguish deterministic and random models** - Understand when to use each type and the advantages of stochastic models
+2. **Define stochastic processes** - Understand the concepts of state space and index set, and the four combinations of discrete/continuous time and space
+3. **Understand the Markov property** - Grasp the core idea of the "memoryless property"
+4. **Apply conditional probability and expectation** - Review and apply basic concepts of conditional probability and expectation
+5. **Formally define Markov chains** - Write and explain the mathematical definition of the Markov property
 
 ---
 
-## 📖 Core Content / 核心内容
+### 📚 Prerequisites / 前置知识
 
-### Topic 1: Deterministic and Random Models / 确定性模型与随机模型
+**中文解释：** 在学习本章节前，你需要掌握以下基础知识：
 
-#### Intuition / 直觉理解
+**English explanation:** Before studying this section, you need to master the following prerequisite knowledge:
 
-**What is a model? (什么是模型？)**
-
-A **model (模型)** is an imitation of a real-world system. Think of it as a simplified representation that helps us understand, predict, and make decisions about complex systems.
-
-**Example analogy (类比)**: 
-- A model airplane in a wind tunnel helps engineers understand how a real airplane will fly
-- A computer simulation of weather helps meteorologists predict tomorrow's forecast
-- A mathematical model of stock prices helps investors make decisions
-
-**Deterministic vs. Stochastic Models (确定性模型 vs. 随机模型)**
-
-| Aspect | Deterministic Model (确定性模型) | Stochastic Model (随机模型) |
-|--------|--------------------------------|---------------------------|
-| **Output** | Completely determined by inputs | Variable outcomes |
-| **Randomness** | No random components | Includes randomness |
-| **Reproducibility** | Same inputs → same output | Same inputs → different outputs each run |
-| **Use case** | Simple, predictable systems | Complex, uncertain systems |
-| **Example** | Moon's orbit around Earth | Apple stock prices |
-
-**Key insight (关键洞察)**: The choice between deterministic and stochastic models depends on:
-1. How significant are the random components? (随机成分有多重要？)
-2. How much uncertainty exists? (存在多少不确定性？)
-3. What level of precision is needed? (需要什么精度水平？)
-
-**The Moon vs. Apple Shares Example (月球 vs. 苹果股票例子)**:
-
-For the **Moon (月球)**:
-- Physical laws (Newton's laws, gravity) are well-understood
-- Random effects (meteorite impacts) are negligible
-- → **Deterministic model** is sufficient
-
-For **Apple shares (苹果股票)**:
-- Price changes are highly uncertain
-- Many unpredictable factors (news, market sentiment, economy)
-- → **Stochastic model** is appropriate
-
-#### Formal Definition / 形式化定义
-
-**Definition (定义)**: A **stochastic model (随机模型)** (pronounced "sto-KASS-tik") is a mathematical model that incorporates randomness to account for uncertainty and unpredictability. The word "stochastic" comes from Greek "stokhastikos" meaning "able to guess" or "aiming at a target."
-
-**Key terminology (关键术语)**:
-- **Deterministic model (确定性模型)**: Output is completely determined by inputs and parameters
-- **Stochastic model (随机模型)**: Output has variable outcomes due to random components
-- **Parameter (参数)**: A constant that characterizes a model (e.g., mean of a distribution)
-
-#### Key Properties / 关键性质
-
-1. **Deterministic models** are appropriate when:
-   - Random components are negligible
-   - System follows well-understood physical laws
-   - High precision is required and achievable
-
-2. **Stochastic models** are appropriate when:
-   - System is highly complex
-   - Many uncertainties exist
-   - We need to understand the range of possible outcomes
-
-3. **Advantages of stochastic models (随机模型的优势)**:
-   - Can be run many times to get distribution of outcomes
-   - Account for variability and unpredictability
-   - Provide risk assessment capabilities
+| 知识点 | 中文说明 | English Description |
+|--------|----------|-------------------|
+| 基本概率论 | 随机变量、概率分布、期望值 | Random variables, probability distributions, expectation |
+| 条件概率 | ℙ(A|B)的定义和计算 | Definition and calculation of conditional probability |
+| 条件期望 | 𝔼(X|Y)的定义和性质 | Definition and properties of conditional expectation |
+| 独立性 | 随机变量独立的概念 | Concept of independence of random variables |
+| 集合论基础 | 可数集、不可数集的概念 | Basic set theory: countable vs uncountable sets |
 
 ---
 
-### Topic 2: Stochastic Processes / 随机过程
-
-#### Intuition / 直觉理解
-
-**From Random Variables to Stochastic Processes (从随机变量到随机过程)**
-
-Think of a **random variable (随机变量)** as a snapshot - it captures the state at one point in time.
-
-A **stochastic process (随机过程)** is like a movie - it captures how the state evolves over time.
-
-**Analogy (类比)**: 
-- Random variable: A photograph of a busy street at noon
-- Stochastic process: A video recording of the street throughout the day
-
-**Example: Insurance Claims (保险索赔例子)**
-
-- **Single random variable**: Total number of claims in 2023 → Model as Poisson(λ)
-- **Stochastic process**: Number of claims changing over 2024 → Need (𝑋₀, 𝑋₁, 𝑋₂, ...)
-
-**Why do we need stochastic processes? (为什么需要随机过程？)**
-
-Because many real-world phenomena change over time, and we need to understand:
-- How they evolve (它们如何演变)
-- Dependencies between different time points (不同时间点之间的依赖关系)
-- Long-term behavior (长期行为)
-
-#### Formal Definition / 形式化定义
-
-**Definition 1 (定义1)**: A **stochastic process (随机过程)**, usually written as (𝑋ₙ) or (𝑋ₙ : 𝑛 ≥ 0), is an indexed sequence of random variables that are (usually) dependent on each other.
-
-**Components of a Stochastic Process (随机过程的组成部分)**:
-
-1. **State Space (状态空间) 𝒮**: The set of all possible values the process can take
-   - Symbol: 𝒮 (calligraphic S)
-   - Example: 𝒮 = {Heads, Tails} for coin flips
-
-2. **Index Set (指标集)**: The set that orders the random variables
-   - Usually interpreted as time
-   - Example: 𝑛 = 0, 1, 2, ... for discrete time
-
-3. **Random Variables (随机变量) 𝑋ₙ**: The value of the process at time 𝑛
-   - Each 𝑋ₙ takes values in 𝒮
-
-**Notation (符号说明)**:
-- (𝑋ₙ) = (𝑋₀, 𝑋₁, 𝑋₂, ...) - the entire process
-- 𝑋ₙ - the value at time 𝑛
-- 𝒮 - state space
-- 𝑛 - time index
-
-#### Types of Stochastic Processes / 随机过程的类型
-
-**Four Possibilities (四种可能性)**:
-
-| | **Discrete State Space (离散状态空间)** | **Continuous State Space (连续状态空间)** |
-|---|---|---|
-| **Discrete Time (离散时间)** | **Discrete time, discrete space** | **Discrete time, continuous space** |
-| | Example: Number of students attending each lecture | Example: Daily maximum temperature in Leeds |
-| | **Main topic of first half of module** | Briefly mentioned |
-| **Continuous Time (连续时间)** | **Continuous time, discrete space** | **Continuous time, continuous space** |
-| | Example: Number of visitors to a webpage over time | Example: FTSE 100 share index level |
-| | **Main topic of second half of module** | Outside scope (see MATH3734) |
-
-**Detailed Explanation of Each Type (每种类型的详细解释)**:
-
-**1. Discrete Time, Discrete Space (离散时间，离散空间)**
-- **Time**: Measured at distinct points: 𝑛 = 0, 1, 2, ...
-- **State space**: Countable set (finite or countably infinite)
-- **Example**: Number of students in each lecture
-  - Time: Lecture number (1, 2, 3, ...)
-  - State: Number of students (0, 1, 2, ..., up to room capacity)
-- **Course focus**: Markov chains - the main topic of Part I
-
-**2. Discrete Time, Continuous Space (离散时间，连续空间)**
-- **Time**: Measured at distinct points: 𝑛 = 0, 1, 2, ...
-- **State space**: Uncountably infinite continuum
-- **Example**: Daily maximum temperature in Leeds
-  - Time: Day number (1, 2, 3, ...)
-  - State: Temperature in °C (any real number)
-- **Course focus**: Briefly mentioned, not emphasized
-
-**3. Continuous Time, Discrete Space (连续时间，离散空间)**
-- **Time**: Monitored constantly: 𝑡 ∈ ℝ⁺ = {𝑥 ∈ ℝ : 𝑥 ≥ 0}
-- **State space**: Countable set
-- **Example**: Number of webpage visitors over time
-  - Time: Real time (seconds, minutes, hours)
-  - State: Number of visitors (0, 1, 2, ...)
-- **Course focus**: Markov jump processes - main topic of Part II
-
-**4. Continuous Time, Continuous Space (连续时间，连续空间)**
-- **Time**: Monitored constantly: 𝑡 ∈ ℝ⁺
-- **State space**: Uncountably infinite continuum
-- **Example**: FTSE 100 share index level
-  - Time: Real time throughout trading day
-  - State: Index value (any positive real number)
-- **Course focus**: Outside scope (see MATH3734 Stochastic Calculus for Finance)
-
-#### Key Properties / 关键性质
-
-1. **Dependence (依赖性)**: The random variables in a stochastic process are usually dependent on each other
-   - 𝑋ₙ₊₁ typically depends on 𝑋ₙ
-   - This dependence is what makes stochastic processes interesting and useful
-
-2. **Indexing (索引)**: The index set puts the random variables in order
-   - Discrete: 𝑛 = 0, 1, 2, ...
-   - Continuous: 𝑡 ∈ ℝ⁺
-
-3. **State Space Classification (状态空间分类)**:
-   - **Discrete (离散)**: Distinct, separate outcomes (countable)
-   - **Continuous (连续)**: Gradually varying continuum (uncountable)
+### 📖 Core Content / 核心内容
 
 ---
 
-### Topic 3: Conditional Probability and Conditional Expectation / 条件概率与条件期望
+#### 1.1 Deterministic and Random Models / 确定性与随机模型
 
-#### Intuition / 直觉理解
+##### Intuition / 直觉理解
 
-**Why do we need conditional probability? (为什么需要条件概率？)**
+**中文解释：** 想象一下，我们想要预测明天是否会下雨。如果我们使用一个确定性模型，我们会说"如果温度低于20°C且湿度大于80%，则一定会下雨"——这个模型没有随机性，输出完全由输入决定。但现实世界非常复杂，我们无法精确知道所有影响因素，所以更好的方法是使用随机模型："有70%的概率会下雨"。
 
-In real life, we often have partial information. Conditional probability helps us update our beliefs based on new information.
+**English explanation:** Imagine we want to predict whether it will rain tomorrow. If we use a deterministic model, we would say "if temperature is below 20°C and humidity is above 80%, then it will definitely rain" — this model has no randomness, the output is completely determined by the inputs. But the real world is extremely complex, and we cannot know all influencing factors precisely, so a better approach is to use a stochastic model: "there is a 70% probability of rain."
 
-**Analogy (类比)**: 
-- **Unconditional probability**: Probability of rain tomorrow without any other information
-- **Conditional probability**: Probability of rain tomorrow given that it's cloudy today
+**Key distinction / 关键区别：**
 
-**Conditional Expectation (条件期望)**:
-- **Unconditional expectation**: Average value of a random variable
-- **Conditional expectation**: Best guess of a random variable given some information
+| 特征 | 确定性模型 | 随机模型 |
+|------|-----------|---------|
+| 中文 | 输出完全由输入决定 | 输出包含随机性 |
+| English | Output completely determined by inputs | Output includes randomness |
+| 示例 | 月球轨道预测 | 苹果股票价格 |
+| 适用场景 | 系统简单、不确定性小 | 系统复杂、不确定性大 |
 
-**Example (例子)**: 
-- 𝑋 = score on a test
-- 𝔼(𝑋) = average score of all students
-- 𝔼(𝑋 | studied ≥ 5 hours) = average score of students who studied at least 5 hours
+**Real-world examples / 实际应用示例：**
 
-#### Formal Definition / 形式化定义
+1. **月球轨道 (Moon's orbit)** : 物理定律精确，小行星撞击影响微小 → 确定性模型足够
+2. **苹果股票 (Apple shares)** : 每日价格变化高度不确定 → 需要随机模型
 
-**Conditional Probability (条件概率)**
+> **重要提示：** 随机模型（stochastic model）这个词来自希腊语"stochastikos"，意为"善于猜测"。在中文中，"随机"和"stochastic"都强调不确定性。
 
-**Definition (定义)**: For events 𝐴 and 𝐵 with ℙ(𝐵) > 0, the conditional probability of 𝐴 given 𝐵 is:
-
-ℙ(𝐴 | 𝐵) = ℙ(𝐴 ∩ 𝐵) / ℙ(𝐵)
-
-**Symbol explanation (符号说明)**:
-- ℙ(𝐴 | 𝐵): Probability of event A occurring given that event B has occurred
-- ℙ(𝐴 ∩ 𝐵): Probability that both A and B occur
-- ℙ(𝐵): Probability that B occurs
-- Condition: ℙ(𝐵) > 0 (we cannot condition on an impossible event)
-
-**Important note (重要说明)**: Whenever we write a conditional probability, we implicitly assume the conditioning event has strictly positive probability.
-
-**Conditional Expectation (条件期望)**
-
-**Definition (定义)**: For a random variable 𝑋 taking values in state space 𝒮 and event 𝐵 (with ℙ(𝐵) > 0), the conditional expectation of 𝑋 given 𝐵 is:
-
-𝔼(𝑋 | 𝐵) = ∑_{𝑠∈𝒮} 𝑠 · ℙ(𝑋 = 𝑠 | 𝐵)
-
-**Symbol explanation (符号说明)**:
-- 𝔼(𝑋 | 𝐵): Expected value of X given that event B occurred
-- ∑_{𝑠∈𝒮}: Sum over all possible values s in the state space
-- 𝑠: A possible value of X
-- ℙ(𝑋 = 𝑠 | 𝐵): Conditional probability that X equals s given B
-
-**Conditional Expectation Given a Random Variable (给定随机变量的条件期望)**
-
-**Definition (定义)**: For random variables X and Y, the conditional expectation 𝔼(𝑋 | 𝑌) is a random variable defined as follows:
-
-1. First, define a function 𝑓(𝑏) = 𝔼(𝑋 | 𝑌 = 𝑏) = ∑_{𝑠∈𝒮} 𝑠 · ℙ(𝑋 = 𝑠 | 𝑌 = 𝑏)
-
-2. Then, 𝔼(𝑋 | 𝑌) = 𝑓(𝑌) is the random variable that takes value 𝔼(𝑋 | 𝑌 = 𝑏) when 𝑌 = 𝑏
-
-**Key insight (关键洞察)**: 
-- 𝔼(𝑋 | 𝑌 = 𝑏) is a **number** (the expected value given a specific outcome)
-- 𝔼(𝑋 | 𝑌) is a **random variable** (it depends on the random value of Y)
-
-#### Worked Example / 例题
-
-**Example 1.1 (例题1.1)**: Rolling Dice
-
-**Problem (问题)**: Let 𝑍₁, 𝑍₂ be the outcomes of rolling independent fair dice, and define:
-- 𝑌 = 𝑍₁
-- 𝑋 = 𝑍₁ + 𝑍₂
-
-Find 𝔼(𝑋 | 𝑌), the conditional expectation of X given Y.
-
-**Solution (解答)**:
-
-**Step 1: Understand the setup (理解设置)**
-- 𝑍₁ and 𝑍₂ are independent fair dice rolls
-- Each takes values in {1, 2, 3, 4, 5, 6} with probability 1/6 each
-- 𝑌 = 𝑍₁ (Y equals the first die roll)
-- 𝑋 = 𝑍₁ + 𝑍₂ (X equals the sum of both dice)
-
-**Step 2: Apply linearity of conditional expectation (应用条件期望的线性性)**
-
-𝔼(𝑋 | 𝑌) = 𝔼(𝑍₁ + 𝑍₂ | 𝑍₁)
-         = 𝔼(𝑍₁ | 𝑍₁) + 𝔼(𝑍₂ | 𝑍₁)
-
-**Why? (为什么？)** Conditional expectation is linear, just like ordinary expectation.
-
-**Step 3: Compute 𝔼(𝑍₁ | 𝑍₁) (计算给定Z₁时Z₁的条件期望)**
-
-If we already know the value of 𝑍₁, our "best guess" of 𝑍₁ is exactly that value.
-
-Formally: The function 𝑓₁(𝑠) = 𝑠 satisfies 𝑓₁(𝑠) = 𝔼(𝑍₁ | 𝑍₁ = 𝑠)
-
-Therefore: 𝔼(𝑍₁ | 𝑍₁) = 𝑍₁
-
-**Step 4: Compute 𝔼(𝑍₂ | 𝑍₁) (计算给定Z₁时Z₂的条件期望)**
-
-Since 𝑍₁ and 𝑍₂ are independent, knowing 𝑍₁ gives no information about 𝑍₂.
-
-Our best guess of 𝑍₂ is simply its unconditional expectation 𝔼(𝑍₂).
-
-𝔼(𝑍₂) = (1+2+3+4+5+6)/6 = 21/6 = 3.5
-
-Formally: The function 𝑓₂(𝑠) = 𝔼(𝑍₂) = 3.5 for all 𝑠 ∈ {1,2,3,4,5,6}
-
-Therefore: 𝔼(𝑍₂ | 𝑍₁) = 3.5
-
-**Step 5: Combine results (合并结果)**
-
-𝔼(𝑋 | 𝑌) = 𝔼(𝑍₁ | 𝑍₁) + 𝔼(𝑍₂ | 𝑍₁)
-         = 𝑍₁ + 3.5
-         = 𝑌 + 3.5
-
-**Final Answer (最终答案)**: 𝔼(𝑋 | 𝑌) = 𝑌 + 3.5
-
-**Interpretation (解释)**: Given that we know the first die roll is Y, our best guess of the sum X is Y + 3.5 (the known first roll plus the expected value of the second roll).
+> **Important note:** The word "stochastic" comes from Greek "stochastikos," meaning "skilled at guessing." Both "随机" and "stochastic" emphasize uncertainty.
 
 ---
 
-### Topic 4: The Markov Property / 马尔可夫性质
+#### 1.2 Stochastic Processes / 随机过程
 
-#### Intuition / 直觉理解
+##### Intuition / 直觉理解
 
-**The "Memoryless" Property ("无记忆性"性质)**
+**中文解释：** 假设我们要研究一家保险公司在2024年全年的理赔数量。如果我们只关心总数，一个随机变量（比如泊松分布）就足够了。但如果我们想追踪理赔数量如何随时间变化——比如月初多还是月末多，节假日是否有变化——我们就需要一个随机过程。
 
-Think of a simple board game where you roll dice and move forward:
+**English explanation:** Suppose we want to study the total number of claims to an insurance company in 2024. If we only care about the total, a single random variable (like a Poisson distribution) is sufficient. But if we want to track how the number of claims changes over time — like whether there are more at the beginning of the month or the end, whether holidays make a difference — we need a stochastic process.
 
-**Analogy (类比)**: 
-- You are currently on square 𝑋ₙ
-- Your next square 𝑋ₙ₊₁ depends on:
-  1. Where you are now (𝑋ₙ) - you add the dice roll to your current position
-  2. The dice roll (random)
-- **Crucially**: Given where you are now, it doesn't matter how you got there!
+##### Formal Definition / 形式化定义
 
-**The Markov property says (马尔可夫性质说明)**:
-"The past and the future are conditionally independent given the present."
+**Definition 1.1 (Stochastic Process / 随机过程):**
 
-**In plain language (通俗解释)**:
-- To predict the future, only the present matters
-- The process "forgets" its history
-- We only need to remember where we are, not how we got here
+A stochastic process, usually written as $(X_n)$, is an indexed sequence of random variables that are (usually) dependent on each other.
 
-**Real-world examples (现实世界例子)**:
-1. **Board game (棋盘游戏)**: Your next position depends only on current position, not on previous moves
-2. **Weather (天气)**: Tomorrow's weather depends on today's weather, not on last week's weather (simplified)
-3. **Stock prices (股票价格)**: Future price depends on current price, not on the entire price history (in efficient markets)
+一个随机过程，通常记为$(X_n)$，是一个索引化的随机变量序列，这些随机变量通常相互依赖。
 
-#### Formal Definition / 形式化定义
+**Key Components / 关键组成部分：**
 
-**Definition 1.1 (定义1.1)**: Let (𝑋ₙ) = (𝑋₀, 𝑋₁, 𝑋₂, ...) be a stochastic process in discrete time 𝑛 = 0, 1, 2, ... and discrete space 𝒮. Then we say that (𝑋ₙ) has the **Markov property (马尔可夫性质)** if, for all times 𝑛 and all states 𝑥₀, 𝑥₁, ..., 𝑥ₙ, 𝑥ₙ₊₁ ∈ 𝒮, we have:
+| 符号 | 中文名称 | English Name | 说明 |
+|------|---------|-------------|------|
+| $X_n$ | 第n个随机变量 | n-th random variable | 过程在时刻n的状态 |
+| $\mathcal{S}$ | 状态空间 | State space | 所有可能取值的集合 |
+| $n$ | 时间指标 | Time index | 表示测量时刻 |
 
-ℙ(𝑋ₙ₊₁ = 𝑥ₙ₊₁ | 𝑋ₙ = 𝑥ₙ, 𝑋ₙ₋₁ = 𝑥ₙ₋₁, ..., 𝑋₀ = 𝑥₀) = ℙ(𝑋ₙ₊₁ = 𝑥ₙ₊₁ | 𝑋ₙ = 𝑥ₙ)
+##### State Space / 状态空间
 
-**Symbol explanation (符号说明)**:
-- ℙ(𝑋ₙ₊₁ = 𝑥ₙ₊₁ | ...): Probability that the next state is 𝑥ₙ₊₁ given the history
-- 𝑋ₙ₊₁: The random variable at time n+1 (next time step)
-- 𝑥ₙ₊₁: A specific value that 𝑋ₙ₊₁ could take
-- 𝑋ₙ = 𝑥ₙ: The current state is 𝑥ₙ
-- 𝑋ₙ₋₁ = 𝑥ₙ₋₁, ..., 𝑋₀ = 𝑥₀: The entire history of the process
-- ℙ(𝑋ₙ₊₁ = 𝑥ₙ₊₁ | 𝑋ₙ = 𝑥ₙ): Probability of next state given only the current state
+**中文解释：** 状态空间$\mathcal{S}$是随机过程可能取值的集合。它可以是离散的（distinct outcomes）或连续的（continuum of outcomes）。
 
-**What this means (这意味着什么)**:
+**English explanation:** The state space $\mathcal{S}$ is the set of possible values the stochastic process can take. It can be discrete (distinct outcomes) or continuous (continuum of outcomes).
 
-The left-hand side: Probability of going to state 𝑥ₙ₊₁ next, conditioned on the **entire history** (all past states and current state)
+**Types of State Spaces / 状态空间类型：**
 
-The right-hand side: Probability of going to state 𝑥ₙ₊₁ next, conditioned **only on the current state**
+| 类型 | 中文说明 | English Description | 示例 |
+|------|---------|-------------------|------|
+| 离散有限 | 有限个不同结果 | Finite distinct outcomes | $\mathcal{S} = \{\text{Heads}, \text{Tails}\}$ |
+| 离散无限 | 可数无限个结果 | Countably infinite outcomes | $\mathcal{S} = \mathbb{Z}_+ = \{0, 1, 2, \ldots\}$ |
+| 连续 | 不可数无限个结果 | Uncountably infinite outcomes | $\mathcal{S} = \mathbb{R}_+ = \{x \in \mathbb{R}: x \geq 0\}$ |
 
-The equality tells us: The entire history doesn't matter - only the current state matters for predicting the future.
+**Examples / 示例：**
 
-#### Key Properties / 关键性质
+- **硬币抛掷 (Coin flip)** : $\mathcal{S} = \{\text{Heads}, \text{Tails}\}$ — 离散有限
+- **保险理赔计数 (Insurance claims)** : $\mathcal{S} = \mathbb{Z}_+ = \{0, 1, 2, \ldots\}$ — 离散无限
+- **降雨量 (Rainfall amount)** : $\mathcal{S} = \mathbb{R}_+ = \{x \in \mathbb{R}: x \geq 0\}$ — 连续
+- **气体粒子位置 (Gas particle position)** : $\mathcal{S} \subset \mathbb{R}^3$ — 连续（三维空间）
 
-1. **Memoryless (无记忆性)**: The process "forgets" how it got to the current state
-   - Only the present matters for future evolution
-   - Past information is irrelevant given the present
+##### Time Index / 时间指标
 
-2. **Conditional Independence (条件独立)**: Past and future are conditionally independent given the present
-   - ℙ(Past and Future | Present) = ℙ(Past | Present) · ℙ(Future | Present)
+**中文解释：** 时间指标集决定了我们何时测量过程。它也可以是离散的或连续的。
 
-3. **Simplification (简化)**: Markov processes are much easier to study than general processes
-   - We only need to track the current state
-   - We can "forget" the entire history
+**English explanation:** The index set determines when we measure the process. It can also be discrete or continuous.
 
-4. **One-step dependence (一步依赖)**: The Markov property is often called "one-step memory"
-   - 𝑋ₙ₊₁ depends on 𝑋ₙ but not on 𝑋ₙ₋₁, 𝑋ₙ₋₂, ..., 𝑋₀
-   - This is the simplest form of dependence
+**Types of Time / 时间类型：**
 
-5. **Historical Note (历史注记)**: Although particular examples of Markov processes go back further, the first general study was by the Russian mathematician **Andrey Andreyevich Markov (安德烈·安德烈耶维奇·马尔可夫)**, published in 1906.
+| 类型 | 中文说明 | English Description | 表示法 |
+|------|---------|-------------------|--------|
+| 离散时间 | 在特定时间点采样 | Sampled at distinct points | $n = 0, 1, 2, \ldots$ |
+| 连续时间 | 持续监控 | Monitored constantly | $t \in \mathbb{R}_+ = \{x \in \mathbb{R}: x \geq 0\}$ |
 
-#### Worked Example / 例题
+**Example / 示例：**
+- 保险理赔：每天统计一次 → 离散时间 $n = 1, 2, \ldots, 365$
+- 保险理赔：每次理赔后更新 → 连续时间 $t$ 表示全年时间
 
-**Example: Board Game (棋盘游戏例子)**
+##### Four Combinations / 四种组合
 
-**Problem (问题)**: Consider a simple board game where you start at square 0 and roll a fair die to move forward. Let 𝑋ₙ be your position after n moves. Does this process have the Markov property?
+**中文解释：** 根据状态空间和时间指标的离散/连续性质，我们得到四种组合。本课程主要关注两种。
 
-**Solution (解答)**:
+**English explanation:** Based on the discrete/continuous nature of state space and time index, we get four combinations. This course focuses mainly on two.
 
-**Step 1: Understand the process (理解过程)**
-- 𝑋₀ = 0 (start at square 0)
-- Each turn: roll die (1-6), move that many squares forward
-- 𝑋ₙ₊₁ = 𝑋ₙ + (die roll at turn n+1)
+| 组合 | 时间 | 状态空间 | 示例 | 本课程覆盖 |
+|-----|------|---------|------|-----------|
+| 1 | 离散 | 离散 | 每节课出勤学生数 | ✅ **主要** (马尔可夫链) |
+| 2 | 离散 | 连续 | 利兹每日最高温度 | ⚠️ 简要提及 |
+| 3 | 连续 | 离散 | 网页访问量随时间变化 | ✅ **主要** (马尔可夫跳过程) |
+| 4 | 连续 | 连续 | FTSE 100指数水平 | ❌ 超出范围 (见MATH3734) |
 
-**Step 2: Check the Markov property (检查马尔可夫性质)**
+**Detailed examples / 详细示例：**
 
-Consider: ℙ(𝑋ₙ₊₁ = 𝑥ₙ₊₁ | 𝑋ₙ = 𝑥ₙ, 𝑋ₙ₋₁ = 𝑥ₙ₋₁, ..., 𝑋₀ = 𝑥₀)
+**Combination 1: Discrete time, discrete space / 离散时间，离散空间**
+- **Example:** Number of students attending each lecture of a maths module
+- **中文示例：** 数学模块每节课的出勤学生数
+- **Course relevance:** This is the main topic of the first half — **Markov chains**
 
-Given the entire history, the next position is:
-𝑋ₙ₊₁ = 𝑋ₙ + (die roll)
+**Combination 2: Discrete time, continuous space / 离散时间，连续空间**
+- **Example:** Daily maximum temperature in Leeds
+- **中文示例：** 利兹每日最高温度
+- **Course relevance:** Briefly mentioned, but not a major focus
 
-The die roll is independent of everything, so:
-ℙ(𝑋ₙ₊₁ = 𝑥ₙ₊₁ | history) = ℙ(die roll = 𝑥ₙ₊₁ - 𝑥ₙ)
+**Combination 3: Continuous time, discrete space / 连续时间，离散空间**
+- **Example:** Number of visitors to a webpage over time
+- **中文示例：** 网页访问量随时间变化
+- **Course relevance:** This is the main topic of the second half — **Markov jump processes**
 
-Now consider: ℙ(𝑋ₙ₊₁ = 𝑥ₙ₊₁ | 𝑋ₙ = 𝑥ₙ)
-
-Given only the current position:
-ℙ(𝑋ₙ₊₁ = 𝑥ₙ₊₁ | 𝑋ₙ = 𝑥ₙ) = ℙ(die roll = 𝑥ₙ₊₁ - 𝑥ₙ)
-
-**Step 3: Compare (比较)**
-
-Both sides equal ℙ(die roll = 𝑥ₙ₊₁ - 𝑥ₙ), so the Markov property holds.
-
-**Answer (答案)**: Yes, this board game process has the Markov property.
-
-**Intuition (直觉)**: To know where you'll be next turn, you only need to know where you are now. It doesn't matter whether you got there by rolling all 1's or by rolling a 6 once - the future depends only on your current position.
+**Combination 4: Continuous time, continuous space / 连续时间，连续空间**
+- **Example:** Level of the FTSE 100 share index over time
+- **中文示例：** FTSE 100指数水平随时间变化
+- **Course relevance:** Outside scope of this course (see MATH3734 Stochastic Calculus for Finance)
 
 ---
 
-### Topic 5: Continuous Time Markov Property / 连续时间马尔可夫性质
+#### 1.3 Markov Property / 马尔可夫性质
 
-#### Intuition / 直觉理解
+##### Intuition / 直觉理解
 
-The Markov property also applies to continuous time processes, though the formal definition is slightly different.
+**中文解释：** 想象你在玩一个简单的棋盘游戏。你掷骰子，然后向前移动相应的格数。假设你现在在第$X_n$格。关于下一步你会移动到哪一格$X_{n+1}$，我们能说什么？
 
-**Analogy (类比)**: 
-- Discrete time: Checking the process at specific moments (like checking your position every minute)
-- Continuous time: Watching
+1. $X_{n+1}$是随机的，因为它取决于骰子的结果
+2. $X_{n+1}$取决于你现在的位置$X_n$，因为骰子点数会加到当前格数上
+3. **关键点：** 给定你现在的位置$X_n$，$X_{n+1}$不再依赖于你之前走过的路径$X_0, X_1, \ldots, X_{n-1}$
+
+**English explanation:** Imagine playing a simple board game. You roll dice and move that many squares forward. Suppose you are currently on square $X_n$. What can we say about which square $X_{n+1}$ you move to next?
+
+1. $X_{n+1}$ is random, since it depends on the roll of the dice
+2. $X_{n+1}$ depends on where you are now $X_n$, since the dice score will be added to your current square
+3. **Key point:** Given where you are now $X_n$, $X_{n+1}$ does not depend any further on which sequence of squares $X_0, X_1, \ldots, X_{n-1}$ you used to get here
+
+**The "Memoryless" Property / "无记忆"性质：**
+
+**中文解释：** 第三点就是马尔可夫性质的核心——"无记忆性"。就好像过程忘记了它是如何到达这里的：我们只需要记住到达了哪个格子，而不需要记住之前经过了哪些格子。数学上表达为："给定现在，过去和未来是条件独立的"。
+
+**English explanation:** The third point is the core of the Markov property — the "memoryless property." It's as if the process forgot how it got here: we only need to remember what square we have reached, not which squares we used to get here. Mathematically: "the past and the future are conditionally independent given the present."
+
+##### Review: Conditional Probability / 复习：条件概率
+
+**中文解释：** 在正式定义马尔可夫性质之前，我们需要复习条件概率和条件期望的概念。
+
+**English explanation:** Before formally defining the Markov property, we need to review the concepts of conditional probability and conditional expectation.
+
+**Conditional Probability / 条件概率：**
+
+For events $A$ and $B$ (with $\mathbb{P}(B) > 0$):
+$$\mathbb{P}(A \mid B) = \frac{\mathbb{P}(A \cap B)}{\mathbb{P}(B)}$$
+
+**中文解释：** 条件概率$\mathbb{P}(A \mid B)$表示在事件$B$确定发生的情况下，事件$A$发生的概率。注意，我们总是隐含假设条件事件（$B$）的概率严格大于0。
+
+**English explanation:** Conditional probability $\mathbb{P}(A \mid B)$ represents the probability that event $A$ occurs given that event $B$ definitely occurs. Note that we always implicitly assume the conditioning event ($B$) has strictly positive probability.
+
+**Conditional Expectation / 条件期望：**
+
+For a random variable $X$ taking values in state space $\mathcal{S}$ and event $B$ (with $\mathbb{P}(B) > 0$):
+$$\mathbb{E}(X \mid B) = \sum_{s \in \mathcal{S}} s \mathbb{P}(X = s \mid B)$$
+
+**中文解释：** 条件期望$\mathbb{E}(X \mid B)$是在已知事件$B$发生的情况下，随机变量$X$的期望值。注意这是一个数值（number）。
+
+**English explanation:** Conditional expectation $\mathbb{E}(X \mid B)$ is the expected value of random variable $X$ given that event $B$ occurs. Note that this is a number.
+
+**Conditioning on Another Random Variable / 以另一个随机变量为条件：**
+
+We can also condition on some other random variable $Y$, writing $\mathbb{E}(X \mid Y)$. In this case, the conditional expectation is also a random variable representing our "best guess" at $X$ given that we know $Y$.
+
+**中文解释：** 我们也可以以另一个随机变量$Y$为条件，记为$\mathbb{E}(X \mid Y)$。此时条件期望也是一个随机变量，代表在已知$Y$的情况下我们对$X$的"最佳猜测"。
+
+**Formal definition / 形式化定义：**
+
+For the event $B = \{Y = b\}$, we define a function:
+$$f(b) = \mathbb{E}(X \mid Y = b) = \sum_{s \in \mathcal{S}} s \mathbb{P}(X = s \mid Y = b)$$
+
+Then $\mathbb{E}(X \mid Y)$ is the random variable that takes value $\mathbb{E}(X \mid Y = b)$ when $Y = b$, i.e., it is the function $f(Y)$.
+
+**中文解释：** 首先定义函数$f(b)$为给定$Y=b$时$X$的条件期望。然后$\mathbb{E}(X \mid Y)$就是一个随机变量，当$Y=b$时取值为$f(b)$，即$f(Y)$。
+
+##### Worked Example 1.1 / 例题1.1
+
+**Problem / 问题：**
+Let $Z_1, Z_2$ be the outcomes of rolling independent fair dice and $Y = Z_1$, $X = Z_1 + Z_2$. Find $\mathbb{E}(X \mid Y)$.
+
+设$Z_1, Z_2$是独立公平骰子的结果，$Y = Z_1$，$X = Z_1 + Z_2$。求$\mathbb{E}(X \mid Y)$。
+
+**Solution / 解答：**
+
+**Step 1: Intuition / 第一步：直觉理解**
+
+**中文解释：** 我们的最佳猜测是：已知$Y$（第一个骰子的结果），那么$X = Y + Z_2$。由于$Z_2$是独立公平骰子，其期望值为3.5。所以$\mathbb{E}(X \mid Y) = Y + 3.5$。
+
+**English explanation:** Our best guess is: given $Y$ (the result of the first die), then $X = Y + Z_2$. Since $Z_2$ is an independent fair die, its expectation is 3.5. So $\mathbb{E}(X \mid Y) = Y + 3.5$.
+
+**Step 2: Formal derivation / 第二步：形式化推导**
+
+Using linearity of conditional expectation (条件期望的线性性):
+$$\mathbb{E}(X \mid Y) = \mathbb{E}(Z_1 + Z_2 \mid Z_1) = \mathbb{E}(Z_1 \mid Z_1) + \mathbb{E}(Z_2 \mid Z_1)$$
+
+**Step 3: Evaluate each term / 第三步：计算每一项**
+
+**For $\mathbb{E}(Z_1 \mid Z_1)$:**
+- **中文解释：** 如果我们已经知道$Z_1$的值，那么对$Z_1$的"最佳猜测"就是它本身。形式化地，函数$f_1(s) = s$满足$f_1(s) = \mathbb{E}(Z_1 \mid Z_1 = s)$。
+- **English explanation:** If we already know the value of $Z_1$, then our "best guess" for $Z_1$ is itself. Formally, the function $f_1(s) = s$ satisfies $f_1(s) = \mathbb{E}(Z_1 \mid Z_1 = s)$.
+- Therefore: $\mathbb{E}(Z_1 \mid Z_1) = Z_1$
+
+**For $\mathbb{E}(Z_2 \mid Z_1)$:**
+- **中文解释：** $Z_1$和$Z_2$独立，所以知道$Z_1$对猜测$Z_2$没有帮助。最佳猜测就是$Z_2$的无条件期望$\mathbb{E}(Z_2) = 3.5$。
+- **English explanation:** $Z_1$ and $Z_2$ are independent, so knowing $Z_1$ does not help us guess $Z_2$. Our best guess is simply the unconditional expectation $\mathbb{E}(Z_2) = 3.5$.
+- Formally: $f_2(s) = \mathbb{E}(Z_2) = 3.5$ for every $s \in \{1, 2, 3, 4, 5, 6\}$
+- Therefore: $\mathbb{E}(Z_2 \mid Z_1) = \mathbb{E}(Z_2) = 3.5$
+
+**Step 4: Combine / 第四步：合并**
+$$\mathbb{E}(X \mid Y) = Z_1 + 3.5 = Y + 3.5$$
+
+**Final Answer / 最终答案：**
+$$\boxed{\mathbb{E}(X \mid Y) = Y + 3.5}$$
+
+**Key insight / 关键洞察：**
+
+**中文解释：** 另一种理解方式是：我们可以把$Y$当作已知常数，然后像计算普通期望一样计算条件期望。即$\mathbb{E}(X \mid Y) = \mathbb{E}(Y + Z_2 \mid Y) = Y + \mathbb{E}(Z_2) = Y + 3.5$。
+
+**English explanation:** Another way to think of this: we can treat $Y$ as a known constant and then compute the conditional expectation in the same way as we did when conditioning on an event. That is, $\mathbb{E}(X \mid Y) = \mathbb{E}(Y + Z_2 \mid Y) = Y + \mathbb{E}(Z_2) = Y + 3.5$.
+
+---
+
+##### Formal Definition of Markov Property / 马尔可夫性质的形式化定义
+
+**Definition 1.2 (Markov Property / 马尔可夫性质):**
+
+Let $(X_n) = (X_0, X_1, X_2, \ldots)$ be a stochastic process in discrete time $n = 0, 1, 2, \ldots$ and discrete space $\mathcal{S}$. Then we say that $(X_n)$ has the **Markov property** if, for all times $n$ and all states $x_0, x_1, \ldots, x_n, x_{n+1} \in \mathcal{S}$ we have:
+
+$$\mathbb{P}(X_{n+1} = x_{n+1} \mid X_n = x_n, X_{n-1} = x_{n-1}, \ldots, X_0 = x_0) = \mathbb{P}(X_{n+1} = x_{n+1} \mid X_n = x_n)$$
+
+**中文解释：** 设$(X_n)$是一个离散时间、离散状态的随机过程。我们说$(X_n)$具有马尔可夫性质，如果对于所有时间$n$和所有状态$x_0, x_1, \ldots, x_n, x_{n+1} \in \mathcal{S}$，上式成立。
+
+**English explanation:** Let $(X_n)$ be a stochastic process in discrete time and discrete space. We say $(X_n)$ has the Markov property if, for all times $n$ and all states, the above equation holds.
+
+**Meaning of the equation / 等式的含义：**
+
+| 部分 | 中文说明 | English Explanation |
+|------|---------|-------------------|
+| 左边 | 给定整个历史（从$X_0$到$X_n$），下一步到$x_{n+1}$的概率 | Probability of going to $x_{n+1}$ next, conditioned on the entire history |
+| 右边 | 仅给定当前位置$X_n$，下一步到$x_{n+1}$的概率 | Probability of going to $x_{n+1}$ next, conditioned only on where we are now |
+| 等式 | 两者相等 → 历史信息不提供额外价值 | They are equal → history provides no additional information |
+
+**Key insight / 关键洞察：**
+
+**中文解释：** 马尔可夫性质告诉我们：**只有当前位置重要，历史路径不重要**。这使得随机过程的研究大大简化，因为我们只需要追踪当前位置，而可以忘记之前的所有历史。
+
+**English explanation:** The Markov property tells us: **only the current position matters, the historical path does not**. This greatly simplifies the study of stochastic processes, as we only have to keep track of where we are now and can forget about the entire history that came before.
+
+**Continuous time version / 连续时间版本：**
+
+**中文解释：** 对于连续时间过程也有类似的定义，我们将在课程后半部分学习。
+
+**English explanation:** There is a similar definition for continuous time processes, which we will come to later in the course.
+
+---
+
+### 🔗 Connections / 知识关联
+
+**中文解释：** 本章节的内容与课程其他部分紧密相连：
+
+**English explanation:** This section's content is closely connected to other parts of the course:
+
+| 连接方向 | 中文说明 | English Explanation |
+|---------|---------|-------------------|
+| **向前连接** | 下一节将学习最重要的离散时间马尔可夫链示例：**随机游走** | The next section will study the most important example of discrete-time Markov chains: **random walk** |
+| **向后连接** | 条件概率和条件期望是概率论的基础知识 | Conditional probability and expectation are fundamental knowledge from probability theory |
+| **课程后半部分** | 连续时间马尔可夫跳过程是离散时间马尔可夫链的推广 | Continuous-time Markov jump processes are generalizations of discrete-time Markov chains |
+| **后续课程** | 连续时间连续空间的马尔可夫过程（如布朗运动）在MATH3734中学习 | Continuous-time continuous-space Markov processes (like Brownian motion) are studied in MATH3734 |
+
+---
+
+### ⚠️ Common Mistakes / 常见误区
+
+**Mistake 1: Confusing deterministic and stochastic models / 混淆确定性和随机模型**
+
+**中文解释：** 学生常认为"随机模型就是不确定的，所以不好"。实际上，对于复杂系统，随机模型往往更准确，因为它能反映真实世界的不确定性。
+
+**English explanation:** Students often think "stochastic models are uncertain, so they are bad." In reality, for complex systems, stochastic models are often more accurate because they reflect the uncertainty of the real world.
+
+**Mistake 2: Misunderstanding the Markov property / 误解马尔可夫性质**
+
+**中文解释：** 马尔可夫性质不是说"未来独立于过去"，而是说"给定现在，未来条件独立于过去"。现在的位置提供了所有相关信息。
+
+**English explanation:** The Markov property does NOT say "the future is independent of the past." It says "given the present, the future is conditionally independent of the past." The current position provides all relevant information.
+
+**Mistake 3: Forgetting the positivity condition / 忘记概率为正的条件**
+
+**中文解释：** 在写条件概率$\mathbb{P}(A \mid B)$时，总是隐含假设$\mathbb{P}(B) > 0$。如果$\mathbb{P}(B) = 0$，条件概率没有定义。
+
+**English explanation:** When writing conditional probability $\mathbb{P}(A \mid B)$, we always implicitly assume $\mathbb{P}(B) > 0$. If $\mathbb{P}(B) = 0$, the conditional probability

@@ -1255,44 +1255,58 @@ async function sendMessage() {
         // Create assistant bubble for streaming
         const assistantDiv = addMessage('assistant', '', null, true);
 
-        // Read SSE stream
+        // Read SSE stream (throttled DOM updates to avoid freezing on long responses)
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let buffer = '';
         let accumulated = '';
         let sources = null;
+        let streamDone = false;
+        let throttleTimer = null;
 
-        while (true) {
+        function flushBubble() {
+            if (throttleTimer) { clearTimeout(throttleTimer); throttleTimer = null; }
+            updateAssistantBubble(assistantDiv, accumulated, sources, /* skipMath */ true);
+        }
+
+        while (!streamDone) {
             const {done, value} = await reader.read();
             if (done) break;
 
             buffer += decoder.decode(value, {stream: true});
             const lines = buffer.split('\n');
-            buffer = lines.pop();  // keep incomplete line in buffer
+            buffer = lines.pop();
 
             for (const line of lines) {
                 if (!line.startsWith('data: ')) continue;
                 const payload = line.slice(6);
-                if (payload === '[DONE]') break;
+                if (payload === '[DONE]') { streamDone = true; break; }
 
                 try {
                     const data = JSON.parse(payload);
-                    if (data.sources) {
-                        // First message: metadata with sources
+                    if ('sources' in data) {
                         sources = data.sources;
                     } else if (data.token) {
                         accumulated += data.token;
-                        // Update the bubble with accumulated text
-                        updateAssistantBubble(assistantDiv, accumulated, sources);
+                        // Throttle: update DOM at most every 80ms
+                        if (!throttleTimer) {
+                            throttleTimer = setTimeout(flushBubble, 80);
+                        }
                     }
                 } catch (e) {
-                    // Skip malformed JSON
+                    console.warn('[SSE] parse error:', e, 'payload:', payload.slice(0, 100));
                 }
             }
         }
+        reader.cancel();
 
-        // Final render
-        updateAssistantBubble(assistantDiv, accumulated, sources);
+        // Final render with full MathJax
+        if (throttleTimer) { clearTimeout(throttleTimer); throttleTimer = null; }
+        if (!accumulated) {
+            updateAssistantBubble(assistantDiv, '⚠️ 未收到回答，请重试。 / No response received, please try again.', sources);
+        } else {
+            updateAssistantBubble(assistantDiv, accumulated, sources, /* skipMath */ false);
+        }
         // Save to state history
         state.messages.push({role: 'assistant', content: accumulated});
 
@@ -1364,7 +1378,7 @@ function renderSourcesHtml(sources) {
     </div>`;
 }
 
-function updateAssistantBubble(div, content, sources) {
+function updateAssistantBubble(div, content, sources, skipMath) {
     const bubble = div.querySelector('.bubble');
     if (!bubble) return;
     bubble.innerHTML = renderAssistantMarkdown(content) + '<span class="streaming-cursor" style="display:none">▊</span>';
@@ -1377,7 +1391,10 @@ function updateAssistantBubble(div, content, sources) {
         div.querySelector('div:last-child')?.appendChild?.(sourcesContainer.firstElementChild) ||
             div.appendChild(sourcesContainer.firstElementChild);
     }
-    typesetMath(div);
+    // Only run MathJax on final render (skip during streaming to avoid freezing)
+    if (!skipMath) {
+        typesetMath(div);
+    }
     scrollToBottom();
 }
 

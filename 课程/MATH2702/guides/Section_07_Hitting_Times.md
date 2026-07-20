@@ -1,57 +1,64 @@
-# Section 7: Hitting Times
+# Section 7: Hitting times
 
-> MATH2702 Stochastic Processes - 自学教材
-> 生成时间: 2026-07-17 14:48
+> MATH2702 - 自学教材 / Self-Study Guide
+> 生成时间: 2026-07-20 15:39
 > 来源页: 40-43
 
 ---
 
 # MATH2702: Markov Chains and Random Processes
+
 ## Section 7: Hitting Times / 击中时间
 
 ---
 
 ### 📋 Section Overview / 章节概览
 
-This section introduces the concept of **hitting times (击中时间)** for Markov chains. We study:
-- The **probability** that a Markov chain ever reaches a particular state or set of states
-- The **expected time** it takes to reach those states
-- **Return times** - the time to come back to a starting state
-- Application to the **simple random walk (简单随机游走)**
+**中文解释：**
+本章节研究马尔可夫链中一个核心问题：从某个起始状态出发，需要多长时间才能首次到达某个目标状态或状态集合？以及到达的概率是多少？这些问题在赌博破产问题、排队论、网络分析等领域都有重要应用。我们将学习如何通过"首次步条件化"（conditioning on the first step）的方法来求解击中概率和期望击中时间，并特别分析简单随机游走的返回性质。
 
-**Why this matters**: Hitting times are fundamental to understanding:
-- Gambler's ruin problems (already introduced in Section 3)
-- Absorption probabilities in Markov chains
-- Whether states are visited infinitely often or only finitely many times
-- Long-run behavior of Markov chains
+**English explanation:**
+This section investigates a core question in Markov chains: starting from a given state, how long does it take to first reach a target state or set of states? And what is the probability of ever reaching it? These questions have important applications in gambler's ruin problems, queueing theory, network analysis, and many other fields. We will learn how to find hitting probabilities and expected hitting times using the method of "conditioning on the first step," and specifically analyze the return properties of simple random walks.
 
 ---
 
 ### 🎯 Learning Objectives / 学习目标
 
-By the end of this section, you should be able to:
+完成本章学习后，你应该能够：
 
-1. **Define** hitting probability ℎ𝑖𝐴 and expected hitting time 𝜂𝑖𝐴 for a Markov chain
-2. **Set up and solve** equations for hitting probabilities by conditioning on the first step
-3. **Set up and solve** equations for expected hitting times by conditioning on the first step
-4. **Calculate** return probability 𝑚𝑖 and expected return time 𝜇𝑖
-5. **Apply** these methods to the simple random walk
-6. **Interpret** the results for symmetric vs. asymmetric random walks
+1. **定义** 击中概率、期望击中时间、返回概率和期望返回时间，并理解它们之间的区别
+2. **应用** 首次步条件化方法建立关于击中概率和期望击中时间的方程
+3. **求解** 由条件化方法得到的线性方程组，计算具体的击中概率和期望击中时间
+4. **分析** 简单随机游走的击中概率和返回性质，理解对称与非对称随机游走的本质区别
+5. **解释** 为什么对称随机游走的返回概率为1但期望返回时间为无穷大
+
+**English objectives:**
+After completing this section, you should be able to:
+1. **Define** hitting probability, expected hitting time, return probability, and expected return time, and understand their differences
+2. **Apply** the conditioning on the first step method to set up equations for hitting probabilities and expected hitting times
+3. **Solve** the resulting systems of linear equations to compute specific hitting probabilities and expected hitting times
+4. **Analyze** the hitting probabilities and return properties of simple random walks, understanding the fundamental difference between symmetric and asymmetric walks
+5. **Explain** why the symmetric random walk has return probability 1 but infinite expected return time
 
 ---
 
 ### 📚 Prerequisites / 前置知识
 
-Before studying this section, you should be comfortable with:
+在开始本章之前，请确保你熟悉以下内容：
 
-| Topic | Details |
-|-------|---------|
-| **Markov chains basics** | State space, transition matrix, Markov property |
-| **Conditional probability** | ℙ(𝐴|𝐵) and the law of total probability |
-| **Expectation** | 𝔼(𝑋) and conditional expectation |
-| **Gambler's ruin** | From Section 3 - the method of conditioning on first step |
-| **Simple random walk** | Definition: 𝑋𝑛 = 𝑋₀ + ∑ᵢ₌₁ⁿ 𝑌ᵢ where ℙ(𝑌ᵢ=1)=𝑝, ℙ(𝑌ᵢ=-1)=𝑞=1-𝑝 |
-| **Solving equations** | Linear equations, quadratic equations |
+**中文解释：**
+- **马尔可夫链的基本概念**：状态空间、转移概率、转移矩阵
+- **条件概率和全概率公式**：特别是条件化于第一次转移
+- **条件期望**：理解条件期望的含义和计算方法
+- **简单随机游走**：定义和基本性质
+- **赌博破产问题**：第3节的内容，因为本章是这些思想的推广
+
+**English explanation:**
+- **Basic concepts of Markov chains**: state space, transition probabilities, transition matrix
+- **Conditional probability and law of total probability**: especially conditioning on the first step
+- **Conditional expectation**: understanding its meaning and computation
+- **Simple random walk**: definition and basic properties
+- **Gambler's ruin problem**: content from Section 3, as this section generalizes those ideas
 
 ---
 
@@ -59,438 +66,340 @@ Before studying this section, you should be comfortable with:
 
 ---
 
-#### Topic 1: Hitting Probabilities and Expected Hitting Times / 击中概率和期望击中时间
+#### Topic 7.1: Hitting Probabilities and Expected Hitting Times / 击中概率与期望击中时间
 
 ##### Intuition / 直觉理解
 
-Imagine you are lost in a city (the state space 𝒮). You want to reach a specific destination (the set 𝐴). 
+**中文解释：**
+想象你在一个城市的地铁系统中随机游走。你想知道从当前车站出发，最终到达某个特定车站（比如市中心）的概率有多大？以及平均需要多少站才能到达？这就是"击中概率"和"期望击中时间"要回答的问题。
 
-- **Hitting probability (击中概率)** ℎ𝑖𝐴: Starting from your current location 𝑖, what is the probability you will EVER reach your destination?
-- **Expected hitting time (期望击中时间)** 𝜂𝑖𝐴: Starting from 𝑖, how long (on average) will it take you to reach your destination?
+关键思想是：我们可以通过"条件化于第一步"来建立方程。也就是说，我们考虑第一步走到哪里，然后利用马尔可夫性质（未来只依赖于当前状态），将问题转化为从新状态出发的类似问题。这样我们就得到了一个关于未知击中概率的方程（或方程组）。
 
-The key insight: **We can figure this out by considering just ONE step**. After taking one step, we are in a new state, and the problem "starts over" from that new state. This is the **Markov property (马尔可夫性)** - the future depends only on the present, not the past.
+**English explanation:**
+Imagine you're randomly wandering in a city's subway system. You want to know: starting from your current station, what's the probability of eventually reaching a specific station (like the city center)? And on average, how many stops will it take? These are the questions that "hitting probability" and "expected hitting time" answer.
+
+The key idea is: we can set up equations by "conditioning on the first step." That is, we consider where the first step takes us, and then use the Markov property (the future depends only on the current state) to transform the problem into a similar problem starting from the new state. This gives us an equation (or system of equations) for the unknown hitting probability.
 
 ##### Formal Definition / 形式化定义
 
-**Definition 7.1 (Hitting Time / 击中时间)**
+**Definition 7.1 (Hitting Time / 击中时间).** Let $(X_n)$ be a Markov chain on state space $\mathcal{S}$. Let $H_A$ be a random variable representing the hitting time to hit the set $A \subset \mathcal{S}$, given by
 
-Let (𝑋ₙ) be a Markov chain on state space 𝒮 (状态空间). Let 𝐻_𝐴 be a random variable (随机变量) representing the **hitting time** to hit the set 𝐴 ⊂ 𝒮, given by:
+$$H_A = \min\{n \in \{0, 1, 2, \ldots\} : X_n \in A\}$$
 
-𝐻_𝐴 = min{𝑛 ∈ {0,1,2,…} : 𝑋ₙ ∈ 𝐴}
+**中文解释：**
+$H_A$ 是首次进入集合 $A$ 的时间（步数）。如果链条永远不进入 $A$，则 $H_A = \infty$。最常见的特殊情况是 $A = \{j\}$ 只包含一个状态，此时记 $H_j = \min\{n \in \{0, 1, 2, \ldots\} : X_n = j\}$。
 
-Where:
-- **𝐻_𝐴** = the first time (smallest n) that the chain enters set A
-- **min** = minimum (最小值)
-- **𝑛** = time step (时间步)
-- **{0,1,2,…}** = non-negative integers (非负整数)
-- **𝑋ₙ** = the state of the chain at time n
-- **∈** = belongs to (属于)
-- **𝐴** = the target set of states (目标状态集合)
-- **⊂** = subset of (子集)
+**English explanation:**
+$H_A$ is the first time (number of steps) the chain enters set $A$. If the chain never enters $A$, then $H_A = \infty$. The most common special case is $A = \{j\}$ containing a single state, in which case we write $H_j = \min\{n \in \{0, 1, 2, \ldots\} : X_n = j\}$.
 
-**Convention (约定)**: 𝐻_𝐴 = ∞ if 𝑋ₙ ∉ 𝐴 for all 𝑛 (the chain never hits A)
+**Definition (Hitting Probability / 击中概率).** The hitting probability $h_i^A$ of set $A$ starting from state $i$ is
 
-**Most common case**: 𝐴 = {𝑗} is a single state, so:
+$$h_i^A = \mathbb{P}(X_n \in A \text{ for some } n \geq 0 \mid X_0 = i) = \mathbb{P}(H_A < \infty \mid X_0 = i)$$
 
-𝐻ⱼ = min{𝑛 ∈ {0,1,2,…} : 𝑋ₙ = 𝑗}
+**中文解释：**
+$h_i^A$ 是从状态 $i$ 出发，最终会进入集合 $A$ 的概率。当 $A = \{j\}$ 时，记 $h_{ij}$ 为从 $i$ 出发击中 $j$ 的概率。
 
-**Definition (Hitting Probability / 击中概率)**
+**English explanation:**
+$h_i^A$ is the probability that, starting from state $i$, the chain will eventually enter set $A$. When $A = \{j\}$, we write $h_{ij}$ for the probability of hitting $j$ starting from $i$.
 
-The **hitting probability** ℎᵢᴬ of the set 𝐴 starting from state 𝑖 is:
+**Definition (Expected Hitting Time / 期望击中时间).** The expected hitting time $\eta_i^A$ of set $A$ starting from state $i$ is
 
-ℎᵢᴬ = ℙ(𝑋ₙ ∈ 𝐴 for some 𝑛 ≥ 0 | 𝑋₀ = 𝑖) = ℙ(𝐻_𝐴 < ∞ | 𝑋₀ = 𝑖)
+$$\eta_i^A = \mathbb{E}(H_A \mid X_0 = i)$$
 
-Where:
-- **ℎᵢᴬ** = probability of ever hitting set A starting from state i
-- **ℙ** = probability (概率)
-- **𝑋ₙ ∈ 𝐴 for some 𝑛 ≥ 0** = the chain is in A at some time n (including n=0)
-- **|** = given that (给定)
-- **𝑋₀ = 𝑖** = the chain starts in state i
-- **𝐻_𝐴 < ∞** = the hitting time is finite (we actually hit A)
+**中文解释：**
+$\eta_i^A$ 是从状态 $i$ 出发，首次进入集合 $A$ 所需的平均步数。显然，只有当 $h_i^A = 1$（即一定能击中）时，$\eta_i^A$ 才可能是有限的。
 
-**Most common case**: ℎᵢⱼ = hitting probability of state j starting from state i
+**English explanation:**
+$\eta_i^A$ is the expected number of steps to first enter set $A$, starting from state $i$. Clearly, $\eta_i^A$ can only be finite if $h_i^A = 1$ (i.e., hitting is certain).
 
-**Definition (Expected Hitting Time / 期望击中时间)**
+**Summary Table / 符号总结表：**
 
-The **expected hitting time** 𝜂ᵢᴬ of the set 𝐴 starting from state 𝑖 is:
-
-𝜂ᵢᴬ = 𝔼(𝐻_𝐴 | 𝑋₀ = 𝑖)
-
-Where:
-- **𝜂ᵢᴬ** = expected (average) time to hit set A starting from state i
-- **𝔼** = expectation (期望)
-- **𝐻_𝐴** = the hitting time random variable
-
-**Important**: 𝜂ᵢᴬ can only be finite if ℎᵢᴬ = 1 (if we are certain to hit A eventually)
-
-**Summary**:
-- **ℎᵢⱼ** = probability we hit state j starting from state i
-- **𝜂ᵢⱼ** = expected time until we hit state j starting from state i
+| Symbol | Meaning (English) | 含义（中文） |
+|--------|-------------------|--------------|
+| $H_A$ | Hitting time of set $A$ | 击中集合 $A$ 的时间 |
+| $H_j$ | Hitting time of state $j$ | 击中状态 $j$ 的时间 |
+| $h_i^A$ | Hitting probability of $A$ from $i$ | 从 $i$ 出发击中 $A$ 的概率 |
+| $h_{ij}$ | Hitting probability of $j$ from $i$ | 从 $i$ 出发击中 $j$ 的概率 |
+| $\eta_i^A$ | Expected hitting time of $A$ from $i$ | 从 $i$ 出发击中 $A$ 的期望时间 |
+| $\eta_{ij}$ | Expected hitting time of $j$ from $i$ | 从 $i$ 出发击中 $j$ 的期望时间 |
 
 ##### Key Properties / 关键性质
 
-**General Formula for Hitting Probabilities (by conditioning on first step)**:
+**中文解释：**
+击中概率和期望击中时间可以通过"条件化于第一步"来求解。基本思想是：从状态 $i$ 出发，第一步走到某个状态 $j$ 的概率是 $p_{ij}$，然后从 $j$ 出发的问题与原问题结构相同。利用全概率公式，我们可以建立方程。
 
-ℎᵢᴬ = { ∑ⱼ∈𝒮 𝑝ᵢⱼ ℎⱼᴬ if 𝑖 ∉ 𝐴
-       { 1 if 𝑖 ∈ 𝐴
+**English explanation:**
+Hitting probabilities and expected hitting times can be found by "conditioning on the first step." The basic idea is: starting from state $i$, the first step goes to state $j$ with probability $p_{ij}$, and then the problem from $j$ has the same structure as the original problem. Using the law of total probability, we can set up equations.
 
-Where:
-- **𝑝ᵢⱼ** = transition probability from state i to state j (转移概率)
-- **∑ⱼ∈𝒮** = sum over all states j in the state space
-- **𝑖 ∉ 𝐴** = i is NOT in the target set
-- **𝑖 ∈ 𝐴** = i IS in the target set (we're already there!)
+**General Formula for Hitting Probabilities / 击中概率的一般公式：**
 
-**Important**: If these equations have multiple solutions, the hitting probabilities are the **smallest non-negative solutions (最小非负解)**.
+$$h_i^A = \begin{cases}
+\sum_{j \in \mathcal{S}} p_{ij} h_j^A & \text{if } i \notin A \\
+1 & \text{if } i \in A
+\end{cases}$$
 
-**General Formula for Expected Hitting Times**:
+**中文解释：**
+- 如果 $i \notin A$（起始状态不在目标集合中），则 $h_i^A = \sum_j p_{ij} h_j^A$。这意味着：第一步走到 $j$ 的概率乘以从 $j$ 出发击中 $A$ 的概率，对所有可能的 $j$ 求和。
+- 如果 $i \in A$（起始状态已经在目标集合中），则 $h_i^A = 1$，因为我们已经"击中"了。
 
-𝜂ᵢᴬ = { 1 + ∑ⱼ∈𝒮 𝑝ᵢⱼ 𝜂ⱼᴬ if 𝑖 ∉ 𝐴
-       { 0 if 𝑖 ∈ 𝐴
+**Important Note / 重要说明：** 如果这些方程有多个解，那么击中概率实际上是最小的非负解（the smallest non-negative solution）。
 
-Where:
-- **1** accounts for the time taken by the first step
-- **∑ⱼ∈𝒮 𝑝ᵢⱼ 𝜂ⱼᴬ** = expected remaining time after the first step
+**English explanation:**
+- If $i \notin A$ (starting state is not in the target set), then $h_i^A = \sum_j p_{ij} h_j^A$. This means: sum over all possible $j$ of (probability of first step to $j$) × (probability of hitting $A$ from $j$).
+- If $i \in A$ (starting state is already in the target set), then $h_i^A = 1$, because we have already "hit" it.
 
-Again, if multiple solutions exist, take the **smallest non-negative solution**.
+**General Formula for Expected Hitting Times / 期望击中时间的一般公式：**
 
-##### Worked Examples / 例题
+$$\eta_i^A = \begin{cases}
+1 + \sum_{j \in \mathcal{S}} p_{ij} \eta_j^A & \text{if } i \notin A \\
+0 & \text{if } i \in A
+\end{cases}$$
 
-**Example 7.1: Finding Hitting Probability**
+**中文解释：**
+- 如果 $i \notin A$，则 $\eta_i^A = 1 + \sum_j p_{ij} \eta_j^A$。这里的"1"代表第一步花费的时间，然后加上从新状态出发的期望剩余时间。
+- 如果 $i \in A$，则 $\eta_i^A = 0$，因为我们已经到达了。
 
-Consider a Markov chain with transition matrix:
+**English explanation:**
+- If $i \notin A$, then $\eta_i^A = 1 + \sum_j p_{ij} \eta_j^A$. The "1" accounts for the time taken by the first step, plus the expected remaining time from the new state.
+- If $i \in A$, then $\eta_i^A = 0$, because we have already arrived.
 
-P = ⎛⎜⎜⎜⎝
-1/5  1/5  1/5  2/5
-0    1    0    0
-0    1/2  0    1/2
-0    0    0    1
-⎞⎟⎟⎟⎠
+##### Worked Example 7.1: Hitting Probability / 例题7.1：击中概率
 
-**Question**: Calculate the probability that the chain is absorbed at state 2 when started from state 1.
+**Problem / 问题：** Consider a Markov chain with transition matrix
 
-**Solution**:
+$$P = $$
+\begin{pmatrix}
+\frac{1}{5} & \frac{1}{5} & \frac{1}{5} & \frac{2}{5} \\
+0 & 1 & 0 & 0 \\
+\frac{1}{2} & 0 & \frac{1}{2} & 0 \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+$$$$
 
-**Step 1: Identify what we need**
-We need ℎ₁₂ = probability of hitting state 2 starting from state 1.
+Calculate the probability that the chain is absorbed at state 2 when started from state 1. / 计算从状态1出发，链条最终被状态2吸收的概率。
 
-**Step 2: Set up the equation by conditioning on the first step**
+**Solution / 解答：**
 
-ℎ₁₂ = 𝑝₁₁ℎ₁₂ + 𝑝₁₂ℎ₂₂ + 𝑝₁₃ℎ₃₂ + 𝑝₁₄ℎ₄₂
+**Step 1: Identify what we need / 第一步：确定我们需要什么**
 
-Where:
-- **𝑝₁₁** = 1/5 = probability of staying at state 1
-- **𝑝₁₂** = 1/5 = probability of moving to state 2
-- **𝑝₁₃** = 1/5 = probability of moving to state 3
-- **𝑝₁₄** = 2/5 = probability of moving to state 4
+We need $h_{12}$, the hitting probability of state 2 starting from state 1. / 我们需要 $h_{12}$，即从状态1出发击中状态2的概率。
 
-So: ℎ₁₂ = (1/5)ℎ₁₂ + (1/5)ℎ₂₂ + (1/5)ℎ₃₂ + (2/5)ℎ₄₂
+**Step 2: Set up equations by conditioning on the first step / 第二步：通过条件化于第一步建立方程**
 
-**Step 3: Find the other hitting probabilities**
+**中文解释：**
+从状态1出发，第一步有四种可能：
+- 以概率 $p_{11} = 1/5$ 留在状态1，然后问题重新开始，击中概率仍为 $h_{12}$
+- 以概率 $p_{12} = 1/5$ 到达状态2，此时已经击中，概率为 $h_{22}$
+- 以概率 $p_{13} = 1/5$ 到达状态3，然后从状态3出发，击中概率为 $h_{32}$
+- 以概率 $p_{14} = 2/5$ 到达状态4，然后从状态4出发，击中概率为 $h_{42}$
 
-- **ℎ₂₂** = 1 (we are already at state 2, so we've hit it!)
-- **ℎ₄₂** = 0 (state 4 is absorbing - once we enter it, we never leave, and it's not state 2)
+**English explanation:**
+Starting from state 1, the first step has four possibilities:
+- With probability $p_{11} = 1/5$, stay at state 1, then the problem restarts with hitting probability $h_{12}$
+- With probability $p_{12} = 1/5$, reach state 2, already hit, probability $h_{22}$
+- With probability $p_{13} = 1/5$, reach state 3, then hitting probability from state 3 is $h_{32}$
+- With probability $p_{14} = 2/5$, reach state 4, then hitting probability from state 4 is $h_{42}$
 
-For ℎ₃₂, condition on the first step from state 3:
-ℎ₃₂ = 𝑝₃₂ℎ₂₂ + 𝑝₃₄ℎ₄₂
-     = (1/2)(1) + (1/2)(0)
-     = 1/2
+Using the law of total probability / 使用全概率公式：
 
-**Step 4: Substitute back**
+$$h_{12} = p_{11}h_{12} + p_{12}h_{22} + p_{13}h_{32} + p_{14}h_{42}$$
 
-ℎ₁₂ = (1/5)ℎ₁₂ + (1/5)(1) + (1/5)(1/2) + (2/5)(0)
-     = (1/5)ℎ₁₂ + 1/5 + 1/10
-     = (1/5)ℎ₁₂ + 3/10
+$$h_{12} = \frac{1}{5}h_{12} + \frac{1}{5}h_{22} + \frac{1}{5}h_{32} + \frac{2}{5}h_{42}$$
 
-**Step 5: Solve for ℎ₁₂**
+**Step 3: Find the other hitting probabilities / 第三步：找出其他击中概率**
 
-ℎ₁₂ - (1/5)ℎ₁₂ = 3/10
-(4/5)ℎ₁₂ = 3/10
-ℎ₁₂ = (3/10)(5/4) = 15/40 = 3/8
+**中文解释：**
+我们需要 $h_{22}$、$h_{32}$ 和 $h_{42}$。
 
-**Answer**: ℎ₁₂ = 3/8
+- $h_{22} = 1$：因为状态2是吸收态，从状态2出发已经"在"状态2了。
+- $h_{42} = 0$：因为状态4是吸收态，且状态4不会转移到状态2（从转移矩阵看，状态4只能留在状态4）。
+- $h_{32}$：需要从状态3出发，条件化于第一步。
+
+**English explanation:**
+We need $h_{22}$, $h_{32}$, and $h_{42}$.
+
+- $h_{22} = 1$: Because state 2 is absorbing, starting from state 2 we are "already there."
+- $h_{42} = 0$: Because state 4 is absorbing and state 4 cannot transition to state 2 (from the transition matrix, state 4 only stays at state 4).
+- $h_{32}$: Need to condition on the first step from state 3.
+
+For $h_{32}$ / 对于 $h_{32}$：
+
+$$h_{32} = p_{32}h_{22} + p_{34}h_{42} = \frac{1}{2}h_{22} + \frac{1}{2}h_{42} = \frac{1}{2} \times 1 + \frac{1}{2} \times 0 = \frac{1}{2}$$
+
+**Step 4: Substitute back / 第四步：代入回原方程**
+
+**中文解释：**
+将 $h_{22} = 1$，$h_{32} = 1/2$，$h_{42} = 0$ 代入方程：
+
+$$h_{12} = \frac{1}{5}h_{12} + \frac{1}{5} \times 1 + \frac{1}{5} \times \frac{1}{2} + \frac{2}{5} \times 0$$
+
+$$h_{12} = \frac{1}{5}h_{12} + \frac{1}{5} + \frac{1}{10}$$
+
+$$h_{12} = \frac{1}{5}h_{12} + \frac{3}{10}$$
+
+**English explanation:**
+Substituting $h_{22} = 1$, $h_{32} = 1/2$, $h_{42} = 0$ into the equation:
+
+$$h_{12} = \frac{1}{5}h_{12} + \frac{1}{5} \times 1 + \frac{1}{5} \times \frac{1}{2} + \frac{2}{5} \times 0$$
+
+$$h_{12} = \frac{1}{5}h_{12} + \frac{1}{5} + \frac{1}{10}$$
+
+$$h_{12} = \frac{1}{5}h_{12} + \frac{3}{10}$$
+
+**Step 5: Solve for $h_{12}$ / 第五步：解出 $h_{12}$**
+
+$$h_{12} - \frac{1}{5}h_{12} = \frac{3}{10}$$
+
+$$\frac{4}{5}h_{12} = \frac{3}{10}$$
+
+$$h_{12} = \frac{3}{10} \times \frac{5}{4} = \frac{15}{40} = \frac{3}{8}$$
+
+**Answer / 答案：** $h_{12} = \frac{3}{8}$
+
+**中文解释：**
+从状态1出发，最终被状态2吸收的概率是3/8。注意这个概率小于1，因为有可能被状态4吸收（概率为5/8）。
+
+**English explanation:**
+Starting from state 1, the probability of eventually being absorbed at state 2 is 3/8. Note this probability is less than 1, because there is a possibility of being absorbed at state 4 (probability 5/8).
+
+##### Worked Example 7.2: Expected Hitting Time / 例题7.2：期望击中时间
+
+**Problem / 问题：** Consider the simple no-claims discount chain from Lecture 5, with transition matrix
+
+$$P = $$
+\begin{pmatrix}
+\frac{1}{4} & \frac{3}{4} & 0 \\
+\frac{1}{4} & 0 & \frac{3}{4} \\
+0 & \frac{1}{4} & \frac{3}{4}
+\end{pmatrix}
+$$$$
+
+Given we start in state 1 (no discount), find the expected amount of time until we reach state 3 (50% discount). / 假设我们从状态1（无折扣）出发，求到达状态3（50%折扣）的期望时间。
+
+**Solution / 解答：**
+
+**Step 1: Identify what we need / 第一步：确定我们需要什么**
+
+We need $\eta_{13}$, the expected hitting time of state 3 starting from state 1. / 我们需要 $\eta_{13}$，即从状态1出发击中状态3的期望时间。
+
+**Step 2: Set up equations / 第二步：建立方程**
+
+**中文解释：**
+首先，显然 $\eta_{33} = 0$，因为从状态3出发已经到达了目标。对于其他状态，我们条件化于第一步。
+
+**English explanation:**
+First, clearly $\eta_{33} = 0$, because starting from state 3 we have already reached the target. For other states, we condition on the first step.
+
+For $\eta_{13}$ / 对于 $\eta_{13}$：
+
+$$\eta_{13} = 1 + p_{11}\eta_{13} + p_{12}\eta_{23} + p_{13}\eta_{33}$$
+
+$$\eta_{13} = 1 + \frac{1}{4}\eta_{13} + \frac{3}{4}\eta_{23} + 0 \times \eta_{33}$$
+
+$$\eta_{13} = 1 + \frac{1}{4}\eta_{13} + \frac{3}{4}\eta_{23}$$
+
+Rearranging / 整理：
+
+$$\eta_{13} - \frac{1}{4}\eta_{13} = 1 + \frac{3}{4}\eta_{23}$$
+
+$$\frac{3}{4}\eta_{13} - \frac{3}{4}\eta_{23} = 1$$
+
+For $\eta_{23}$ / 对于 $\eta_{23}$：
+
+$$\eta_{23} = 1 + p_{21}\eta_{13} + p_{22}\eta_{23} + p_{23}\eta_{33}$$
+
+$$\eta_{23} = 1 + \frac{1}{4}\eta_{13} + 0 \times \eta_{23} + \frac{3}{4} \times 0$$
+
+$$\eta_{23} = 1 + \frac{1}{4}\eta_{13}$$
+
+Rearranging / 整理：
+
+$$-\frac{1}{4}\eta_{13} + \eta_{23} = 1$$
+
+**Step 3: Solve the system of equations / 第三步：解方程组**
+
+**中文解释：**
+我们有两个方程：
+(1) $\frac{3}{4}\eta_{13} - \frac{3}{4}\eta_{23} = 1$
+(2) $-\frac{1}{4}\eta_{13} + \eta_{23} = 1$
+
+我们可以用代入法或消元法。这里用消元法：将方程(2)乘以3/4，然后加到方程(1)上。
+
+**English explanation:**
+We have two equations:
+(1) $\frac{3}{4}\eta_{13} - \frac{3}{4}\eta_{23} = 1$
+(2) $-\frac{1}{4}\eta_{13} + \eta_{23} = 1$
+
+We can use substitution or elimination. Here we use elimination: multiply equation (2) by 3/4 and add to equation (1).
+
+Equation (2) × 3/4 / 方程(2)乘以3/4：
+
+$$-\frac{3}{16}\eta_{13} + \frac{3}{4}\eta_{23} = \frac{3}{4}$$
+
+Add to equation (1) / 加到方程(1)：
+
+$$\left(\frac{3}{4} - \frac{3}{16}\right)\eta_{13} + \left(-\frac{3}{4} + \frac{3}{4}\right)\eta_{23} = 1 + \frac{3}{4}$$
+
+$$\left(\frac{12}{16} - \frac{3}{16}\right)\eta_{13} = \frac{7}{4}$$
+
+$$\frac{9}{16}\eta_{13} = \frac{7}{4} = \frac{28}{16}$$
+
+$$\eta_{13} = \frac{28}{9} \approx 3.11$$
+
+**Answer / 答案：** $\eta_{13} = \frac{28}{9} \approx 3.11$
+
+**中文解释：**
+从状态1出发，平均需要约3.11步才能到达状态3。注意这个期望时间是有穷的，因为从任何状态出发最终都能到达状态3（链条是不可约的）。
+
+**English explanation:**
+Starting from state 1, on average it takes about 3.11 steps to reach state 3. Note this expected time is finite because from any state we can eventually reach state 3 (the chain is irreducible).
 
 ---
 
-**Example 7.2: Finding Expected Hitting Time**
-
-Consider the simple no-claims discount chain with transition matrix:
-
-P = ⎛⎜⎝
-1/4  3/4  0
-1/4  0    3/4
-0    1/4  3/4
-⎞⎟⎠
-
-States: 1 = no discount, 2 = 25% discount, 3 = 50% discount
-
-**Question**: Given we start in state 1 (no discount), find the expected amount of time until we reach state 3 (50% discount).
-
-**Solution**:
-
-**Step 1: Identify what we need**
-We need 𝜂₁₃ = expected time to hit state 3 starting from state 1.
-
-**Step 2: Set up equations for all 𝜂ᵢ₃**
-
-- **𝜂₃₃** = 0 (we're already at state 3)
-
-For 𝜂₁₃, condition on first step:
-𝜂₁₃ = 1 + 𝑝₁₁𝜂₁₃ + 𝑝₁₂𝜂₂₃ + 𝑝₁₃𝜂₃₃
-     = 1 + (1/4)𝜂₁₃ + (3/4)𝜂₂₃ + (0)(0)
-     = 1 + (1/4)𝜂₁₃ + (3/4)𝜂₂₃
-
-Rearranging: 𝜂₁₃ - (1/4)𝜂₁₃ - (3/4)𝜂₂₃ = 1
-(3/4)𝜂₁₃ - (3/4)𝜂₂₃ = 1  ... Equation (1)
-
-For 𝜂₂₃, condition on first step:
-𝜂₂₃ = 1 + 𝑝₂₁𝜂₁₃ + 𝑝₂₂𝜂₂₃ + 𝑝₂₃𝜂₃₃
-     = 1 + (1/4)𝜂₁₃ + (0)𝜂₂₃ + (3/4)(0)
-     = 1 + (1/4)𝜂₁₃
-
-Rearranging: 𝜂₂₃ - (1/4)𝜂₁₃ = 1
--(1/4)𝜂₁₃ + 𝜂₂₃ = 1  ... Equation (2)
-
-**Step 3: Solve the system of equations**
-
-From Equation (2): 𝜂₂₃ = 1 + (1/4)𝜂₁₃
-
-Substitute into Equation (1):
-(3/4)𝜂₁₃ - (3/4)[1 + (1/4)𝜂₁₃] = 1
-(3/4)𝜂₁₃ - 3/4 - (3/16)𝜂₁₃ = 1
-(12/16)𝜂₁₃ - (3/16)𝜂₁₃ = 1 + 3/4
-(9/16)𝜂₁₃ = 7/4 = 28/16
-𝜂₁₃ = 28/9 ≈ 3.11
-
-**Answer**: 𝜂₁₃ = 28/9 ≈ 3.11 time steps
-
----
-
-#### Topic 2: Return Times / 返回时间
+#### Topic 7.2: Return Times / 返回时间
 
 ##### Intuition / 直觉理解
 
-When we talk about hitting a state FROM ITSELF, the definitions above give:
-- ℎᵢᵢ = 1 (we're already there!)
-- 𝜂ᵢᵢ = 0 (it takes no time)
+**中文解释：**
+对于击中概率 $h_{ii}$ 和期望击中时间 $\eta_{ii}$，从状态 $i$ 出发击中状态 $i$ 的概率总是1（因为一开始就在那里），期望时间总是0。这显然没有提供有用信息。因此我们引入"返回时间"的概念：从状态 $i$ 出发，**第一次回到**状态 $i$ 的时间（不包括初始时刻 $n=0$）。
 
-These are trivial. Instead, we ask: **After leaving state i, when do we come back?**
-
-Think of it like leaving your house in the morning. The "return time" is when you come back home, not counting the moment you left.
+**English explanation:**
+For hitting probability $h_{ii}$ and expected hitting time $\eta_{ii}$, starting from state $i$, the probability of hitting state $i$ is always 1 (we start there) and the expected time is always 0. This clearly provides no useful information. So we introduce the concept of "return time": starting from state $i$, the **first time we come back** to state $i$ (excluding the initial time $n=0$).
 
 ##### Formal Definition / 形式化定义
 
-**Definition (Return Time / 返回时间)**
+**Definition (Return Time / 返回时间).** Let $M_i$ be the return time to state $i$, defined as
 
-Let 𝑀ᵢ be the **return time** to state i:
+$$M_i = \min\{n \in \{1, 2, \ldots\} : X_n = i\}$$
 
-𝑀ᵢ = min{𝑛 ∈ {1,2,…} : 𝑋ₙ = 𝑖}
+**中文解释：**
+注意 $M_i$ 只考虑 $n = 1, 2, \ldots$，不包括 $n = 0$。所以 $M_i$ 是第一次真正"回来"的时间。
 
-**Important**: This only considers times 𝑛 = 1,2,… (not including 𝑛 = 0). So it's the NEXT time we come back after the starting time.
+**English explanation:**
+Note that $M_i$ only considers $n = 1, 2, \ldots$, not including $n = 0$. So $M_i$ is the first time we actually "come back."
 
-**Definition (Return Probability / 返回概率)**
+**Definition (Return Probability / 返回概率).** The return probability $m_i$ is
 
-The **return probability** 𝑚ᵢ to state i is:
+$$m_i = \mathbb{P}(X_n = i \text{ for some } n \geq 1 \mid X_0 = i) = \mathbb{P}(M_i < \infty \mid X_0 = i)$$
 
-𝑚ᵢ = ℙ(𝑋ₙ = 𝑖 for some 𝑛 ≥ 1 | 𝑋₀ = 𝑖) = ℙ(𝑀ᵢ < ∞ | 𝑋₀ = 𝑖)
+**Definition (Expected Return Time / 期望返回时间).** The expected return time $\mu_i$ is
 
-Where:
-- **𝑚ᵢ** = probability of ever returning to state i after leaving it
-- **𝑛 ≥ 1** = at least one step has been taken
-- **𝑀ᵢ < ∞** = the return time is finite (we actually return)
-
-**Definition (Expected Return Time / 期望返回时间)**
-
-The **expected return time** 𝜇ᵢ to state i is:
-
-𝜇ᵢ = 𝔼(𝑀ᵢ | 𝑋₀ = 𝑖)
+$$\mu_i = \mathbb{E}(M_i \mid X_0 = i)$$
 
 ##### Key Properties / 关键性质
 
-**General Formulas for Return Quantities**:
+**中文解释：**
+返回概率和期望返回时间也可以通过条件化于第一步来求解。一般公式为：
 
-By conditioning on the first step:
+$$m_i = \sum_{j \in \mathcal{S}} p_{ij} h_{ji}$$
 
-𝑚ᵢ = ∑ⱼ∈𝒮 𝑝ᵢⱼ ℎⱼᵢ
+$$\mu_i = 1 + \sum_{j \in \mathcal{S}} p_{ij} \eta_{ji}$$
 
-𝜇ᵢ = 1 + ∑ⱼ∈𝒮 𝑝ᵢⱼ 𝜂ⱼᵢ
+其中 $h_{ji}$ 和 $\eta_{ji}$ 是从状态 $j$ 出发击中状态 $i$ 的击中概率和期望击中时间。
 
-Where:
-- **𝑝ᵢⱼ** = probability of moving from i to j in the first step
-- **ℎⱼᵢ** = hitting probability of state i starting from state j
-- **𝜂ⱼᵢ** = expected hitting time of state i starting from state j
-- The **1** accounts for the first step itself
+**English explanation:**
+Return probability and expected return time can also be found by conditioning on the first step. The general formulas are:
 
-Again, take the **minimal non-negative solution** if multiple solutions exist.
+$$m_i = \sum_{j \in \mathcal{S}} p_{ij} h_{ji}$$
 
----
-
-#### Topic 3: Hitting and Return Times for the Simple Random Walk / 简单随机游走的击中与返回时间
-
-##### Intuition / 直觉理解
-
-The simple random walk on ℤ (integers) moves:
-- Up (+1) with probability 𝑝
-- Down (-1) with probability 𝑞 = 1-𝑝
-
-Key questions:
-1. Starting from 0, what's the probability we ever reach a specific level i?
-2. Starting from 0, what's the probability we ever return to 0?
-3. If we do return, how long does it take on average?
-
-The answers depend critically on whether 𝑝 = 1/2 (symmetric) or 𝑝 ≠ 1/2 (asymmetric).
-
-##### Formal Definition / 形式化定义
-
-**Simple Random Walk (简单随机游走)**:
-- State space: ℤ = {..., -2, -1, 0, 1, 2, ...}
-- Transition probabilities: 𝑝ᵢ,ᵢ₊₁ = 𝑝, 𝑝ᵢ,ᵢ₋₁ = 𝑞 = 1-𝑝
-- Starting from 0: 𝑋₀ = 0
-
-##### Theorem 7.1: Hitting Probabilities for Simple Random Walk
-
-**Theorem 7.1**: Consider a random walk with up probability 𝑝 ≠ 0,1. Then:
-
-**For hitting from 0 to i > 0** (hitting a positive level):
-
-ℎ₀ᵢ = { (𝑝/𝑞)ⁱ < 1 if 𝑝 < 1/2
-       { 1 if 𝑝 ≥ 1/2
-
-**For hitting from 0 to i < 0** (hitting a negative level):
-
-ℎ₀ᵢ = { (𝑞/𝑝)⁻ⁱ < 1 if 𝑝 > 1/2
-       { 1 if 𝑝 ≤ 1/2
-
-Where:
-- **ℎ₀ᵢ** = probability of ever hitting state i starting from state 0
-- **𝑝** = probability of moving up
-- **𝑞** = 1-𝑝 = probability of moving down
-- **𝑖** = target state (positive or negative integer)
-- **(𝑝/𝑞)ⁱ** = (p/q) raised to the power i
-
-**Interpretation**:
-- If the walk is biased TOWARDS the target (𝑝 ≥ 1/2 for positive targets, 𝑝 ≤ 1/2 for negative targets), we hit with probability 1
-- If the walk is biased AWAY from the target, the probability is less than 1
-
-##### Proof / 证明
-
-**Proof of Theorem 7.1**:
-
-We prove the case for 𝑖 > 0. The case for 𝑖 < 0 follows by symmetry (swap p and q, consider -i > 0).
-
-**Step 1: Show ℎ₀ᵢ = (ℎ₀₁)ⁱ**
-
-We prove this by induction (归纳法).
-
-**Base case**: ℎ₀₁ = (ℎ₀₁)¹ ✓ (trivially true)
-
-**Inductive step**: Assume ℎ₀ᵢ = (ℎ₀₁)ⁱ. We need to show ℎ₀,ᵢ₊₁ = (ℎ₀₁)ⁱ⁺¹.
-
-Let 𝑇ᵢ = min{𝑛 ≥ 1 : 𝑋ₙ = 𝑖} be the first time the walk hits i.
-
-By the Markov property, conditional on the event {𝑇ᵢ < ∞} (the walk ever hits i):
-- The process (𝑋ₙ)ₙ≥ₜᵢ is independent of (𝑋ₙ)ₙ<ₜᵢ
-- It has the same distribution as a simple random walk starting from i
-
-Let (𝑌ₙ) be a simple random walk starting from i. Then:
-
-ℙ(∃𝑛 ≥ 𝑇ᵢ : 𝑋ₙ = 𝑖+1 | 𝑇ᵢ < ∞) = ℙ(∃𝑛 ≥ 0 : 𝑌ₙ = 𝑖+1) = ℎ₀₁
-
-This is because from state i, hitting i+1 is the same as hitting 1 starting from 0 (by translation invariance - 平移不变性).
-
-Now expand the conditional probability:
-
-ℎ₀₁ = ℙ(∃𝑛 ≥ 𝑇ᵢ : 𝑋ₙ = 𝑖+1, 𝑇ᵢ < ∞) / ℙ(𝑇ᵢ < ∞)
-     = ℙ(𝑇ᵢ₊₁ < ∞) / ℙ(𝑇ᵢ < ∞)
-     = ℎ₀,ᵢ₊₁ / ℎ₀ᵢ
-
-Therefore: ℎ₀,ᵢ₊₁ = ℎ₀₁ · ℎ₀ᵢ = ℎ₀₁ · (ℎ₀₁)ⁱ = (ℎ₀₁)ⁱ⁺¹
-
-This completes the induction. ✓
-
-**Step 2: Find ℎ₀₁**
-
-Condition on the first step from state 0:
-
-ℎ₀₁ = ℙ(𝑋₁ = 1) · ℎ₁₁ + ℙ(𝑋₁ = -1) · ℎ₋₁,₁
-
-Where:
-- **ℎ₁₁** = probability of hitting 1 starting from 1 = 1 (we're already there!)
-- **ℎ₋₁,₁** = probability of hitting 1 starting from -1
-
-From Step 1, ℎ₋₁,₁ = ℎ₀₂ = (ℎ₀₁)² (since from -1 to 1 is the same as from 0 to 2)
-
-So: ℎ₀₁ = 𝑝 · 1 + 𝑞 · (ℎ₀₁)²
-
-This gives us a quadratic equation (二次方程):
-
-𝑞(ℎ₀₁)² - ℎ₀₁ + 𝑝 = 0
-
-**Step 3: Solve the quadratic**
-
-Using the quadratic formula: ℎ₀₁ = [1 ± √(1 - 4𝑝𝑞)] / (2𝑞)
-
-Note that: 1 - 4𝑝𝑞 = 1 - 4𝑝(1-𝑝) = 1 - 4𝑝 + 4𝑝² = (1-2𝑝)² = (𝑝-𝑞)²
-
-So: √(1 - 4𝑝𝑞) = |𝑝 - 𝑞|
-
-Therefore: ℎ₀₁ = [1 ± |𝑝 - 𝑞|] / (2𝑞)
-
-**Two possible solutions**:
-- Solution 1: (1 + |𝑝 - 𝑞|) / (2𝑞)
-- Solution 2: (1 - |𝑝 - 𝑞|) / (2𝑞)
-
-**Step 4: Choose the correct solution**
-
-Solution 1: (1 + |𝑝 - 𝑞|) / (2𝑞)
-
-If 𝑝 < 1/2: |𝑝 - 𝑞| = 𝑞 - 𝑝, so (1 + 𝑞 - 𝑝) / (2𝑞) = (1 + 𝑞 - 𝑝) / (2𝑞)
-Since 1 = 𝑝 + 𝑞, this becomes (𝑝 + 𝑞 + 𝑞 - 𝑝) / (2𝑞) = (2𝑞) / (2𝑞) = 1
-
-If 𝑝 > 1/2: |𝑝 - 𝑞| = 𝑝 - 𝑞, so (1 + 𝑝 - 𝑞) / (2𝑞) = (𝑝 + 𝑞 + 𝑝 - 𝑞) / (2𝑞) = (2𝑝) / (2𝑞) = 𝑝/𝑞 > 1
-
-A probability cannot be > 1, so Solution 1 is invalid when 𝑝 > 1/2.
-
-Solution 2: (1 - |𝑝 - 𝑞|) / (2𝑞)
-
-If 𝑝 < 1/2: |𝑝 - 𝑞| = 𝑞 - 𝑝, so (1 - (𝑞-𝑝)) / (2𝑞) = (1 - 𝑞 + 𝑝) / (2𝑞) = (𝑝 + 𝑝) / (2𝑞) = (2𝑝) / (2𝑞) = 𝑝/𝑞 < 1 ✓
-
-If 𝑝 > 1/2: |𝑝 - 𝑞| = 𝑝 - 𝑞, so (1 - (𝑝-𝑞)) / (2𝑞) = (1 - 𝑝 + 𝑞) / (2𝑞) = (𝑞 + 𝑞) / (2𝑞) = (2𝑞) / (2𝑞) = 1 ✓
-
-If 𝑝 = 1/2: Both solutions give 1 (since |𝑝-𝑞| = 0)
-
-**Therefore**:
-ℎ₀₁ = { 1 if 𝑝 ≥ 1/2
-       { 𝑝/𝑞 if 𝑝 < 1/2
-
-**Step 5: Generalize to ℎ₀ᵢ**
-
-From Step 1: ℎ₀ᵢ = (ℎ₀₁)ⁱ
-
-So for 𝑖 > 0:
-ℎ₀ᵢ = { (𝑝/𝑞)ⁱ if 𝑝 < 1/2
-       { 1 if 𝑝 ≥ 1/2
-
-This completes the proof. ∎
-
-##### Return Probability for Simple Random Walk
-
-**Calculation of return probability 𝑚₀**:
-
-By conditioning on the first step:
-
-𝑚₀ = 𝑝 · ℎ₁₀ + 𝑞 · ℎ₋₁,₀
-
-Where:
-- **ℎ₁₀** = probability of hitting 0 starting from 1
-- **ℎ₋₁,₀** = probability of hitting 0 starting from -1
-
-By symmetry and Theorem 7.1:
-- ℎ₁₀ = ℎ₀,₋₁ (by translation invariance)
-- For hitting a negative target from 0: ℎ₀,₋₁ = { 1 if 𝑝 ≤ 1/2, (𝑞/𝑝) if 𝑝 > 1/2 }
-
-So:
-- ℎ₁₀ = { 1 if 𝑝 ≤ 1/2, (𝑞/𝑝) if 𝑝 > 1/2 }
-- ℎ₋₁,₀ = { 1 if 𝑝 ≥ 1/2, (𝑝/𝑞) if 𝑝 < 1/2 }
-
-**Case 1: 𝑝 = 1/2 (symmetric)**
-𝑚₀ = (1/2)(1)
+$$\mu_i = 1

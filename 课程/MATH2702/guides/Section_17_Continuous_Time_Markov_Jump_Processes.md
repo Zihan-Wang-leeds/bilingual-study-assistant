@@ -1,542 +1,375 @@
-# Section 17: Continuous Time Markov Jump Processes
+# Section 17: Continuous time Markov jump processes
 
-> MATH2702 Stochastic Processes - 自学教材
-> 生成时间: 2026-07-17 14:55
-> 来源页: 83-90
-
----
-
-# MATH2702: Continuous Time Markov Jump Processes
-## 连续时间马尔可夫跳跃过程
+> MATH2702 - 自学教材 / Self-Study Guide
+> 生成时间: 2026-07-20 15:46
+> 来源页: 83-85
 
 ---
 
-# 📋 Section Overview / 章节概览
+# 📘 MATH2702: Continuous Time Markov Jump Processes / 连续时间马尔可夫跳跃过程
 
-This section covers **Continuous Time Markov Jump Processes (连续时间马尔可夫跳跃过程)**, which are stochastic processes that evolve in continuous time over a discrete state space. Unlike discrete-time Markov chains where transitions occur at fixed time steps, these processes wait random amounts of time in each state before "jumping" to another state.
+## 📋 Section Overview / 章节概览
 
-**Why this matters (为什么重要)**:
-- Real-world systems often evolve continuously in time (e.g., queue lengths, chemical reactions, population dynamics)
-- The Poisson process (泊松过程) is a special case
-- These models are fundamental in operations research, biology, physics, and finance
+**中文解释：** 本章节介绍连续时间马尔可夫跳跃过程（Continuous Time Markov Jump Processes）。与离散时间马尔可夫链不同，这里的"时间"是连续的，系统可以在任意时刻发生状态变化。我们将学习如何通过"跳跃链"（Jump Chain）和"停留时间"（Holding Times）来完全描述这类过程。这是随机过程理论中非常重要的一环，广泛应用于排队论、可靠性工程、生物统计等领域。
 
-The section covers:
-1. **Jump chain and holding times** - the two-component structure
-2. **Generator matrix** - the continuous-time analogue of the transition matrix
-3. **Forward and backward equations** - differential equations for transition probabilities
-4. **Matrix exponential** - the solution method
-5. **Explosion** - a technical issue with infinite state spaces
+**English explanation:** This section introduces Continuous Time Markov Jump Processes (CTMJPs). Unlike discrete-time Markov chains where time is measured in steps, here "time" is continuous, and the system can change state at any moment. We will learn how to fully describe such processes using the "Jump Chain" and "Holding Times". This is a crucial part of stochastic process theory, widely applied in queueing theory, reliability engineering, biostatistics, and many other fields.
+
+**Why this matters / 为什么重要：**
+- Real-world processes often evolve in continuous time (e.g., radioactive decay, customer arrivals, chemical reactions) / 现实世界中的过程通常在连续时间中演化（如放射性衰变、顾客到达、化学反应）
+- Understanding CTMJPs is essential for advanced topics like queueing theory and birth-death processes / 理解CTMJP是学习排队论和生灭过程等高级主题的基础
 
 ---
 
-# 🎯 Learning Objectives / 学习目标
+## 🎯 Learning Objectives / 学习目标
 
-By the end of this section, you will be able to:
+After completing this section, you should be able to / 完成本节后，你应该能够：
 
-1. **Define** a continuous-time Markov jump process in terms of its jump chain and holding times
-2. **Construct** the generator matrix Q from a transition rate diagram
-3. **Derive** the jump chain transition matrix R from Q
-4. **Calculate** probabilities and expected times using the jump chain and holding times
-5. **Formulate** the Kolmogorov forward and backward equations
-6. **Compute** transition probabilities using the matrix exponential
-
----
-
-# 📚 Prerequisites / 前置知识
-
-Before studying this section, you should be familiar with:
-
-| Concept | Details |
-|---------|---------|
-| **Discrete-time Markov chains (离散时间马尔可夫链)** | Transition matrices, n-step probabilities |
-| **Exponential distribution (指数分布)** | PDF: f(t) = λe^{-λt}, memoryless property |
-| **Matrix multiplication (矩阵乘法)** | How to multiply matrices |
-| **Basic differential equations (基本微分方程)** | First-order ODEs, separation of variables |
-| **Taylor series (泰勒级数)** | e^x = 1 + x + x²/2! + ... |
-| **Probability theory (概率论)** | Conditional probability, expectation |
+1. **Define** a continuous time Markov jump process in terms of its generator matrix Q and jump chain / **定义**连续时间马尔可夫跳跃过程，使用生成矩阵Q和跳跃链
+2. **Calculate** the holding time distribution and transition probabilities from the generator matrix / **计算**从生成矩阵得到的停留时间分布和转移概率
+3. **Construct** the jump chain transition matrix R from the generator matrix Q / **构造**从生成矩阵Q到跳跃链转移矩阵R
+4. **Identify** absorbing states and understand their implications / **识别**吸收态并理解其含义
+5. **Recognize** the potential for explosion in infinite state spaces / **认识**无限状态空间中可能发生的"爆炸"现象
+6. **Apply** these concepts to simple examples like Poisson processes / **应用**这些概念到简单例子，如泊松过程
 
 ---
 
-# 📖 Core Content / 核心内容
+## 📚 Prerequisites / 前置知识
+
+**中文解释：** 在学习本节之前，你需要掌握以下内容：
+
+**English explanation:** Before studying this section, you need to master the following:
+
+| Prerequisite / 前置知识 | Why needed / 为什么需要 |
+|------------------------|------------------------|
+| Discrete-time Markov chains / 离散时间马尔可夫链 | The jump chain is a discrete-time Markov chain / 跳跃链本身就是离散时间马尔可夫链 |
+| Exponential distribution / 指数分布 | Holding times are exponentially distributed / 停留时间服从指数分布 |
+| Memoryless property / 无记忆性 | This property justifies using exponential distribution for holding times / 这个性质证明了使用指数分布作为停留时间的合理性 |
+| Theorem 14.2 (minimum of exponentials) / 定理14.2（指数分布的最小值） | Used to derive the total rate and jump probabilities / 用于推导总速率和跳跃概率 |
+| Basic matrix operations / 基本矩阵运算 | Needed to work with generator matrix Q / 处理生成矩阵Q时需要 |
 
 ---
 
-## Topic 1: Jump Chain and Holding Times / 跳跃链与停留时间
+## 📖 Core Content / 核心内容
 
-### Intuition / 直觉理解
+### Topic 1: Intuition and Basic Setup / 直觉与基本设定
 
-Imagine you're at a bus station (state i). Several bus routes serve this station:
-- Route to state j arrives after an **exponential** time with rate q_{ij}
-- Route to state k arrives after an exponential time with rate q_{ik}
-- etc.
+#### Intuition / 直觉理解
 
-**Key insight (关键洞察)**: The bus that arrives FIRST determines where you go next. Because exponential distributions are **memoryless (无记忆性)**, the waiting time until ANY bus arrives is also exponential, with rate equal to the SUM of all individual rates.
+**中文解释：** 想象你正在观察一个系统，它可以在多个状态之间切换。与离散时间马尔可夫链不同，这里的时间是连续的——系统可以在任何时刻发生变化。关键思想是：系统在某个状态停留一段时间（称为"停留时间"），然后突然"跳跃"到另一个状态。这个过程由两个独立的部分组成：
+1. **跳到哪里**：由跳跃链决定，这是一个离散时间马尔可夫链
+2. **等待多久**：由停留时间决定，这些时间必须服从指数分布
 
-This gives us a two-step process:
-1. **Wait** for an exponential time (holding time)
-2. **Jump** to a state chosen according to probabilities proportional to the rates
+**English explanation:** Imagine you are observing a system that can switch between multiple states. Unlike discrete-time Markov chains, time here is continuous — the system can change at any moment. The key idea is: the system stays in a state for some time (called the "holding time"), then suddenly "jumps" to another state. This process is composed of two independent parts:
+1. **Where to jump**: Determined by the jump chain, which is a discrete-time Markov chain
+2. **How long to wait**: Determined by the holding times, which must follow an exponential distribution
 
-### Formal Definition / 形式化定义
+**Why exponential? / 为什么是指数分布？**
+- The exponential distribution is the **only** continuous distribution with the **memoryless property** / 指数分布是**唯一**具有**无记忆性**的连续分布
+- Memoryless property: $P(T > s + t \mid T > s) = P(T > t)$ / 无记忆性：$P(T > s + t \mid T > s) = P(T > t)$
+- This preserves the Markov property: the future depends only on the present state, not on how long we've been there / 这保持了马尔可夫性质：未来只依赖于当前状态，而不依赖于我们已经在那里停留了多久
 
-#### The Generator Matrix Q (生成矩阵 Q)
+#### Formal Definition / 形式化定义
 
-**Definition**: For a Markov jump process (X(t)) on state space 𝒮, the **transition rates (转移率)** q_{ij} for i ≠ j represent the rate at which the process jumps from state i to state j.
+**中文解释：** 考虑一个马尔可夫跳跃过程 $(X(t))$，其状态空间为 $\mathcal{S}$。假设我们在状态 $i \in \mathcal{S}$。我们想要跳跃到另一个状态 $j \neq i$ 的**转移速率**记为 $q_{ij} \geq 0$。这意味着，经过一个服从指数分布 $\text{Exp}(q_{ij})$ 的时间后（如果过程还没有跳跃），它将跳跃到状态 $j$。
 
-The **generator matrix (生成矩阵)** Q = (q_{ij} : i, j ∈ 𝒮) is defined as:
+**English explanation:** Consider a Markov jump process $(X(t))$ on a state space $\mathcal{S}$. Suppose we are at a state $i \in \mathcal{S}$. The **transition rate** at which we wish to jump to another state $j \neq i$ is written as $q_{ij} \geq 0$. This means that, after a time with an exponential distribution $\text{Exp}(q_{ij})$, if the process has not jumped yet, it will jump to state $j$.
 
-- **Off-diagonal entries (非对角元)**: q_{ij} ≥ 0 for i ≠ j
-  - q_{ij} = 0 means we never jump from i to j
-- **Diagonal entries (对角元)**: q_{ii} = -q_i = -∑_{j≠i} q_{ij}
-  - These are NEGATIVE (or zero)
-  - Each row sums to 0: ∑_j q_{ij} = 0
+**Conventions / 约定：**
+- If $q_{ij} = 0$ for some $j \neq i$, we will never jump from $i$ to $j$ / 如果 $q_{ij} = 0$，我们永远不会从 $i$ 跳到 $j$
+- If $q_{ij} = 0$ for all $j \neq i$, then $i$ is an **absorbing state** — we stay there forever / 如果对所有 $j \neq i$ 都有 $q_{ij} = 0$，那么 $i$ 是**吸收态**——我们永远停留在那里
 
-**Symbol explanation (符号说明)**:
-- q_{ij}: transition rate from state i to state j (i→j的转移率)
-- q_i = -q_{ii} = ∑_{j≠i} q_{ij}: total rate of leaving state i (离开状态i的总率)
-- If q_i = 0 for all j ≠ i, then i is an **absorbing state (吸收态)**
+#### Key Formula: Total Rate and Jump Probabilities / 关键公式：总速率和跳跃概率
 
-#### The Jump Chain R (跳跃链 R)
+**中文解释：** 从状态 $i$ 出发，有多个可能跳跃到的状态 $j$，每个都等待一个 $\text{Exp}(q_{ij})$ 的时间。哪一个时间会先结束，导致过程跳跃到那个状态？以及我们要等多久才会发生第一次跳跃？答案由定理14.2给出。
 
-**Definition**: The **jump chain (跳跃链)** (Y_n) is a discrete-time Markov chain that records the sequence of states visited, ignoring the timing.
+**English explanation:** From state $i$, there are many other states $j$ we could jump to, each waiting for a time $\text{Exp}(q_{ij})$. Which of these times will be up first, leading the process to jump to that state? And how long will it be until that first time is up and we move? The answer is given by Theorem 14.2.
 
-Its transition matrix R = (r_{ij} : i, j ∈ 𝒮) is:
+**Theorem 14.2 Result / 定理14.2的结果：**
 
-- For states with q_i ≠ 0:
-  - r_{ij} = q_{ij}/q_i for j ≠ i (probability of jumping to j)
-  - r_{ii} = 0 (cannot stay in same state)
-- For absorbing states with q_i = 0:
-  - r_{ii} = 1
-  - r_{ij} = 0 for j ≠ i
+The minimum of independent exponential random variables is itself exponential, with rate equal to the sum of the rates / 独立指数随机变量的最小值本身也服从指数分布，其速率等于各速率之和：
 
-**Symbol explanation (符号说明)**:
-- r_{ij}: probability that the jump chain moves from i to j (跳跃链从i到j的概率)
-- Note: r_{ij} = q_{ij}/q_i = q_{ij} / ∑_{j≠i} q_{ij}
+$$q_i := \sum_{j \neq i} q_{ij}$$
 
-#### Holding Times (停留时间)
+The probability that we move to a particular state $j \neq i$ is / 我们跳跃到特定状态 $j \neq i$ 的概率是：
 
-**Definition**: The **holding times (停留时间)** T_1, T_2, ... are the times spent in each state before jumping.
+$$r_{ij} := \frac{q_{ij}}{\sum_{j \neq i} q_{ij}} = \frac{q_{ij}}{q_i}$$
 
-- T_n ∼ Exp(q_{Y_{n-1}})
-  - If we are in state i, the holding time is Exp(q_i)
-- The holding times are **conditionally independent** given the jump chain (Y_n)
+**Symbol Table / 符号表：**
 
-#### The Full Process Definition
+| Symbol / 符号 | Meaning / 含义 | Chinese / 中文 |
+|---------------|----------------|----------------|
+| $q_{ij}$ | Transition rate from $i$ to $j$ | 从 $i$ 到 $j$ 的转移速率 |
+| $q_i$ | Total rate out of state $i$ | 离开状态 $i$ 的总速率 |
+| $r_{ij}$ | Probability of jumping from $i$ to $j$ | 从 $i$ 跳跃到 $j$ 的概率 |
+| $\text{Exp}(\lambda)$ | Exponential distribution with rate $\lambda$ | 速率为 $\lambda$ 的指数分布 |
 
-**Definition 17.1 (Formal Definition)**:
-
-1. Let 𝒮 be a set (state space), and λ a distribution on 𝒮 (initial distribution)
-2. Let Q = (q_{ij}) be a matrix with q_{ij} ≥ 0 for i ≠ j and ∑_j q_{ij} = 0 for all i
-   - Write q_i = -q_{ii} = ∑_{j≠i} q_{ij}
-3. Define R = (r_{ij}) as:
-   - If q_i ≠ 0: r_{ij} = q_{ij}/q_i for j ≠ i, r_{ii} = 0
-   - If q_i = 0: r_{ii} = 1, r_{ij} = 0 for j ≠ i
-4. The **jump chain** (Y_n) is a DTMC with initial distribution λ and transition matrix R
-5. The **holding times** T_n ∼ Exp(q_{Y_{n-1}}), conditionally independent given (Y_n)
-6. The **jump times** J_n = T_1 + T_2 + ... + T_n
-7. The Markov jump process (X(t)) is:
-   - X(t) = Y_0 for t < J_1
-   - X(t) = Y_n for J_n ≤ t < J_{n+1}
-
-### Key Properties / 关键性质
-
-**Property 1: Memoryless Property (无记忆性)**
-The exponential distribution is the ONLY continuous distribution with the memoryless property:
-P(T > s + t | T > s) = P(T > t)
-
-This is essential for the Markov property to hold.
-
-**Property 2: Minimum of Exponentials (指数分布的最小值)**
-From Theorem 14.2: If we have independent Exp(q_{ij}) random variables for each j ≠ i, then:
-- The minimum has distribution Exp(q_i) where q_i = ∑_{j≠i} q_{ij}
-- The probability that the minimum corresponds to state j is r_{ij} = q_{ij}/q_i
-
-**Property 3: Row Sum Zero (行和为零)**
-Each row of the generator matrix Q sums to 0:
-∑_j q_{ij} = q_{ii} + ∑_{j≠i} q_{ij} = -q_i + q_i = 0
-
-### Worked Examples / 例题
-
-#### Example 17.1: Three-State Process
-
-**Problem**: Consider a Markov jump process on 𝒮 = {1,2,3} with transition rates:
-- From 1 to 2: rate 2
-- From 2 to 1: rate 1, from 2 to 3: rate 2
-- From 3 to 2: rate 1
-
-**Step 1: Write the generator matrix Q**
-
-Q = 
-⎛⎜
-⎝-2   2   0
- 1  -3   2
- 0   1  -1⎞⎟
-⎠
-
-**Explanation**:
-- Row 1: q_{11} = -2 (since q_{12} = 2, no other transitions), q_{12} = 2, q_{13} = 0
-- Row 2: q_{21} = 1, q_{22} = -3 (since q_{21} + q_{23} = 1 + 2 = 3), q_{23} = 2
-- Row 3: q_{31} = 0, q_{32} = 1, q_{33} = -1 (since q_{32} = 1)
-
-Check: Each row sums to 0 ✓
-
-**Step 2: Find the jump chain transition matrix R**
-
-First, compute q_i = -q_{ii}:
-- q_1 = 2, q_2 = 3, q_3 = 1
-
-Then r_{ij} = q_{ij}/q_i:
-- Row 1: r_{12} = 2/2 = 1, r_{13} = 0/2 = 0, r_{11} = 0
-- Row 2: r_{21} = 1/3, r_{23} = 2/3, r_{22} = 0
-- Row 3: r_{32} = 1/1 = 1, r_{31} = 0, r_{33} = 0
-
-R = 
-⎛⎜
-⎝0   1     0
- 1/3  0   2/3
- 0   1     0⎞⎟
-⎠
-
-**Step 3: Interpret the process**
-
-Starting from state 2:
-- Wait T_1 ∼ Exp(q_2) = Exp(3)
-- Jump to state 1 with probability 1/3, or state 3 with probability 2/3
-- If we jump to state 1: wait Exp(2), then jump to state 2 with certainty
-- If we jump to state 3: wait Exp(1), then jump to state 2 with certainty
-
-#### Example 17.2: Process with Absorbing State
-
-**Problem**: States 𝒮 = {A, B, C} with transition rates as shown in Figure 16.
-
-**Step 1: Generator matrix**
-
-Q = 
-⎛⎜
-⎝-q_A   q_{AB}   q_{AC}
- q_{BA}  -q_B    q_{BC}
-   0      0       0   ⎞⎟
-⎠
-
-where q_A = q_{AB} + q_{AC} and q_B = q_{BA} + q_{BC}
-
-**Explanation**: State C is absorbing because row 3 has all zeros (q_{Cj} = 0 for all j).
-
-**Step 2: Jump chain**
-
-R = 
-⎛⎜
-⎝0     q_{AB}/q_A   q_{AC}/q_A
- q_{BA}/q_B    0     q_{BC}/q_B
-   0        0         1      ⎞⎟
-⎠
-
-**Interpretation**: Once we reach state C, we stay there forever (r_{CC} = 1).
-
-#### Example 17.3: Poisson Process
-
-**Problem**: The Poisson process with rate λ has state space 𝒮 = ℤ_+ = {0,1,2,...}.
-
-**Generator matrix**:
-Q = 
-⎛⎜⎜⎜
-⎝-λ   λ   0   0  ...
- 0  -λ   λ   0  ...
- 0   0  -λ   λ  ...
- ⋮   ⋮   ⋮   ⋱  ⎞⎟⎟⎟
-⎠
-
-**Explanation**: 
-- From state i, the only possible transition is to i+1 with rate λ
-- q_{i,i+1} = λ, all other q_{ij} = 0
-- q_i = λ, so holding time in state i is Exp(λ)
-
-**Jump chain**: The jump chain is deterministic:
-- Y_0 = 0, Y_1 = 1, Y_2 = 2, Y_3 = 3, ...
-- r_{i,i+1} = 1 for all i
+**Important note / 重要说明：** If $i$ is an absorbing state, then by convention we put $r_{ii} = 1$ and $r_{ij} = 0$ for $j \neq i$ / 如果 $i$ 是吸收态，按约定我们设 $r_{ii} = 1$，且对 $j \neq i$ 设 $r_{ij} = 0$。
 
 ---
 
-## Topic 2: Explosion / 爆炸
+### Topic 2: The Generator Matrix Q / 生成矩阵Q
 
-### Intuition / 直觉理解
+#### Formal Definition / 形式化定义
 
-**Explosion (爆炸)** occurs when a process can make infinitely many jumps in finite time. This is only possible with infinite state spaces.
+**中文解释：** 将所有转移速率 $q_{ij}$ 写成一个矩阵，称为**生成矩阵** Q。其定义如下：
+- **非对角线元素**：$q_{ij}$，对于 $i \neq j$（这些是正的或0）
+- **对角线元素**：$q_{ii} = -q_i = -\sum_{j \neq i} q_{ij}$（这些是负的或0）
 
-Think of a population that grows faster and faster:
-- If birth rates increase with population size, births happen more frequently
-- If rates grow fast enough (e.g., λ_j = λj²), the expected time to reach infinite population is finite
+**English explanation:** It is convenient to write all the transition rates $q_{ij}$ down in a **generator matrix** Q defined as follows:
+- **Off-diagonal entries**: $q_{ij}$, for $i \neq j$ (these are positive or 0)
+- **Diagonal entries**: $q_{ii} = -q_i = -\sum_{j \neq i} q_{ij}$ (these are negative or 0)
 
-### Formal Definition / 形式化定义
+**Key property / 关键性质：** Each row sums to 0 / 每一行之和为0：
+$$\sum_j q_{ij} = 0 \quad \text{for all } i$$
 
-**Definition**: A Markov jump process **explodes** if there exists a finite time T such that the process makes infinitely many jumps before time T.
+**Why "generator"? / 为什么叫"生成矩阵"？**
+- It "generates" the process — from Q we can derive all properties of the process / 它"生成"了过程——从Q我们可以推导出过程的所有性质
+- It plays a role similar to the transition matrix in discrete time / 它扮演的角色类似于离散时间中的转移矩阵
 
-**Condition for explosion**: For a birth process with birth rates λ_j, explosion occurs if:
-∑_{j=1}^{∞} 1/λ_j < ∞
+#### Structure of Q / Q的结构
 
-**Example**: For λ_j = λj²:
-∑_{j=1}^{n} 1/(λj²) = (1/λ)∑_{j=1}^{n} 1/j² → (1/λ)(π²/6) as n → ∞
+**中文解释：** 生成矩阵Q具有以下结构特点：
+- 非对角线元素 $q_{ij} \geq 0$（$i \neq j$）
+- 对角线元素 $q_{ii} \leq 0$
+- 每一行之和为0
 
-This is finite, so explosion occurs.
+**English explanation:** The generator matrix Q has the following structural characteristics:
+- Off-diagonal entries $q_{ij} \geq 0$ ($i \neq j$)
+- Diagonal entries $q_{ii} \leq 0$
+- Each row sums to 0
 
-### Key Properties / 关键性质
+**Example / 示例：**
+For a 3-state system with rates as shown in the diagram on page 83:
 
-1. **Finite state spaces never explode** - there are only finitely many states to visit
-2. **Explosion is a technical issue** - we can often avoid it by choosing models where explosion probability is 0
-3. **Technical fixes exist** - e.g., adding an "infinity" state or restarting the process
+$$Q = $$
+\begin{pmatrix}
+-2 & 2 & 0 \\
+1 & -3 & 2 \\
+0 & 1 & -1
+\end{pmatrix}
+$$$$
 
----
-
-## Topic 3: Transitions in Infinitesimal Time / 无穷小时间内的转移
-
-### Intuition / 直觉理解
-
-What happens in a very short time τ? Because of the memoryless property, the process "forgets" how long it has been waiting. So:
-
-- **Probability of staying**: P(no jump in time τ) = e^{-q_iτ} ≈ 1 - q_iτ
-- **Probability of jumping to j**: P(jump to j in time τ) ≈ q_{ij}τ
-- **Probability of multiple jumps**: Negligible (o(τ))
-
-### Formal Definition / 形式化定义
-
-For a very small time τ:
-
-P(X(t+τ) = j | X(t) = i) = 
-⎧
-⎨
-⎩
-1 - q_iτ + o(τ)  for i = j
-q_{ij}τ + o(τ)   for i ≠ j
-⎫
-⎬
-⎭
-
-**Symbol explanation**:
-- o(τ) means "little-o of τ" - terms that go to 0 faster than τ
-- Formally: lim_{τ→0} o(τ)/τ = 0
-
-This is an **equivalent definition** of the Markov jump process.
+**Verification / 验证：**
+- Row 1: $-2 + 2 + 0 = 0$ ✓
+- Row 2: $1 + (-3) + 2 = 0$ ✓
+- Row 3: $0 + 1 + (-1) = 0$ ✓
 
 ---
 
-## Topic 4: Transition Semigroup and Forward/Backward Equations / 转移半群与向前/向后方程
+### Topic 3: The Jump Chain (Yₙ) / 跳跃链(Yₙ)
 
-### Intuition / 直觉理解
+#### Definition / 定义
 
-In discrete time, we had P^{(n)} = P^n (matrix power). In continuous time, we need P(t) for any real t ≥ 0.
+**中文解释：** 跳跃链 $(Y_n)$ 是与连续时间过程 $(X(t))$ 相关联的离散时间马尔可夫链。它记录的是过程在每次跳跃后所处的状态，而不考虑跳跃发生的时间。具体定义如下：
+- $Y_0 = X(0)$（从相同的初始状态开始）
+- $Y_n =$ 第 $n$ 次跳跃后 $(X(t))$ 所处的状态
 
-The **transition semigroup (转移半群)** P(t) = (p_{ij}(t)) where:
-p_{ij}(t) = P(X(t) = j | X(0) = i)
+**English explanation:** The jump chain $(Y_n)$ is a discrete-time Markov chain associated with the continuous-time process $(X(t))$. It records the state the process is in after each jump, without considering when the jumps occur. Specifically:
+- $Y_0 = X(0)$ (starts from the same initial state)
+- $Y_n =$ state of $X(t)$ just after the $n$th jump
 
-**Key question**: Given Q (generator matrix), how do we find P(t)?
+#### Transition Matrix R / 转移矩阵R
 
-The answer comes from differential equations:
-- **Forward equation**: P'(t) = P(t)Q (looks at changes forward in time)
-- **Backward equation**: P'(t) = QP(t) (looks at changes backward in time)
+**中文解释：** 跳跃链的转移矩阵 R 由以下方式定义：
+- 对于 $q_i \neq 0$ 的状态 $i$：$r_{ij} = q_{ij}/q_i$ 对于 $j \neq i$，且 $r_{ii} = 0$
+- 对于 $q_i = 0$ 的状态 $i$（吸收态）：$r_{ij} = 0$ 对于 $j \neq i$，且 $r_{ii} = 1$
 
-### Formal Definition / 形式化定义
+**English explanation:** The transition matrix R of the jump chain is defined as follows:
+- For states $i$ with $q_i \neq 0$: $r_{ij} = q_{ij}/q_i$ for $j \neq i$, and $r_{ii} = 0$
+- For states $i$ with $q_i = 0$ (absorbing states): $r_{ij} = 0$ for $j \neq i$, and $r_{ii} = 1$
 
-#### Chapman-Kolmogorov Equations (查普曼-科尔莫戈罗夫方程)
+**Important property / 重要性质：** The jump chain cannot move from a state to itself (unless it's absorbing) / 跳跃链不能从状态移动到自身（除非是吸收态）。
 
-For any s, t ≥ 0:
+**Example / 示例：**
+For the same 3-state system:
 
-p_{ij}(s+t) = ∑_{k∈𝒮} p_{ik}(s) p_{kj}(t)
+$$R = $$
+\begin{pmatrix}
+0 & 1 & 0 \\
+\frac{1}{3} & 0 & \frac{2}{3} \\
+0 & 1 & 0
+\end{pmatrix}
+$$$$
 
-In matrix form: P(s+t) = P(s)P(t)
-
-This is the **semigroup property (半群性质)**.
-
-#### Kolmogorov Forward Equation (科尔莫戈罗夫向前方程)
-
-P'(t) = P(t)Q, P(0) = I
-
-In component form:
-p'_{ij}(t) = ∑_k p_{ik}(t) q_{kj}
-
-**Derivation**:
-1. Start with Chapman-Kolmogorov: p_{ij}(t+τ) = ∑_k p_{ik}(t) p_{kj}(τ)
-2. Use infinitesimal approximation:
-   p_{kj}(τ) = 
-   ⎧
-   ⎨
-   ⎩
-   1 - q_jτ + o(τ)  for k = j
-   q_{kj}τ + o(τ)   for k ≠ j
-   ⎫
-   ⎬
-   ⎭
-3. Separate the k = j term:
-   p_{ij}(t+τ) = p_{ij}(t)(1 - q_jτ) + ∑_{k≠j} p_{ik}(t) q_{kj}τ + o(τ)
-4. Rearrange:
-   p_{ij}(t+τ) = p_{ij}(t) + ∑_k p_{ik}(t) q_{kj}τ + o(τ)
-5. Subtract p_{ij}(t), divide by τ:
-   [p_{ij}(t+τ) - p_{ij}(t)]/τ = ∑_k p_{ik}(t) q_{kj} + o(τ)/τ
-6. Take limit τ → 0:
-   p'_{ij}(t) = ∑_k p_{ik}(t) q_{kj}
-
-#### Kolmogorov Backward Equation (科尔莫戈罗夫向后方程)
-
-P'(t) = QP(t), P(0) = I
-
-**Derivation**: Same as forward equation but start with:
-p_{ij}(t+τ) = ∑_k p_{ik}(τ) p_{kj}(t)
-
-### Key Properties / 关键性质
-
-1. **Both equations are equivalent** - they give the same solution
-2. **Initial condition**: P(0) = I (identity matrix)
-3. **For finite state spaces**: The solution is unique
-4. **Minimal nonnegative solution**: For infinite state spaces, there may be multiple solutions; we take the minimal nonnegative one
+**Verification / 验证：**
+- From state 1: $q_1 = 2$, so $r_{12} = 2/2 = 1$, $r_{13} = 0/2 = 0$ ✓
+- From state 2: $q_2 = 3$, so $r_{21} = 1/3$, $r_{23} = 2/3$ ✓
+- From state 3: $q_3 = 1$, so $r_{32} = 1/1 = 1$, $r_{31} = 0/1 = 0$ ✓
 
 ---
 
-## Topic 5: Matrix Exponential / 矩阵指数
+### Topic 4: Holding Times / 停留时间
 
-### Intuition / 直觉理解
+#### Distribution / 分布
 
-Just as e^{at} solves the ODE x'(t) = ax(t), the **matrix exponential (矩阵指数)** e^{tQ} solves P'(t) = P(t)Q.
+**中文解释：** 一旦我们知道跳跃链将如何移动，我们就知道下一个停留时间的分布。从状态 $j$ 出发，停留时间服从指数分布 $\text{Exp}(q_j)$，其中 $q_j = -q_{jj} = \sum_{k \neq j} q_{jk}$。
 
-**Analogy (类比)**:
-- Discrete time: P^{(n)} = P^n (matrix power)
-- Continuous time: P(t) = e^{tQ} (matrix exponential)
+**English explanation:** Once we know where the jump process will move, we then know what the next holding time will be: from state $j$, the holding time will be $\text{Exp}(q_j)$, where $q_j = -q_{jj} = \sum_{k \neq j} q_{jk}$.
 
-### Formal Definition / 形式化定义
+#### Conditional Independence / 条件独立性
 
-For any square matrix A, the **matrix exponential (矩阵指数)** is defined by the Taylor series:
+**中文解释：** 给定跳跃链 $(Y_n)$，停留时间 $T_1, T_2, \ldots$ 是条件独立的。这意味着，如果我们知道每次跳跃后到达的状态，那么每次停留的时间长度是相互独立的。
 
-e^A = exp(A) = ∑_{n=0}^{∞} A^n/n! = I + A + A²/2! + A³/3! + ...
+**English explanation:** Given the jump chain $(Y_n)$, the holding times $T_1, T_2, \ldots$ are conditionally independent. This means that if we know which state we arrive at after each jump, then the lengths of each stay are independent of each other.
 
-where A⁰ = I (identity matrix).
+#### Jump Times / 跳跃时间
 
-For the generator matrix Q:
-P(t) = e^{tQ} = ∑_{n=0}^{∞} (tQ)^n/n! = I + tQ + t²Q²/2! + t³Q³/6! + ...
+**中文解释：** 第 $n$ 次跳跃发生的时间 $J_n$ 是前 $n$ 个停留时间的总和：
+$$J_n = T_1 + T_2 + \cdots + T_n$$
 
-### Key Properties / 关键性质
-
-**Property 1: Derivative**
-d/dt e^{tA} = Ae^{tA} = e^{tA}A
-
-This follows from term-by-term differentiation of the series.
-
-**Property 2: Commutation**
-Ae^A = e^A A (A commutes with its own exponential)
-
-**Property 3: Semigroup Property**
-e^{(s+t)Q} = e^{sQ} e^{tQ} = P(s)P(t)
-
-**Property 4: Initial Condition**
-e^{0·Q} = I = P(0)
-
-**Theorem 18.1**: For a finite state space, the unique solution to both forward and backward equations is:
-P(t) = e^{tQ}
-
-### Worked Examples / 例题
-
-#### Example from Problem Sheet, Question 4
-
-**Problem**: For a two-state process with generator matrix:
-Q = ⎛⎜⎝-α   α⎞⎟⎠
-    ⎝ β  -β⎠
-
-where α, β > 0.
-
-**Part (a)**: Show Q² = -(α+β)Q
-
-**Solution**:
-Q² = ⎛⎜⎝-α   α⎞⎟⎠ × ⎛⎜⎝-α   α⎞⎟⎠
-     ⎝ β  -β⎠     ⎝ β  -β⎠
-
-= ⎛⎜⎝(-α)(-α) + α·β   (-α)α + α(-β)⎞⎟⎠
-  ⎝ β(-α) + (-β)β     β·α + (-β)(-β)⎠
-
-= ⎛⎜⎝α² + αβ   -α² - αβ⎞⎟⎠
-  ⎝-αβ - β²   αβ + β² ⎠
-
-= ⎛⎜⎝α(α+β)   -α(α+β)⎞⎟⎠
-  ⎝-β(α+β)   β(α+β) ⎠
-
-= -(α+β) ⎛⎜⎝-α   α⎞⎟⎠ = -(α+β)Q ✓
-          ⎝ β  -β⎠
-
-**Part (b)**: Write Q^n for n ≥ 1 in terms of Q.
-
-**Solution**: From part (a), Q² = -(α+β)Q.
-Then Q³ = Q·Q² = Q·(-(α+β)Q) = -(α+β)Q² = -(α+β)·(-(α+β)Q) = (α+β)²Q
-
-By induction: Q^n = (-(α+β))^{n-1} Q for n ≥ 1
-
-**Part (c)**: Show P(t) = e^{tQ} = I + Q/(α+β)(1 - e^{-(α+β)t})
-
-**Solution**:
-e^{tQ} = ∑_{n=0}^{∞} (tQ)^n/n!
-= I + ∑_{n=1}^{∞} t^n Q^n/n!
-= I + ∑_{n=1}^{∞} t^n (-(α+β))^{n-1} Q/n!
-= I + Q ∑_{n=1}^{∞} t^n (-(α+β))^{n-1}/n!
-= I + Q/(α+β) ∑_{n=1}^{∞} (-(α+β)t)^n/n!
-= I + Q/(α+β) (e^{-(α+β)t} - 1)
-= I + Q/(α+β)(1 - e^{-(α+β)t}) ✓
-
-**Part (d)**: Find p_{11}(t).
-
-**Solution**: From part (c), the (1,1) entry of P(t) is:
-p_{11}(t) = 1 + q_{11}/(α+β)(1 - e^{-(α+β)t})
-= 1 + (-α)/(α+β)(1 - e^{-(α+β)t})
-= 1 - α/(α+β) + α/(α+β)e^{-(α+β)t}
-= β/(α+β) + α/(α+β)e^{-(α+β)t}
+**English explanation:** The time of the $n$th jump $J_n$ is the sum of the first $n$ holding times:
+$$J_n = T_1 + T_2 + \cdots + T_n$$
 
 ---
 
-## 🔗 Connections / 知识关联
+### Topic 5: Complete Definition of the Process / 过程的完整定义
 
-### Connections to Previous Topics (与前面内容的联系)
+#### Definition 17.1 / 定义17.1
 
-1. **Discrete-time Markov chains (离散时间马尔可夫链)**: The jump chain is a DTMC; the generator matrix Q plays the role of P - I in discrete time
-2. **Exponential distribution (指数分布)**: Essential for holding times; its memoryless property ensures the Markov property
-3. **Poisson process (泊松过程)**: A special case of a Markov jump process with only forward jumps
+**中文解释：** 现在我们可以给出马尔可夫跳跃过程的完整形式化定义。它由三个部分组成：初始分布、生成矩阵和跳跃链。
 
-### Connections to Future Topics (与后面内容的联系)
+**English explanation:** Now we can give the complete formal definition of a Markov jump process. It consists of three parts: the initial distribution, the generator matrix, and the jump chain.
 
-1. **Communicating classes (通信类)**: Will be studied next, analogous to DTMC theory
-2. **Hitting times and recurrence (击中时间与常返性)**: Continuous-time analogues of DTMC concepts
-3. **Birth-death processes (生灭过程)**: Important applications in queueing theory
-4. **Stationary distributions (平稳分布)**: Will be studied later
+**Definition 17.1 (Formal Definition / 形式化定义):**
 
----
+1. **Let $\mathcal{S}$ be a set, and $\lambda$ a distribution on $\mathcal{S}$** / 设 $\mathcal{S}$ 是一个集合，$\lambda$ 是 $\mathcal{S}$ 上的一个分布
+   - $\lambda$ gives the initial probabilities: $P(X(0) = i) = \lambda_i$ / $\lambda$ 给出初始概率：$P(X(0) = i) = \lambda_i$
 
-## ⚠️ Common Mistakes / 常见误区
+2. **Let $Q = (q_{ij} : i, j \in \mathcal{S})$ be a matrix where $q_{ij} \geq 0$ for $i \neq j$ and $\sum_j q_{ij} = 0$ for all $i$, and write $q_i = -q_{ii} = \sum_{j \neq i} q_{ij}$** / 设 $Q = (q_{ij} : i, j \in \mathcal{S})$ 是一个矩阵，其中对于 $i \neq j$ 有 $q_{ij} \geq 0$，且对所有 $i$ 有 $\sum_j q_{ij} = 0$，并记 $q_i = -q_{ii} = \sum_{j \neq i} q_{ij}$
 
-### Mistake 1: Confusing Q and R
-**错误**: Thinking the jump chain transition matrix R is the same as the generator matrix Q.
+3. **Define $R = (r_{ij} : i, j \in \mathcal{S})$ as follows** / 定义 $R = (r_{ij} : i, j \in \mathcal{S})$ 如下：
+   - For $i$ such that $q_i \neq 0$: $r_{ij} = q_{ij}/q_i$ for $j \neq i$, and $r_{ii} = 0$
+   - For $i$ such that $q_i = 0$: $r_{ij} = 0$ for $j \neq i$, and $r_{ii} = 1$
 
-**Correct**: R is a PROBABILITY matrix (rows sum to 1), Q is a RATE matrix (rows sum to 0). They are related by r_{ij} = q_{ij}/q_i for i ≠ j.
+4. **The jump chain $(Y_n)$** is the discrete-time Markov chain on $\mathcal{S}$ with initial distribution $\lambda$ and transition matrix $R$ / **跳跃链 $(Y_n)$** 是 $\mathcal{S}$ 上的离散时间马尔可夫链，具有初始分布 $\lambda$ 和转移矩阵 $R$
 
-### Mistake 2: Forgetting the diagonal of Q
-**错误**: Writing Q with all positive entries.
+5. **The holding times $T_1, T_2, \ldots$** have distribution $T_n \sim \text{Exp}(q_{Y_{n-1}})$, and are conditionally independent given $(Y_n)$ / **停留时间 $T_1, T_2, \ldots$** 服从分布 $T_n \sim \text{Exp}(q_{Y_{n-1}})$，并且在给定 $(Y_n)$ 的条件下相互独立
 
-**Correct**: The diagonal entries of Q are NEGATIVE (or zero). q_{ii} = -∑_{j≠i} q_{ij}.
+6. **The jump times are $J_n = T_1 + T_2 + \cdots + T_n$** / **跳跃时间**为 $J_n = T_1 + T_2 + \cdots + T_n$
 
-### Mistake 3: Confusing forward and backward equations
-**错误**: Writing P'(t) = QP(t) as the forward equation.
+7. **Then the Markov jump process $(X(t))$ is defined by** / **那么马尔可夫跳跃过程 $(X(t))$ 定义为**：
+   $$X(t) = \begin{cases}
+   Y_0 & \text{for } t < J_1 \\
+   Y_n & \text{for } J_n \leq t < J_{n+1}
+   \end{cases}$$
 
-**Correct**: 
-- Forward: P'(t) = P(t)Q (Q on the right)
-- Backward: P'(t) = QP(t) (Q on the left)
-
-### Mistake 4: Assuming explosion is always a problem
-**错误**: Thinking all infinite state space processes explode.
-
-**Correct**: Explosion only occurs when ∑ 1/λ_j < ∞. Many processes (like the Poisson process) never explode.
-
-### Mistake 5: Forgetting the initial condition
-**错误**: Solving the forward/backward equations without P(0) = I.
-
-**Correct**: Always check P(0) = I (identity matrix).
+**Intuitive interpretation / 直观解释：**
+- Before the first jump ($t < J_1$), we are in the initial state $Y_0$ / 在第一次跳跃之前，我们处于初始状态 $Y_0$
+- Between the $n$th and $(n+1)$th jumps ($J_n \leq t < J_{n+1}$), we are in state $Y_n$ / 在第 $n$ 次和第 $n+1$ 次跳跃之间，我们处于状态 $Y_n$
 
 ---
 
-## ✍️ Practice / 练习
+### Topic 6: Examples / 例题
 
-### Question 1: Generator Matrix Construction
+#### Example 17.1: Three-State System / 三状态系统
 
-Consider a Markov jump process on 𝒮 = {1,2,3} with transition rates:
-- From 1 to 2: rate 3, from 1 to 3: rate 1
-- From 2 to 1: rate 2, from 2 to 3: rate 4
+**中文解释：** 考虑一个状态空间为 $\mathcal{S} = \{1, 2, 3\}$ 的马尔可夫跳跃过程，其转移速率如下图所示。
+
+**English explanation:** Consider a Markov jump process on a state space $\mathcal{S} = \{1, 2, 3\}$ with transition rates as illustrated in the following transition rate diagram.
+
+**Transition Rate Diagram / 转移速率图：**
+```
+1 ←→ 2 (rates: 2 from 1→2, 1 from 2→1)
+2 → 3 (rate: 2)
+3 → 2 (rate: 1)
+```
+
+**Step-by-step solution / 逐步求解：**
+
+**Step 1: Write the generator matrix Q / 写出生成矩阵Q**
+
+$$Q = $$
+\begin{pmatrix}
+-2 & 2 & 0 \\
+1 & -3 & 2 \\
+0 & 1 & -1
+\end{pmatrix}
+$$$$
+
+**Explanation / 解释：**
+- $q_{12} = 2$ (rate from 1 to 2), $q_{13} = 0$ (no direct transition from 1 to 3)
+- $q_{21} = 1$, $q_{23} = 2$
+- $q_{31} = 0$, $q_{32} = 1$
+- Diagonal: $q_{11} = -(2+0) = -2$, $q_{22} = -(1+2) = -3$, $q_{33} = -(0+1) = -1$
+
+**Step 2: Calculate the total rates / 计算总速率**
+- $q_1 = -q_{11} = 2$
+- $q_2 = -q_{22} = 3$
+- $q_3 = -q_{33} = 1$
+
+**Step 3: Write the jump chain transition matrix R / 写出跳跃链转移矩阵R**
+
+$$R = $$
+\begin{pmatrix}
+0 & 1 & 0 \\
+\frac{1}{3} & 0 & \frac{2}{3} \\
+0 & 1 & 0
+\end{pmatrix}
+$$$$
+
+**Explanation / 解释：**
+- From state 1: $r_{12} = 2/2 = 1$, $r_{11} = 0$, $r_{13} = 0$
+- From state 2: $r_{21} = 1/3$, $r_{23} = 2/3$, $r_{22} = 0$
+- From state 3: $r_{32} = 1/1 = 1$, $r_{31} = 0$, $r_{33} = 0$
+
+**Step 4: Interpret the process / 解释过程**
+
+**中文解释：** 从状态2开始，我们等待一个服从 $\text{Exp}(3)$ 分布的停留时间 $T_1$。然后以概率 $1/3$ 移动到状态1，以概率 $2/3$ 移动到状态3。假设我们移动到状态1，那么我们在状态1停留一个服从 $\text{Exp}(2)$ 分布的时间，然后以概率1跳回状态2。如此继续。
+
+**English explanation:** Starting from state 2, we wait for a holding time $T_1 \sim \text{Exp}(3)$. We then move to state 1 with probability $1/3$ and to state 3 with probability $2/3$. Suppose we move to state 1. Then we stay in state 1 for a time $\text{Exp}(2)$, before moving with certainty back to state 2. And so on.
+
+**Key insight / 关键洞察：**
+- The holding time depends on the **current state** / 停留时间取决于**当前状态**
+- The jump probabilities depend on the **relative rates** / 跳跃概率取决于**相对速率**
+- The process alternates between states, with different average waiting times / 过程在状态之间交替，具有不同的平均等待时间
+
+---
+
+#### Example 17.2: System with an Absorbing State / 含有吸收态的系统
+
+**中文解释：** 考虑一个状态空间为 $\mathcal{S} = \{A, B, C\}$ 的马尔可夫跳跃过程，其中状态C是吸收态。
+
+**English explanation:** Consider a Markov jump process with state space $\mathcal{S} = \{A, B, C\}$, where state C is an absorbing state.
+
+**Transition Rate Diagram / 转移速率图：**
+```
+A → B (rate: q_AB)
+A → C (rate: q_AC)
+B → A (rate: q_BA)
+B → C (rate: q_BC)
+C is absorbing (no outgoing arrows)
+```
+
+**Step-by-step solution / 逐步求解：**
+
+**Step 1: Write the generator matrix Q / 写出生成矩阵Q**
+
+$$Q = $$
+\begin{pmatrix}
+-q_A & q_{AB} & q_{AC} \\
+q_{BA} & -q_B & q_{BC} \\
+0 & 0 & 0
+\end{pmatrix}
+$$$$
+
+where / 其中：
+- $q_A = q_{AB} + q_{AC}$
+- $q_B = q_{BA} + q_{BC}$
+
+**Explanation / 解释：**
+- Row A: diagonal is $-(q_{AB} + q_{AC}) = -q_A$, off-diagonals are $q_{AB}$ and $q_{AC}$
+- Row B: diagonal is $-(q_{BA} + q_{BC}) = -q_B$, off-diagonals are $q_{BA}$ and $q_{BC}$
+- Row C: all zeros (absorbing state — no outgoing transitions) / 全为零（吸收态——没有离开的转移）
+
+**Step 2: Write the jump chain transition matrix R / 写出跳跃链转移矩阵R**
+
+$$R = $$
+\begin{pmatrix}
+0 & q_{AB}/q_A & q_{AC}/q_A \\
+q_{BA}/q_B & 0 & q_{BC}/q_B \\
+0 & 0 & 1
+\end{pmatrix}
+$$$$
+
+**Explanation / 解释：**
+- From A: $r_{AB} = q_{AB}/

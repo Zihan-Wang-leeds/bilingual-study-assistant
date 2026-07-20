@@ -11,7 +11,7 @@ import re
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from llm_client import get_client, call_llm_with_prompts, call_llm_stream_with_prompts
+from llm_client import get_client, call_llm, call_llm_with_prompts, call_llm_stream, call_llm_stream_with_prompts
 
 from config import (
     API_KEY, BASE_URL, MODEL_NAME,
@@ -241,26 +241,22 @@ class CourseRAG:
         # 1. 检索
         relevant_docs = self.search(question, course_code, top_k)
 
-        if not relevant_docs:
-            return {
-                "answer": "在课程资料中没有找到相关内容。请确认课程代码是否正确，或尝试换一种问法。",
-                "sources": [],
-                "mode": mode
-            }
-
-        # 2. 构建上下文
-        context_parts = []
-        for i, doc in enumerate(relevant_docs):
-            meta = doc["metadata"]
-            src_info = f"[来源{i+1}] "
-            if "course_name" in meta:
-                src_info += f"课程: {meta['course_name']}, "
-            if "section_title" in meta:
-                src_info += f"Section {meta['section']}: {meta['section_title']}"
-            elif "section" in meta:
-                src_info += f"Section {meta['section']}"
-            context_parts.append(f"{src_info}\n{doc['content']}")
-        context = "\n\n---\n\n".join(context_parts)
+        # 2. 构建上下文（即使检索为空也继续，让 LLM 自行判断）
+        if relevant_docs:
+            context_parts = []
+            for i, doc in enumerate(relevant_docs):
+                meta = doc["metadata"]
+                src_info = f"[来源{i+1}] "
+                if "course_name" in meta:
+                    src_info += f"课程: {meta['course_name']}, "
+                if "section_title" in meta:
+                    src_info += f"Section {meta.get('section', '?')}: {meta['section_title']}"
+                elif "section" in meta:
+                    src_info += f"Section {meta['section']}"
+                context_parts.append(f"{src_info}\n{doc['content']}")
+            context = "\n\n---\n\n".join(context_parts)
+        else:
+            context = "[未在课件中找到直接相关内容 / No directly relevant content found in course materials]"
 
         # 3. 根据模式选择System Prompt
         system_prompt = get_study_prompt(mode, context)
@@ -291,34 +287,32 @@ class CourseRAG:
         """
         流式版本 ask() — 逐个 token yield。
 
-        先 yield metadata (JSON)，然后逐 token yield 回答文本。
+        先 yield ("meta", dict) 元数据，然后逐 ("token", str) yield 回答文本。
         Yields:
-            首条: '{"sources": [...], "mode": "..."}\n'  (metadata)
-            后续: str (逐个 delta 文本)
+            ("meta", {"sources": [...], "mode": "..."})  — 元数据
+            ("token", str)                                 — 逐个 delta 文本
         """
-        import json as _json
-
         # 1. 检索
         relevant_docs = self.search(question, course_code, top_k)
-        if not relevant_docs:
-            yield _json.dumps({"answer": "在课程资料中没有找到相关内容。", "sources": [], "mode": mode}, ensure_ascii=False)
-            return
 
-        # 2. 构建上下文
-        context_parts = []
-        for i, doc in enumerate(relevant_docs):
-            meta = doc["metadata"]
-            src_info = f"[来源{i+1}] "
-            if "course_name" in meta:
-                src_info += f"课程: {meta['course_name']}, "
-            if "section_title" in meta:
-                src_info += f"Section {meta['section']}: {meta['section_title']}"
-            elif "section" in meta:
-                src_info += f"Section {meta['section']}"
-            context_parts.append(f"{src_info}\n{doc['content']}")
-        context = "\n\n---\n\n".join(context_parts)
+        # 2. 构建上下文（即使检索为空也继续，让 LLM 自行判断）
+        if relevant_docs:
+            context_parts = []
+            for i, doc in enumerate(relevant_docs):
+                meta = doc["metadata"]
+                src_info = f"[来源{i+1}] "
+                if "course_name" in meta:
+                    src_info += f"课程: {meta['course_name']}, "
+                if "section_title" in meta:
+                    src_info += f"Section {meta.get('section', '?')}: {meta['section_title']}"
+                elif "section" in meta:
+                    src_info += f"Section {meta['section']}"
+                context_parts.append(f"{src_info}\n{doc['content']}")
+            context = "\n\n---\n\n".join(context_parts)
+        else:
+            context = "[未在课件中找到直接相关内容 / No directly relevant content found in course materials]"
 
-        # 3. 来源 metadata
+        # 3. 来源 metadata（用 tuple 区分，避免被前端当文本显示）
         sources = []
         for doc in relevant_docs:
             meta = doc["metadata"]
@@ -328,7 +322,7 @@ class CourseRAG:
                 "section_title": meta.get("section_title", ""),
                 "preview": doc["content"][:200]
             })
-        yield _json.dumps({"sources": sources, "mode": mode}, ensure_ascii=False) + "\n"
+        yield ("meta", {"sources": sources, "mode": mode})
 
         # 4. System prompt
         system_prompt = get_study_prompt(mode, context)
@@ -339,31 +333,12 @@ class CourseRAG:
         messages.append({"role": "user", "content": question})
 
         # 5. 流式生成
-        buffer = ""
         for delta in call_llm_stream(
             messages=messages,
             temperature=TEMPERATURE,
             max_tokens=MAX_TOKENS,
         ):
-            buffer += delta
-            yield delta
-
-        # 最终做一次 math normalize（整段输出也可用）
-        # 流式无法实时 normalize，所以只在最后做
-        """调用LLM生成回答（带自动重试）。"""
-        messages = [{"role": "system", "content": system_prompt}]
-        # 注入对话历史
-        if history:
-            for turn in history[-12:]:  # 最多保留最近 12 条消息
-                messages.append({"role": turn["role"], "content": turn["content"]})
-        messages.append({"role": "user", "content": question})
-
-        answer = call_llm(
-            messages=messages,
-            temperature=TEMPERATURE,
-            max_tokens=MAX_TOKENS,
-        )
-        return normalize_math_answer(answer)
+            yield ("token", delta)
 
 
 def normalize_math_answer(answer: str) -> str:

@@ -289,11 +289,11 @@ class GuideGenerator:
     def _generate_single_guide(self, boundary: dict, section_text: str) -> str:
         """生成单个章节教材（文本已确保不超过限制）。"""
 
-        prompt = f"""You are a university professor creating self-study materials for a Chinese-speaking student studying abroad.
+        prompt = f"""You are a university professor creating self-study materials for Chinese-speaking students studying abroad (留学生).
 
 Below is the RAW course material for ONE section of the course {self.course_code}.
 
-Your task: Transform this raw material into a COMPLETE, SELF-CONTAINED study guide.
+Your task: Transform this raw material into a COMPLETE, SELF-CONTAINED bilingual study guide.
 
 The student learns ALONE from this document - they have no lectures. You must be thorough.
 
@@ -302,10 +302,46 @@ RAW COURSE MATERIAL:
 {section_text}
 ---
 
-Generate a comprehensive study guide in the following structure. Use BILINGUAL format throughout:
-- Technical terms: "English Term (中文翻译)"
-- Explanations: mix of Chinese and English for clarity
-- Mathematics: universal notation, explain each symbol
+⚠️ CRITICAL — BILINGUAL FORMAT (中英双语格式):
+The FINAL OUTPUT must be a TRUE bilingual document, NOT English with occasional Chinese glosses. Follow these rules STRICTLY:
+
+1. **Every paragraph/section MUST contain SUBSTANTIAL Chinese explanation.** Do NOT write entire paragraphs in English-only. For each concept, provide the Chinese explanation FIRST, followed by the English version, OR interleave Chinese and English sentence by sentence.
+
+2. **Structure pattern for each topic:**
+   - 中文解释 (Chinese explanation): Explain the concept in clear Chinese, using plain language the student can understand.
+   - English explanation: Provide the same explanation in English, with proper technical terminology.
+   - The two should be comparable in depth — do not write a detailed English paragraph and a one-line Chinese summary.
+
+3. **Technical terms format:** "English Term (中文翻译)" on first use. Then freely use either language.
+
+4. **For definitions, theorems, and formulas:** Present them in English first (to match the course notation), then immediately explain in Chinese what it means, why it matters, and how to use it.
+
+5. **For proofs and worked examples:** Explain the logic and each step in Chinese. Keep the mathematical notation in LaTeX as-is.
+
+6. **Headings:** Keep the English heading, followed by " / " and Chinese translation. Example: "### Topic 1: Simple Random Walk / 简单随机游走"
+
+7. **Mathematics:** Use standard LaTeX notation. After every formula, include a compact table explaining each symbol in both languages.
+   **CRITICAL: All matrices MUST use LaTeX `\\begin{pmatrix}...\\end{pmatrix}` — NEVER use Unicode box-drawing characters.**
+
+Example of GOOD bilingual content:
+```
+#### Intuition / 直觉理解
+
+**中文解释：** 想象一个醉汉在一条直线上行走。每一步，他随机地向左或向右移动一个单位。经过 n 步后，他的位置就是这 n 次随机移动的累计结果。这种模型被称为"随机游走"，是描述随机演化过程的最基本工具。
+
+**English explanation:** Imagine a drunkard walking on a line. At each step, they randomly move left or right by one unit. After n steps, their position is the cumulative result of these n random moves. This model is called a "random walk" and is the most fundamental tool for describing randomly evolving processes.
+
+**Real-world applications / 实际应用：**
+- Stock price daily changes / 股票价格每日变动
+- Particle diffusion in physics / 物理学中的粒子扩散
+```
+
+Example of BAD content (DO NOT DO THIS):
+```
+A random walk is a stochastic process that describes a path consisting of a succession of random steps. (随机游走是一种随机过程。)
+```
+↑ This is English-only with a token Chinese summary — NOT acceptable.
+
 
 ## REQUIRED STRUCTURE:
 
@@ -356,7 +392,7 @@ IMPORTANT RULES:
 6. The guide should be usable WITHOUT referring back to the original PDF"""
 
         response = call_llm_with_prompts(
-            "You are an expert university professor creating bilingual (Chinese/English) self-study textbooks. You are thorough, patient, and include EVERY detail from the source material.",
+            "You are an expert university professor creating truly bilingual (Chinese/English) self-study textbooks for Chinese international students. Every paragraph you write contains substantial content in BOTH languages — Chinese explanations are as detailed as English ones. You NEVER write English-only paragraphs. You are thorough, patient, and include EVERY detail from the source material.",
             prompt,
             temperature=GENERATION_TEMPERATURE,
             max_tokens=GENERATION_MAX_TOKENS,

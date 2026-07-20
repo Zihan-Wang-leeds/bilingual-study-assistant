@@ -385,9 +385,20 @@ if app:
             mode = 'teach'
 
         def generate():
-            for token in rag.ask_stream(question, course_code=course_code, mode=mode, history=history):
-                yield f"data: {json.dumps({'token': token}, ensure_ascii=False)}\n\n"
-            yield "data: [DONE]\n\n"
+            try:
+                for kind, value in rag.ask_stream(question, course_code=course_code, mode=mode, history=history):
+                    if kind == "meta":
+                        # 元数据直接发送，不用 token 包装
+                        yield f"data: {json.dumps(value, ensure_ascii=False)}\n\n"
+                    else:
+                        # 文本 token
+                        yield f"data: {json.dumps({'token': value}, ensure_ascii=False)}\n\n"
+                yield "data: [DONE]\n\n"
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                yield f"data: {json.dumps({'token': f'❌ 服务器错误: {str(e)}'}, ensure_ascii=False)}\n\n"
+                yield "data: [DONE]\n\n"
 
         return Response(
             stream_with_context(generate()),
