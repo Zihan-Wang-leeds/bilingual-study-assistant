@@ -108,7 +108,7 @@ def main():
         # Commands
         if user_input.startswith("/mode"):
             print_modes()
-            new_choice = input("Select (1-4): ").strip()
+            new_choice = input("Select (1-5): ").strip()
             if new_choice in mode_map and new_choice != "6":
                 mode = mode_map[new_choice]
                 print(f"Switched to / 切换到: {mode_names[mode]}")

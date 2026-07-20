@@ -12,7 +12,10 @@ from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from config import API_KEY, BASE_URL, MODEL_NAME, COURSES_DIR
+from config import (
+    API_KEY, BASE_URL, MODEL_NAME, COURSES_DIR,
+    GENERATION_TEMPERATURE, GENERATION_MAX_TOKENS, GENERATION_SLEEP,
+)
 from pdf_loader import extract_text_from_pdf, extract_course_info
 
 load_dotenv()
@@ -149,7 +152,7 @@ class ProblemSolver:
 
                 print(f"  Saved: {filepath}")
                 generated.append(ps)
-                time.sleep(2)
+                time.sleep(GENERATION_SLEEP)
 
             except Exception as e:
                 print(f"  ERROR: {e}")
@@ -240,8 +243,8 @@ RULES:
                 {"role": "system", "content": "You are a university mathematics tutor specializing in stochastic processes. You create detailed, step-by-step solutions with bilingual (Chinese/English) explanations. You never skip steps and always explain the reasoning."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.3,
-            max_tokens=6000
+            temperature=GENERATION_TEMPERATURE,
+            max_tokens=GENERATION_MAX_TOKENS
         )
 
         content = response.choices[0].message.content
@@ -266,11 +269,28 @@ def main():
     import argparse
 
     ap = argparse.ArgumentParser(description="Generate solutions for Problem Sheets")
+    ap.add_argument("--course", type=str, default=None,
+                    help="Course code (e.g. MATH2702). Auto-detects if not specified.")
     ap.add_argument("--all", action="store_true", help="Solve ALL Problem Sheets")
     ap.add_argument("--sheet", type=int, default=1, help="Solve single Problem Sheet (default: 1)")
     args = ap.parse_args()
 
-    course_code = "MATH2702"
+    # Auto-detect course if not specified
+    if args.course:
+        course_code = args.course
+    else:
+        courses = [
+            d for d in os.listdir(COURSES_DIR)
+            if os.path.isdir(os.path.join(COURSES_DIR, d))
+        ]
+        if not courses:
+            print(f"ERROR: No course directories found in {COURSES_DIR}")
+            return
+        course_code = courses[0]
+        if len(courses) > 1:
+            print(f"Multiple courses found: {courses}")
+            print(f"Using first: {course_code}. Use --course to specify.")
+
     pdf_path = os.path.join(COURSES_DIR, course_code, "课件.pdf")
 
     if not os.path.exists(pdf_path):

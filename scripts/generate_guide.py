@@ -14,7 +14,10 @@ from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from config import API_KEY, BASE_URL, MODEL_NAME, COURSES_DIR
+from config import (
+    API_KEY, BASE_URL, MODEL_NAME, COURSES_DIR,
+    GENERATION_TEMPERATURE, GENERATION_MAX_TOKENS, GENERATION_SLEEP,
+)
 from pdf_loader import extract_text_from_pdf, extract_with_structure
 
 load_dotenv()
@@ -225,7 +228,7 @@ class GuideGenerator:
                 )
 
                 # 避免API限流
-                time.sleep(2)
+                time.sleep(GENERATION_SLEEP)
 
             except Exception as e:
                 print(f"  ERROR generating Section {b['number']}: {e}")
@@ -271,7 +274,7 @@ class GuideGenerator:
             guide = self._generate_single_guide(partial_boundary, chunk_text)
             partial_guides.append(guide)
             if i < len(chunks) - 1:
-                time.sleep(1)
+                time.sleep(GENERATION_SLEEP // 2)
 
         # 合并各段
         return self._merge_partial_guides(boundary, partial_guides)
@@ -366,8 +369,8 @@ IMPORTANT RULES:
                 {"role": "system", "content": "You are an expert university professor creating bilingual (Chinese/English) self-study textbooks. You are thorough, patient, and include EVERY detail from the source material."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.3,
-            max_tokens=6000
+            temperature=GENERATION_TEMPERATURE,
+            max_tokens=GENERATION_MAX_TOKENS
         )
 
         content = response.choices[0].message.content
@@ -438,22 +441,45 @@ IMPORTANT RULES:
 # ================================================================
 
 def main():
-    course_code = "MATH2702"
-    pdf_path = os.path.join(COURSES_DIR, course_code, "课件.pdf")
-
-    if not os.path.exists(pdf_path):
-        print(f"ERROR: PDF not found: {pdf_path}")
-        return
-
-    gen = GuideGenerator(course_code, pdf_path)
-
-    # 先生成Section 1测试效果
     import argparse
-    ap = argparse.ArgumentParser()
+
+    ap = argparse.ArgumentParser(
+        description="Generate bilingual self-study guides from course PDFs"
+    )
+    ap.add_argument("--course", type=str, default=None,
+                    help="Course code (e.g. MATH2702). Auto-detects if not specified.")
     ap.add_argument("--all", action="store_true", help="Generate ALL sections")
     ap.add_argument("--section", type=int, default=1, help="Generate single section (default: 1)")
     ap.add_argument("--from-section", type=int, default=1, help="Start from section N")
     args = ap.parse_args()
+
+    # Auto-detect course if not specified
+    if args.course:
+        course_code = args.course
+    else:
+        # Find all course directories
+        courses = [
+            d for d in os.listdir(COURSES_DIR)
+            if os.path.isdir(os.path.join(COURSES_DIR, d))
+        ]
+        if not courses:
+            print(f"ERROR: No course directories found in {COURSES_DIR}")
+            return
+        course_code = courses[0]
+        if len(courses) > 1:
+            print(f"Multiple courses found: {courses}")
+            print(f"Using first: {course_code}. Use --course to specify.")
+        else:
+            print(f"Auto-detected course: {course_code}")
+
+    pdf_path = os.path.join(COURSES_DIR, course_code, "课件.pdf")
+
+    if not os.path.exists(pdf_path):
+        print(f"ERROR: PDF not found: {pdf_path}")
+        print(f"  Available courses: {[d for d in os.listdir(COURSES_DIR) if os.path.isdir(os.path.join(COURSES_DIR, d))]}")
+        return
+
+    gen = GuideGenerator(course_code, pdf_path)
 
     # Auto-detect section boundaries (no hardcoded list needed)
     print("Auto-detecting section boundaries...")
