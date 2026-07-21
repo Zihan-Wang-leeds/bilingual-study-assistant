@@ -5,7 +5,7 @@ PDF 课件加载器 - 从PDF提取结构化文本、表格和章节结构
   1. PyMuPDF (fitz) 作为主提取引擎，保留布局信息，速度更快
   2. pdfplumber 表格提取 → Markdown 表格
   3. 字体大小/粗体检测 → 自动识别章节标题
-  4. 扫描版 PDF 检测 → 提示 OCR 需求
+  4. 扫描版 PDF 检测 → OCR (Tesseract) 自动回退
   5. PyPDF2 作为回退方案
 """
 import os
@@ -29,6 +29,19 @@ except ImportError:
 # --- 回退：PyPDF2 ---
 from PyPDF2 import PdfReader
 
+# --- OCR 支持 ---
+try:
+    from pdf2image import convert_from_path
+    HAS_PDF2IMAGE = True
+except ImportError:
+    HAS_PDF2IMAGE = False
+
+try:
+    import pytesseract
+    HAS_TESSERACT = True
+except ImportError:
+    HAS_TESSERACT = False
+
 
 def extract_text_from_pdf(pdf_path: str, method: str = "auto") -> list[dict]:
     """
@@ -51,6 +64,16 @@ def extract_text_from_pdf(pdf_path: str, method: str = "auto") -> list[dict]:
         pages = _extract_with_fitz(pdf_path)
     else:
         pages = _extract_with_pypdf2(pdf_path)
+
+    # 扫描版/图片型 PDF 检测：如果文本提取结果为空或极少，自动回退到 OCR
+    if not _has_meaningful_text(pages) and HAS_PDF2IMAGE and HAS_TESSERACT:
+        print(f"[INFO] 检测到扫描版/图片型 PDF，自动切换为 OCR 模式...")
+        ocr_pages = _extract_with_ocr(pdf_path)
+        if ocr_pages and _has_meaningful_text(ocr_pages):
+            pages = ocr_pages
+            print(f"[OK] OCR 完成: 提取了 {len(pages)} 页文本")
+        else:
+            print("[WARN] OCR 也未提取到足够文本，请检查 PDF 质量")
 
     # 清理多余空白
     for p in pages:
@@ -104,6 +127,60 @@ def _extract_with_pypdf2(pdf_path: str) -> list[dict]:
     return pages
 
 
+def _extract_with_ocr(pdf_path: str, dpi: int = 250) -> list[dict]:
+    """
+    使用 OCR (Tesseract) 从扫描版/图片型 PDF 提取文本。
+
+    流程：PDF → 图片 (via pdf2image/poppler) → OCR (via pytesseract)
+    """
+    if not HAS_PDF2IMAGE:
+        print("[ERROR] OCR 需要 pdf2image + poppler。请: brew install poppler && pip install pdf2image")
+        return []
+    if not HAS_TESSERACT:
+        print("[ERROR] OCR 需要 pytesseract。请: brew install tesseract && pip install pytesseract")
+        return []
+
+    print(f"  OCR mode: converting PDF pages to images (DPI={dpi})...")
+    try:
+        images = convert_from_path(pdf_path, dpi=dpi)
+    except Exception as e:
+        print(f"[ERROR] PDF→图片转换失败: {e}")
+        return []
+
+    pages = []
+    total = len(images)
+    print(f"  OCR mode: running Tesseract on {total} pages...")
+
+    for i, img in enumerate(images):
+        try:
+            text = pytesseract.image_to_string(img, lang='eng')
+        except Exception as e:
+            print(f"  [WARN] OCR failed on page {i+1}: {e}")
+            text = ""
+
+        pages.append({
+            "page": i + 1,
+            "text": text.strip(),
+            "blocks": [],
+            "width": img.width,
+            "height": img.height,
+        })
+
+        if (i + 1) % 10 == 0 or i == total - 1:
+            print(f"  OCR progress: {i+1}/{total} pages")
+
+    return pages
+
+
+def _has_meaningful_text(pages: list[dict], threshold: int = 50) -> bool:
+    """检查提取结果是否包含有意义的文本（前几页平均字符数超过阈值）。"""
+    if not pages:
+        return False
+    sample = pages[:min(5, len(pages))]
+    avg_len = sum(len(p["text"]) for p in sample) / len(sample)
+    return avg_len >= threshold
+
+
 # --- 结构提取（基于 pdf-harvester 的 extract_with_structure 模式） ---
 
 def extract_with_structure(pdf_path: str) -> dict:
@@ -112,6 +189,8 @@ def extract_with_structure(pdf_path: str) -> dict:
 
     使用字体大小和粗体来识别标题层级，无需硬编码目录。
     适用于课件 PDF（Slide 标题通常字号更大/加粗）。
+
+    对于扫描版/OCR PDF，回退到基于文本模式的标题检测。
 
     返回:
         {
@@ -137,6 +216,47 @@ def extract_with_structure(pdf_path: str) -> dict:
     doc = fitz.open(pdf_path)
     pages_out = []
     outline = []
+
+    # 先检查是否有文本块可用（非扫描版）
+    sample_text = ""
+    for page in doc[:min(3, len(doc))]:
+        sample_text += page.get_text("text")
+    is_scanned = len(sample_text.strip()) < 100
+
+    if is_scanned:
+        # 扫描版 PDF：使用 OCR 提取文本后再做结构分析
+        doc.close()
+        print("[INFO] 扫描版 PDF 检测到，使用 OCR 文本进行结构分析...")
+        ocr_pages = extract_text_from_pdf(pdf_path)
+        if not ocr_pages or not _has_meaningful_text(ocr_pages):
+            print("[WARN] OCR 文本不足，无法进行结构分析")
+            return {
+                "total": len(ocr_pages) if ocr_pages else 0,
+                "pages": [{"page": p["page"], "text": p["text"], "headings": [], "paragraphs": []}
+                          for p in (ocr_pages or [])],
+                "outline": [],
+            }
+        outline = []
+        pages_out = []
+        for p in ocr_pages:
+            headings, body_lines = _detect_headings_from_text(p["text"])
+            pages_out.append({
+                "page": p["page"],
+                "text": p["text"],
+                "headings": [{"text": h, "level": lv, "font_size": 0, "page": p["page"]}
+                            for h, lv in headings],
+                "paragraphs": [" ".join(body_lines)] if body_lines else [],
+            })
+            for h, lv in headings:
+                if not any(o["title"] == h for o in outline):
+                    outline.append({"title": h, "page": p["page"], "level": lv})
+        print(f"[OK] 结构提取完成: {len(pages_out)} 页, {len(outline)} 个标题")
+        print(f"  (使用 OCR 文本模式匹配，标题检测精度有限)")
+        return {
+            "total": len(pages_out),
+            "pages": pages_out,
+            "outline": outline,
+        }
 
     for i, page in enumerate(doc):
         page_num = i + 1
@@ -217,11 +337,104 @@ def extract_with_structure(pdf_path: str) -> dict:
     doc.close()
 
     print(f"[OK] 结构提取完成: {len(pages_out)} 页, {len(outline)} 个标题")
+    if is_scanned:
+        print(f"  (使用 OCR 文本模式匹配，标题检测精度有限)")
     return {
         "total": len(pages_out),
         "pages": pages_out,
         "outline": outline,
     }
+
+
+def _detect_headings_from_text(text: str) -> tuple:
+    """
+    从纯文本中基于模式匹配检测标题（OCR 回退方案）。
+
+    检测规则（保守策略，减少误匹配）：
+      - "N. Chapter N: Title" → Level 1
+      - "Chapter N: Title" 或 "Chapter N - Title" → Level 1
+      - "N.N Title" (如 "1.1 What is a time series?") → Level 2
+      - "Problem Sheet N" → Level 2
+      - 排除：纯数字行、明显是公式/代码的行
+
+    返回: ([(标题文本, level), ...], [正文行, ...])
+    """
+    headings = []
+    body_lines = []
+    lines = text.split('\n')
+
+    # Level 1 patterns: chapter-level headings
+    l1_patterns = [
+        # "N. Chapter N: Title" e.g. "1. Chapter 1: Introduction"
+        (r'^(\d{1,2})\.\s*Chapter\s+\1[\.:\)]\s*(.+)', 1),
+        # "N. Chapter N - Title"
+        (r'^(\d{1,2})\.\s*Chapter\s+\1\s*[-–—]\s*(.+)', 1),
+        # "Chapter N: Title" or "Chapter N. Title"
+        (r'^Chapter\s+(\d{1,2})[\.:\)\s-]+(.+)', 1),
+    ]
+
+    # Level 2 patterns: subsection-level
+    l2_patterns = [
+        # "N.M Title" e.g. "1.1 What is a time series?"
+        (r'^(\d{1,2}\.\d+)\s+(.+)', 2),
+        # "Problem Sheet N" or "Problem Sheet N: Title"
+        (r'^Problem\s+Sheet\s+\d+.*', 2),
+    ]
+
+    for line in lines:
+        line = line.strip()
+        if not line or len(line) < 4:
+            body_lines.append(line)
+            continue
+
+        # 跳过明显的非标题行
+        if _is_likely_not_heading(line):
+            body_lines.append(line)
+            continue
+
+        matched = False
+
+        for pattern, level in l1_patterns:
+            m = re.match(pattern, line, re.IGNORECASE)
+            if m:
+                # 保留完整行作为标题文本（generate_guide.py 需要解析编号）
+                headings.append((line, level))
+                matched = True
+                break
+
+        if not matched:
+            for pattern, level in l2_patterns:
+                m = re.match(pattern, line, re.IGNORECASE)
+                if m:
+                    headings.append((line, level))
+                    matched = True
+                    break
+
+        if not matched:
+            body_lines.append(line)
+
+    return headings, body_lines
+
+
+def _is_likely_not_heading(line: str) -> bool:
+    """检测一行文本是否大概率不是标题（启发式规则）。"""
+    # 纯数字或纯标点
+    if re.match(r'^[\d\s\.\,\;\:\-\=\+\*\/\(\)\[\]\{\}\<\>\|\&\^\%\$\#\@\!\\\?\'\"\_\~\`]+$', line):
+        return True
+    # 太短
+    if len(line) < 4:
+        return True
+    # 明显是公式/代码（包含过多数学符号且字母很少）
+    alpha_chars = sum(1 for c in line if c.isalpha())
+    if alpha_chars < len(line) * 0.3:
+        return True
+    # 以 "== " 或 "--" 开头（可能是分隔线或 OCR 噪音）
+    if re.match(r'^[=\-]{2,}', line):
+        return True
+    # 看起来像方程式引用编号加噪音
+    if re.match(r'^\d{1,3}[\.\)]\s*[=\-\(\)\[\]]', line):
+        return True
+    return False
 
 
 # --- 表格提取（基于 pdf-harvester 的 table_to_markdown 模式）---
