@@ -1,0 +1,406 @@
+# Section 1: Introduction
+
+> MATH2703 - 自学教材 / Self-Study Guide
+> 生成时间: 2026-07-21 11:07
+> 来源页: 4-12
+
+---
+
+# MATH2703: Time Series / 时间序列分析
+
+## Section 1: Introduction to Time Series / 第一章：时间序列导论
+
+---
+
+### 📋 Section Overview / 章节概览
+
+**中文解释：** 本章是时间序列分析的入门章节。我们将学习什么是时间序列，如何识别时间序列中的趋势（trend）和季节效应（seasonal effect），以及如何通过线性回归等方法对这些成分进行建模和去除。这是整个课程的基础，因为后续所有高级模型（如ARIMA等）都建立在理解这些基本概念之上。
+
+**English explanation:** This chapter serves as the introduction to time series analysis. We will learn what a time series is, how to identify trends and seasonal effects in time series data, and how to model and remove these components using methods like linear regression. This is the foundation of the entire course, as all subsequent advanced models (such as ARIMA) are built upon understanding these basic concepts.
+
+---
+
+### 🎯 Learning Objectives / 学习目标
+
+完成本章学习后，你应该能够：
+
+1. **定义时间序列**并解释其基本特征 / Define a time series and explain its basic characteristics
+2. **识别**时间序列中的趋势和季节效应 / Identify trends and seasonal effects in time series data
+3. **使用线性回归拟合线性趋势** / Fit a linear trend using linear regression
+4. **使用虚拟变量（dummy variables）拟合季节效应** / Fit seasonal effects using dummy variables
+5. **解释残差（residuals）的含义**并判断模型拟合质量 / Interpret residuals and assess model fit quality
+6. **理解趋势和季节效应去除后的后续分析步骤** / Understand the next steps after removing trend and seasonal effects
+
+---
+
+### 📚 Prerequisites / 前置知识
+
+**中文解释：** 本课程要求你先完成 MATH1000 和 MATH1700 两门课程。特别地，你需要熟悉以下内容：
+- 线性回归的基本概念（MATH1700 第29章）
+- 最小二乘法（Ordinary Least Squares, OLS）
+- 基本的R语言操作
+
+如果你对这些内容感到生疏，请及时复习。教授明确表示：**如果你不主动寻求帮助，教授无法帮助你**（"If you don't tell me, there's nothing I can do to help"）。
+
+**English explanation:** This course requires you to have completed MATH1000 and MATH1700. Specifically, you need to be familiar with:
+- Basic concepts of linear regression (Chapter 29 of MATH1700)
+- Ordinary Least Squares (OLS) method
+- Basic R programming operations
+
+If you feel rusty on these topics, please review them promptly. The professor explicitly states: **"If you don't tell me, there's nothing I can do to help"** — so don't hesitate to ask questions!
+
+---
+
+### 📖 Core Content / 核心内容
+
+---
+
+#### Topic 1.1: What is a Time Series? / 什么是时间序列？
+
+##### Intuition / 直觉理解
+
+**中文解释：** 想象你每天记录自己所在城市的最高气温。如果你把这些数据按时间顺序画出来，就得到了一个时间序列。时间序列的核心特点是：
+1. **数据按时间顺序排列**（如每天、每月、每年）
+2. **相邻时间点的观测值往往相似**（比如今天的温度与昨天的温度相近）
+3. **数据受到系统性因素和随机性的共同影响**（比如季节变化是系统性的，而某天的异常天气是随机的）
+
+**English explanation:** Imagine you record the daily maximum temperature in your city. If you plot these data points in chronological order, you get a time series. The key characteristics of a time series are:
+1. **Data are ordered by time** (e.g., daily, monthly, yearly)
+2. **Observations at nearby times tend to be similar** (e.g., today's temperature is similar to yesterday's)
+3. **Data are influenced by both systematic effects and randomness** (e.g., seasonal changes are systematic, while an unusual weather event on a particular day is random)
+
+##### Formal Definition / 形式化定义
+
+**Definition 1.1 (Time Series / 时间序列):** A time series $\{X_t\}$ consists of observations $X_t$ made at times $t = t_1, \ldots, t_n$ (e.g., every day).
+
+**Symbol Explanation / 符号说明：**
+
+| Symbol / 符号 | Meaning / 含义 |
+|:---:|:---|
+| $X_t$ | The observation at time $t$ / 在时间点 $t$ 的观测值 |
+| $t$ | Time index / 时间索引 |
+| $\{X_t\}$ | The collection of all observations / 所有观测值的集合 |
+
+**中文解释：** 时间序列 $\{X_t\}$ 是在一系列时间点 $t_1, t_2, \ldots, t_n$ 上观测到的数据 $X_t$ 的集合。这些时间点通常是等间隔的（如每天、每月、每年）。
+
+**English explanation:** A time series $\{X_t\}$ is a collection of observations $X_t$ made at a sequence of time points $t_1, t_2, \ldots, t_n$. These time points are usually equally spaced (e.g., every day, every month, every year).
+
+##### Three Main Goals of Time Series Analysis / 时间序列分析的三个主要目标
+
+| Goal / 目标 | Description / 描述 |
+|:---|:---|
+| **Description / 描述** | Plot $X_t$ against $t$ to visualize patterns / 将 $X_t$ 对 $t$ 作图以可视化模式 |
+| **Modeling / 建模** | Suggest a model, estimate parameters, and test validity / 提出模型、估计参数并检验有效性 |
+| **Forecasting / 预测** | Predict future behavior of the time series / 预测时间序列的未来行为 |
+
+##### Examples of Time Series / 时间序列的例子
+
+**Example 1.1: Nottingham Castle Monthly Air Temperature / 诺丁汉城堡月平均气温**
+
+**中文解释：** 图1.1显示了1920年1月至1939年12月诺丁汉城堡的月平均气温（华氏度）。我们可以清楚地看到**周期为12的季节效应**——每年气温呈现相似的波动模式。
+
+**English explanation:** Figure 1.1 shows the monthly air temperature at Nottingham Castle from January 1920 to December 1939 (in Fahrenheit). We can clearly see a **seasonal effect with period 12** — the temperature follows a similar pattern of fluctuations each year.
+
+```r
+data(nottem)
+plot(nottem, type="l", ylab="Temperature (F)")
+```
+
+**Example 1.2: Mauna Loa CO2 Concentration / 莫纳罗亚山二氧化碳浓度**
+
+**中文解释：** 图1.2显示了1959年1月至1997年12月夏威夷莫纳罗亚山大气观测站的月均CO2浓度。我们可以观察到：
+- **明显的上升趋势**（increasing trend）——CO2浓度随时间持续增加
+- **周期为12的季节效应**——每年CO2浓度呈现周期性波动
+
+**English explanation:** Figure 1.2 shows the monthly CO2 concentration at the Mauna Loa atmospheric observatory, Hawaii, from January 1959 to December 1997. We can observe:
+- A **very clear increasing trend** — CO2 concentration continuously increases over time
+- A **seasonal effect with period 12** — CO2 concentration shows periodic fluctuations each year
+
+```r
+data(co2)  # note: dataset is "co2", not "CO2"
+plot(co2, type="l", ylab="CO2 concentration (ppm)")
+```
+
+**Example 1.3: Airline Passengers / 航空公司乘客数**
+
+**中文解释：** 图1.3显示了1949年1月至1960年12月的航空公司乘客数量。我们可以观察到：
+- **上升趋势**（increasing trend）
+- **季节效应**（seasonal effect）
+- **方差随时间增加**（variance increases）——这是异方差性（heteroscedasticity）的表现
+
+**English explanation:** Figure 1.3 shows the number of airline passengers from January 1949 to December 1960. We can observe:
+- An **increasing trend**
+- A **seasonal effect**
+- **Increasing variance over time** — this is a manifestation of heteroscedasticity
+
+```r
+data(AirPassengers)
+plot(AirPassengers, type="l", ylab="Passengers (1000)")
+```
+
+**Example 1.4: Johnson & Johnson Quarterly Earnings / 强生公司季度收益**
+
+**中文解释：** 图1.4显示了1960年第一季度至1980年第四季度强生公司的每股季度收益，共84个观测值。我们可以观察到：
+- **明显的上升趋势**
+- **周期为4的季节效应**（季度数据，一年4个季度）
+- **方差随时间增加**
+
+**English explanation:** Figure 1.4 shows the quarterly earnings per share for Johnson & Johnson from Q1 1960 to Q4 1980, totaling 84 observations. We can observe:
+- An **obvious increasing trend**
+- A **seasonal effect with period 4** (quarterly data, 4 quarters per year)
+- **Increasing variance over time**
+
+```r
+data(JohnsonJohnson)
+plot(JohnsonJohnson, type="o", ylab="Earnings per share")
+```
+
+##### Roadmap of the Course / 课程路线图
+
+**中文解释：** 时间序列分析的一般流程如下：
+
+1. **初始阶段（第1章）**：识别、建模并去除数据中的趋势和季节效应
+2. **中间阶段（第3-5章）**：对去除趋势和季节效应后的残差使用时间序列模型（如AR、MA、ARMA等）
+3. **估计阶段（第6章）**：学习参数估计方法
+4. **模型选择与诊断（第7章）**：选择最佳模型并进行诊断检验
+5. **预测（第8章）**：使用模型进行预测
+
+**English explanation:** The general workflow of time series analysis is as follows:
+
+1. **Initial stage (Chapter 1)**: Identify, model, and remove any trend or seasonal effects
+2. **Intermediate stage (Chapters 3-5)**: Model the residuals using time series models (such as AR, MA, ARMA, etc.)
+3. **Estimation stage (Chapter 6)**: Learn parameter estimation methods
+4. **Model selection and diagnostics (Chapter 7)**: Select the best model and perform diagnostic checks
+5. **Forecasting (Chapter 8)**: Use the model for prediction
+
+---
+
+#### Topic 1.2: Fitting a Trend / 拟合趋势
+
+##### Intuition / 直觉理解
+
+**中文解释：** 趋势（trend）是时间序列均值水平的缓慢变化。例如，CO2浓度数据中，尽管每年有季节性波动，但整体上CO2浓度在几十年间持续上升——这就是趋势。我们的目标是找到并量化这种趋势，然后将其从数据中去除，以便分析剩余的波动（残差）。
+
+**English explanation:** A trend is a slow change in the mean level of a time series. For example, in the CO2 concentration data, despite seasonal fluctuations each year, the overall CO2 concentration has been continuously rising over decades — this is the trend. Our goal is to find and quantify this trend, then remove it from the data so we can analyze the remaining fluctuations (residuals).
+
+##### Formal Definition / 形式化定义
+
+**Model (1.1):** Consider the model:
+$$X_t = \mu(t) + \varepsilon_t$$
+
+where:
+- $\mu(t)$ is a **(deterministic) trend** as a function of $t$ / 作为 $t$ 的函数的（确定性）趋势
+- $\varepsilon_t$ is a **(random) fluctuation** about the trend at time $t$ / 在时间 $t$ 围绕趋势的（随机）波动
+- $\mathbb{E}[\varepsilon_t] = 0$ / 残差的期望为0
+
+**Symbol Explanation / 符号说明：**
+
+| Symbol / 符号 | Meaning / 含义 |
+|:---:|:---|
+| $X_t$ | Observed value at time $t$ / 时间 $t$ 的观测值 |
+| $\mu(t)$ | Trend function at time $t$ / 时间 $t$ 的趋势函数 |
+| $\varepsilon_t$ | Random fluctuation (residual) at time $t$ / 时间 $t$ 的随机波动（残差） |
+| $\mathbb{E}[\varepsilon_t] = 0$ | The expected value of the fluctuation is zero / 波动的期望值为0 |
+
+**中文解释：** 模型(1.1)将观测值 $X_t$ 分解为两部分：确定性趋势 $\mu(t)$ 和随机波动 $\varepsilon_t$。残差 $\varepsilon_t$ 的期望为0，这意味着平均而言，观测值围绕趋势上下波动。
+
+**English explanation:** Model (1.1) decomposes the observed value $X_t$ into two parts: a deterministic trend $\mu(t)$ and a random fluctuation $\varepsilon_t$. The expected value of the residual $\varepsilon_t$ is 0, meaning that on average, observations fluctuate around the trend.
+
+##### Example 1.1: Linear Trend / 线性趋势
+
+**中文解释：** 最简单的趋势形式是线性趋势（linear trend）：$\mu(t) = \alpha + \beta t$，其中 $\alpha$ 是截距（intercept），$\beta$ 是斜率（slope）。我们需要根据观测数据 $X_1, \ldots, X_n$ 来估计 $\alpha$ 和 $\beta$。
+
+**English explanation:** The simplest form of trend is the linear trend: $\mu(t) = \alpha + \beta t$, where $\alpha$ is the intercept and $\beta$ is the slope. We need to estimate $\alpha$ and $\beta$ based on the observed data $X_1, \ldots, X_n$.
+
+**Solution / 解法：**
+
+**中文解释：** 通过最小化残差平方和（Residual Sum of Squares, RSS），我们得到参数估计：
+
+$$\hat{\beta} = \frac{\sum_{i=1}^n (X_i - \bar{X})(t_i - \bar{t})}{\sum_{i=1}^n (t_i - \bar{t})^2}$$
+
+$$\hat{\alpha} = \bar{X} - \hat{\beta}\bar{t}$$
+
+其中 $\bar{X} = \frac{1}{n}\sum_{i=1}^n X_i$，$\bar{t} = \frac{1}{n}\sum_{i=1}^n t_i$。
+
+估计出的趋势为：$\hat{\mu}(t) = \hat{\alpha} + \hat{\beta}t$
+
+**English explanation:** By minimizing the Residual Sum of Squares (RSS), we obtain the parameter estimates:
+
+$$\hat{\beta} = \frac{\sum_{i=1}^n (X_i - \bar{X})(t_i - \bar{t})}{\sum_{i=1}^n (t_i - \bar{t})^2}$$
+
+$$\hat{\alpha} = \bar{X} - \hat{\beta}\bar{t}$$
+
+where $\bar{X} = \frac{1}{n}\sum_{i=1}^n X_i$ and $\bar{t} = \frac{1}{n}\sum_{i=1}^n t_i$.
+
+The estimated trend is: $\hat{\mu}(t) = \hat{\alpha} + \hat{\beta}t$
+
+**Symbol Explanation / 符号说明：**
+
+| Symbol / 符号 | Meaning / 含义 |
+|:---:|:---|
+| $\hat{\beta}$ | Estimated slope / 估计的斜率 |
+| $\hat{\alpha}$ | Estimated intercept / 估计的截距 |
+| $\bar{X}$ | Sample mean of observations / 观测值的样本均值 |
+| $\bar{t}$ | Sample mean of time points / 时间点的样本均值 |
+| $\hat{\mu}(t)$ | Estimated trend at time $t$ / 时间 $t$ 的估计趋势 |
+
+##### Example 1.2: Linear Trend in CO2 Data / CO2数据的线性趋势拟合
+
+**中文解释：** 现在我们用R语言对CO2浓度数据拟合线性趋势。
+
+**English explanation:** Now we use R to fit a linear trend to the CO2 concentration data.
+
+```r
+data(co2)  # note: dataset is "co2", not "CO2"
+plot(co2, type="l", ylab="CO2 concentration (ppm)")
+
+n <- length(co2)
+tt <- as.numeric(time(co2))
+
+# Fit linear trend using lm function / 使用lm函数拟合线性趋势
+trend <- lm(co2 ~ tt)
+
+# Add the straight line to the time plot / 将直线添加到时间图中
+lines(tt, fitted.values(trend), col="blue")
+
+# Obtain the residuals after removing linear trend / 去除线性趋势后获得残差
+Y <- residuals(trend)
+
+# Plot the residuals / 绘制残差图
+plot(tt, Y, type="l", xlab="", ylab="X-trend", 
+     main="CO2: residual after removing linear trend", 
+     xlim=c(1965, 2000))
+```
+
+**中文解释：** 图1.5显示了原始CO2数据及其拟合的线性趋势（蓝色直线）。图1.6显示了去除线性趋势后的残差。观察残差图，你能发现什么？残差中是否还存在确定性特征？
+
+**English explanation:** Figure 1.5 shows the original CO2 data with the fitted linear trend (blue straight line). Figure 1.6 shows the residuals after removing the linear trend. Looking at the residual plot, what can you observe? Are there still deterministic features in the residuals?
+
+**Question for reflection / 思考问题：** Are you happy with the analysis so far? Do you spot any deterministic features in the residuals? / 你对目前的分析满意吗？你在残差中发现了任何确定性特征吗？
+
+##### Important Remarks / 重要说明
+
+**Remark 1 / 说明1：** Trends do not have to be linear! More general trend models are possible, such as:
+- Quadratic trend / 二次趋势：$\mu(t) = \alpha + \beta t + \gamma t^2$
+- Exponential trend / 指数趋势：$\mu(t) = \alpha \exp(\beta t)$
+
+**中文解释：** 趋势不一定是线性的！更一般的趋势模型也是可能的，如二次趋势和指数趋势。
+
+**Remark 2 / 说明2：** If a trend is present in the data, the usual summary statistics (mean, variance, etc.) will not be very useful.
+
+**中文解释：** 如果数据中存在趋势，通常的汇总统计量（均值、方差等）将不太有用。因为均值会随时间变化，方差也会受到趋势的影响。
+
+**Remark 3 / 说明3：** After a trend is fitted, the residuals $Y_t = X_t - \hat{\mu}(t)$ can be analyzed further.
+
+**中文解释：** 拟合趋势后，残差 $Y_t = X_t - \hat{\mu}(t)$ 可以进一步分析。这些残差代表了去除趋势后的波动。
+
+**Remark 4 / 说明4：** We can predict future behavior of $X$ by considering $\hat{\mu}(t)$ for $t > t_n$. Once we have analyzed the residuals, we can improve the forecast by considering $\hat{\mu}(t) + \hat{Y}_t$ for $t > t_n$.
+
+**中文解释：** 我们可以通过考虑 $t > t_n$ 时的 $\hat{\mu}(t)$ 来预测 $X$ 的未来行为。一旦我们分析了残差，我们可以通过考虑 $t > t_n$ 时的 $\hat{\mu}(t) + \hat{Y}_t$ 来改进预测。
+
+---
+
+#### Topic 1.3: Fitting Seasonal Effects / 拟合季节效应
+
+##### Intuition / 直觉理解
+
+**中文解释：** 季节效应（seasonal effect）是时间序列中以固定频率重复的周期性成分。例如：
+- 月平均气温数据：每年12个月呈现相似的波动模式（周期=12）
+- 季度收益数据：每年4个季度呈现相似的波动模式（周期=4）
+- CO2浓度数据：每年呈现相似的季节性波动（周期=12）
+
+季节效应与趋势不同：趋势是长期缓慢变化，而季节效应是短期周期性波动。
+
+**English explanation:** Seasonal effects are periodic components of a time series that repeat with a fixed frequency. For example:
+- Monthly temperature data: similar fluctuation pattern each year across 12 months (period=12)
+- Quarterly earnings data: similar fluctuation pattern each year across 4 quarters (period=4)
+- CO2 concentration data: similar seasonal fluctuation each year (period=12)
+
+Seasonal effects differ from trends: trends are long-term slow changes, while seasonal effects are short-term periodic fluctuations.
+
+##### Formal Definition / 形式化定义
+
+**Model (1.3):** We revise model (1.1) to include seasonal effects:
+$$X_t = \mu(t) + s(t) + \varepsilon_t$$
+
+where:
+- $\mu(t)$ — trend / 趋势
+- $s(t)$ — seasonal effect, with $s(t) = s(t+a)$ $\forall t$ where $a$ is the period length / 季节效应，满足 $s(t) = s(t+a)$，其中 $a$ 是周期长度
+- $\varepsilon_t$ — residuals/fluctuations / 残差/波动
+
+**Symbol Explanation / 符号说明：**
+
+| Symbol / 符号 | Meaning / 含义 |
+|:---:|:---|
+| $X_t$ | Observed value at time $t$ / 时间 $t$ 的观测值 |
+| $\mu(t)$ | Trend function / 趋势函数 |
+| $s(t)$ | Seasonal effect function / 季节效应函数 |
+| $a$ | Period length (e.g., 12 for monthly, 4 for quarterly) / 周期长度 |
+| $\varepsilon_t$ | Random fluctuation / 随机波动 |
+
+##### Example 1.3: Monthly Seasonal Effect / 月度季节效应
+
+**中文解释：** 假设我们有观测值 $X_1, X_2, X_3, \ldots$ 在时间点 $1, 2, 3, \ldots$。考虑月度季节效应，即周期长度 $a = 12$。那么季节效应向量为：
+
+$$s = (s(1), s(2), \ldots, s(11), s(12), s(13), \ldots, s(23), s(24), \ldots)$$
+$$= (s(1), s(2), \ldots, s(11), s(12), s(1), \ldots, s(11), s(12), \ldots)$$
+$$= (s_1, s_2, \ldots, s_{11}, s_0, s_1, \ldots, s_{11}, s_0, \ldots)$$
+
+所以 $s(t) = s_{t \bmod 12}$。我们需要估计 $s_1, s_2, \ldots, s_{11}, s_0$（共12个参数）。
+
+**English explanation:** Suppose we have observed values $X_1, X_2, X_3, \ldots$ at times $1, 2, 3, \ldots$. Consider a monthly seasonal effect, i.e., period length $a = 12$. Then the seasonal effect vector is:
+
+$$s = (s(1), s(2), \ldots, s(11), s(12), s(13), \ldots, s(23), s(24), \ldots)$$
+$$= (s(1), s(2), \ldots, s(11), s(12), s(1), \ldots, s(11), s(12), \ldots)$$
+$$= (s_1, s_2, \ldots, s_{11}, s_0, s_1, \ldots, s_{11}, s_0, \ldots)$$
+
+So $s(t) = s_{t \bmod 12}$. We need to estimate $s_1, s_2, \ldots, s_{11}, s_0$ (12 parameters in total).
+
+**Solution using dummy variables / 使用虚拟变量的解法：**
+
+**中文解释：** 我们可以将模型写为：
+
+$$X_t = \mu(t) + s_1 I_{t1} + s_2 I_{t2} + \cdots + s_{11} I_{t,11} + s_0 I_{t0} + \varepsilon_t$$
+
+其中 $I_{tj}$ 是虚拟变量（dummy variable），定义为：
+$$I_{tj} = \begin{cases} 1 & \text{if time } t \text{ is in season } j \\ 0 & \text{else} \end{cases}$$
+
+参数 $s_1, \ldots, s_{11}, s_0$ 可以通过线性回归估计。
+
+**English explanation:** We can write the model as:
+
+$$X_t = \mu(t) + s_1 I_{t1} + s_2 I_{t2} + \cdots + s_{11} I_{t,11} + s_0 I_{t0} + \varepsilon_t$$
+
+where $I_{tj}$ is a dummy variable defined as:
+$$I_{tj} = \begin{cases} 1 & \text{if time } t \text{ is in season } j \\ 0 & \text{else} \end{cases}$$
+
+The parameters $s_1, \ldots, s_{11}, s_0$ can be estimated using linear regression.
+
+**Important note / 重要说明：** In MATH1700, only simple linear regression (with one explanatory variable) was introduced. You need to search and read literature to fill the gap of **multiple linear regression models** with more than one explanatory variables, and of linear regression models with a **categorical explanatory variable**.
+
+**中文解释：** 在MATH1700中，只介绍了简单线性回归（只有一个解释变量）。你需要查阅文献来补充**多元线性回归模型**（多个解释变量）和**分类解释变量的线性回归模型**的知识。
+
+##### Example 1.4: Monthly Seasonal Effect in CO2 Data / CO2数据的月度季节效应拟合
+
+**中文解释：** 现在我们对去除线性趋势后的CO2残差数据（即Example 1.2中的Y序列）拟合季节效应。
+
+**English explanation:** Now we fit the seasonal effect to the CO2 residuals after removing the linear trend (i.e., the Y series from Example 1.2).
+
+```r
+# Create dummy variables for each month / 为每个月创建虚拟变量
+jan <- as.numeric((1:n) %% 12 == 1)
+feb <- as.numeric((1:n) %% 12 == 2)
+mar <- as.numeric((1:n) %% 12 == 3)
+apr <- as.numeric((1:n) %% 12 == 4)
+may <- as.numeric((1:n) %% 12 == 5)
+jun <- as.numeric((1:n) %% 12 == 6)
+jul <- as.numeric((1:n) %% 12 == 7)
+aug <- as.numeric((1:n) %% 12 == 8)
+sep <- as.numeric((1:n) %% 12 == 9)
+oct <- as.numeric((1:n) %% 12 == 10)
+nov <- as.numeric((1:n) %% 12 == 11)
+dec <- as.numeric((1:n) %% 12 == 0)
+
+# Fit seasonal effect using linear regression / 使用线性回归拟合季节效应
+# Note: "0+" means no intercept (we include all 12 months) / "0+"表示无截距（包含所有12个月）
+S <- lm

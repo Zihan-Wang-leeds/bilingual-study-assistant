@@ -58,81 +58,50 @@ class GuideGenerator:
         """
         使用 pdf_loader.extract_with_structure() 自动检测章节边界。
 
-        MATH2702 课件的标题结构：
-          "1"           ← 纯数字
-          "Stochastic processes and the Markov property"  ← 紧随的标题
-        二者在同一页、同层级，需要配对合并。
+        支持两种课件格式：
+          A) MATH2702 式：纯数字 "1" + 紧随标题文字（同一页配对）
+          B) MATH2703 式：编号+标题一行 "1. Chapter 1: Introduction"
+          C) "Chapter N: Title" 式
+
+        对于 OCR/扫描版 PDF，直接从已提取的文本搜索章节标记。
 
         返回: [{number, title, start_page, end_page}, ...]
         """
         print("Auto-detecting sections via font/heading analysis...")
-        structure = extract_with_structure(self.pdf_path)
-        outline = structure["outline"]
-        total_pages = structure["total"]
 
-        body_outline = [
-            o for o in outline
-            if o["page"] > 6
-            and not _matches_skip_keyword(o["title"])
-        ]
+        # 快速检测是否为 OCR（self.pages 中前几页的 blocks 是否为空）
+        is_likely_ocr = all(
+            len(p.get("blocks", [])) == 0
+            for p in self.pages[:min(5, len(self.pages))]
+        )
 
-        # 配对逻辑：纯数字标题 + 紧随的非数字标题 = 一个章节
-        number_pattern = re.compile(r'^(\d{1,2})$')
-        part_pattern = re.compile(r'^Part\s+[IVX]+', re.IGNORECASE)
-        sections = []
+        if is_likely_ocr:
+            print("  OCR PDF detected — using full-text search for chapter boundaries")
+            sections = self._detect_sections_from_full_text()
+        else:
+            structure = extract_with_structure(self.pdf_path)
+            outline = structure["outline"]
+            total_pages = structure["total"]
 
-        i = 0
-        while i < len(body_outline):
-            item = body_outline[i]
-            title = item["title"].strip()
+            # 非 OCR 路径：也用文本搜索检查一下
+            body_outline = [
+                o for o in outline
+                if not _matches_skip_keyword(o["title"])
+            ]
 
-            # Part I/II 标记（不独立成章，但标记阶段切换）
-            if part_pattern.match(title):
-                i += 1
-                continue
-
-            # 纯数字 → 尝试与后续标题配对
-            m = number_pattern.match(title)
-            if m:
-                sec_num = int(m.group(1))
-                page = item["page"]
-                full_title_parts = []
-
-                # 收集同页紧随的非数字标题
-                j = i + 1
-                while j < len(body_outline) and body_outline[j]["page"] == page:
-                    next_title = body_outline[j]["title"].strip()
-                    if number_pattern.match(next_title):
-                        break  # 遇到下一个数字，说明这个数字没有标题跟随
-                    # 跳过 Problem Sheet
-                    if 'problem sheet' in next_title.lower():
-                        j += 1
-                        continue
-                    full_title_parts.append(next_title)
-                    j += 1
-
-                if full_title_parts:
-                    # 合并标题片段（处理 "exam-" 和 "ples" 分开的情况）
-                    full_title = " ".join(full_title_parts)
-                    # 修复断词：移除 " - " 前后的多余空格中的连字符
-                    full_title = re.sub(r'-\s+', '', full_title)
-
-                    if len(full_title) >= 3:
-                        sections.append({
-                            "number": sec_num,
-                            "title": full_title,
-                            "start_page": page,
-                            "end_page": None,
-                        })
-                i = j
+            if len(body_outline) < 5:
+                print(f"  Only {len(body_outline)} headings found — trying full-text search")
+                sections = self._detect_sections_from_full_text()
             else:
-                # 非数字标题 → 检测是否是独立章节（如 "Part I: ..." 下的隐式数字）
-                # 跳过前几页的非章节内容
-                i += 1
+                sections = self._detect_from_outline(body_outline)
 
-        # 按章节号排序
+        if not sections:
+            print("  WARNING: No sections detected!")
+
+        total_pages = len(self.pages)
+
+        # 排序和去重
         sections.sort(key=lambda s: s["number"])
-        # 去重
         seen = set()
         deduped = []
         for s in sections:
@@ -148,16 +117,289 @@ class GuideGenerator:
             else:
                 s["end_page"] = total_pages
 
-        # 过滤无效范围
+        # 过滤无效范围并合并过短的章节
         valid = [s for s in sections if s["end_page"] >= s["start_page"]]
+        valid = self._merge_short_sections(valid)
 
-        print(f"  Auto-detected {len(valid)} sections from {len(outline)} headings")
+        print(f"  Auto-detected {len(valid)} sections")
         for s in valid[:5]:
             print(f"    Section {s['number']:2d}: {s['title'][:55]:55s} pages {s['start_page']:3d}-{s['end_page']:3d}")
         if len(valid) > 5:
             print(f"    ... and {len(valid) - 5} more")
 
         return valid
+
+    def _detect_sections_from_full_text(self) -> list[dict]:
+        """
+        从 OCR 提取的完整文本中直接搜索章节边界。
+
+        策略：
+          1. 从 TOC（第1页）提取章节标题列表
+          2. 搜索 "X.1" 模式（如 "1.1", "2.1"）定位每章起始页
+          3. 没有 X.1 标记的章节从上下文推断
+
+        返回: [{number, title, start_page, end_page}, ...]
+        """
+        sections = []
+        seen_numbers = set()
+
+        # 1. 从 TOC 提取章节标题
+        chapter_titles = self._extract_chapter_titles_from_toc()
+        if chapter_titles:
+            print(f"  Extracted {len(chapter_titles)} chapter titles from TOC")
+
+        # 2. 搜索 X.1 模式定位章节起始页
+        # "1.1 Title" → Chapter 1 starts here
+        chapter_start_re = re.compile(r'^(\d{1,2})\.1\s+')
+        chapter_starts = {}  # chapter_num → page
+
+        for page in self.pages:
+            page_num = page["page"]
+            text = page["text"]
+            for line in text.split('\n'):
+                line = line.strip()
+                m = chapter_start_re.match(line)
+                if m:
+                    chap_num = int(m.group(1))
+                    if chap_num not in chapter_starts:
+                        chapter_starts[chap_num] = page_num
+
+        # 3. 寻找后续章节（Ch 9-11 可能没有 X.1）
+        # Look for Problem Sheet markers or other chapter indicators
+        ps_re = re.compile(r'^Problem\s+Sheet\s+(\d+)', re.IGNORECASE)
+        for page in self.pages:
+            page_num = page["page"]
+            text = page["text"]
+            for line in text.split('\n'):
+                line = line.strip()
+                # "Chapter N" standalone on a page
+                ch_marker = re.match(r'^Chapter\s+(\d{1,2})$', line, re.IGNORECASE)
+                if ch_marker:
+                    cn = int(ch_marker.group(1))
+                    if cn not in chapter_starts and cn <= 11:
+                        chapter_starts[cn] = page_num
+
+        # 4. Build section list from detected starts + TOC titles
+        all_chapters = set(range(1, 12))  # Ch 1-11
+
+        # Fill in missing chapters (9, 10, 11 may not have X.1 markers)
+        max_page = len(self.pages)
+        sorted_starts = sorted(chapter_starts.items())  # [(num, page), ...]
+
+        # Ensure all TOC chapters are represented
+        all_chapters = set(chapter_titles.keys()) | set(chapter_starts.keys())
+        if not all_chapters:
+            all_chapters = set(range(1, 12))
+
+        for chap_num in sorted(all_chapters):
+            if chap_num in chapter_starts:
+                start_page = chapter_starts[chap_num]
+            else:
+                # Infer from nearest known chapters using page distribution
+                if sorted_starts:
+                    prev_chap = None
+                    next_chap = None
+                    for cn, cp in sorted_starts:
+                        if cn < chap_num:
+                            prev_chap = (cn, cp)
+                        if cn > chap_num and next_chap is None:
+                            next_chap = (cn, cp)
+
+                    if prev_chap and next_chap:
+                        prev_num, prev_page = prev_chap
+                        next_num, next_page = next_chap
+                        total_unknown = next_num - prev_num
+                        total_pages_avail = next_page - prev_page
+                        pages_per_chap = total_pages_avail / total_unknown
+                        offset = chap_num - prev_num
+                        start_page = prev_page + int(pages_per_chap * offset)
+                        # Ensure we don't overlap with next known chapter
+                        if start_page >= next_page:
+                            start_page = next_page - max(1, total_pages_avail // total_unknown)
+                    elif prev_chap:
+                        # Distribute remaining pages among trailing chapters
+                        _, prev_page = prev_chap
+                        trailing_count = sum(1 for c in all_chapters if c > prev_chap[0])
+                        if trailing_count > 0:
+                            pages_each = max(1, (max_page - prev_page) // trailing_count)
+                            offset = chap_num - prev_chap[0]
+                            start_page = min(prev_page + pages_each * offset, max_page)
+                        else:
+                            start_page = min(prev_page + 8, max_page)
+                    else:
+                        # First chapter not detected — rough estimate
+                        start_page = max(1, chap_num * 8)
+                else:
+                    start_page = max(1, chap_num * 8)
+
+            # Get title from TOC or use default
+            title = chapter_titles.get(chap_num, f"Chapter {chap_num}")
+            sections.append({
+                "number": chap_num,
+                "title": title,
+                "start_page": min(start_page, max_page),
+                "end_page": None,
+            })
+
+        # Sort by chapter number
+        sections.sort(key=lambda s: s["number"])
+        return sections
+
+    def _extract_chapter_titles_from_toc(self) -> dict:
+        """
+        从 PDF 文本的前几页（通常第1页）提取章节标题。
+        匹配 "N. Chapter N: Title" 格式。
+        返回: {chapter_number: title, ...}
+        """
+        titles = {}
+        # TOC patterns: "1. Chapter 1: Introduction" or "N. Chapter N: Title"
+        toc_re = re.compile(
+            r'^(\d{1,2})\.\s*Chapter\s+\d{1,2}[\.:\)]\s*(.+)',
+            re.IGNORECASE
+        )
+
+        # Search first 5 pages for TOC entries
+        for page in self.pages[:5]:
+            for line in page["text"].split('\n'):
+                line = line.strip()
+                if len(line) < 5 or len(line) > 200:
+                    continue
+                m = toc_re.match(line)
+                if m:
+                    num = int(m.group(1))
+                    title = m.group(2).strip()
+                    # Clean up title (remove trailing URLs, etc.)
+                    title = re.sub(r'\s*https?://\S+', '', title)
+                    title = re.sub(r'\s*file:///\S+', '', title)
+                    if len(title) >= 2:
+                        titles[num] = title
+
+        return titles
+
+    def _merge_short_sections(self, sections: list[dict]) -> list[dict]:
+        """合并过短的章节（< 2页），可能是误检测。"""
+        if len(sections) <= 1:
+            return sections
+        merged = []
+        i = 0
+        while i < len(sections):
+            s = sections[i]
+            page_count = s["end_page"] - s["start_page"] + 1
+            if page_count < 2 and i + 1 < len(sections):
+                # 过短：合并到下一章
+                next_s = sections[i + 1]
+                next_s["start_page"] = s["start_page"]
+                i += 1
+                continue
+            merged.append(s)
+            i += 1
+        return merged
+
+    def _detect_from_outline(self, body_outline: list[dict]) -> list[dict]:
+        """从 outline 检测章节（原有逻辑，用于非 OCR PDF）。"""
+        # 章节匹配模式
+        number_pattern = re.compile(r'^(\d{1,2})$')
+        numbered_title_pattern = re.compile(
+            r'^(\d{1,2})[\.\)]\s*(?:Chapter\s*\d{1,2}[\.:\)]\s*)?(.+)',
+            re.IGNORECASE
+        )
+        chapter_pattern = re.compile(
+            r'^Chapter\s+(\d{1,2})[\.:\)\s-]+(.+)',
+            re.IGNORECASE
+        )
+        part_pattern = re.compile(r'^Part\s+[IVX]+', re.IGNORECASE)
+        sections = []
+        seen_numbers = set()
+
+        # === Pass 1: 尝试格式 B) "N. Chapter N: Title" 或 "N. Title" ===
+        for item in body_outline:
+            title = item["title"].strip()
+
+            # 跳过 Part 标记
+            if part_pattern.match(title):
+                continue
+
+            # 格式 B: "1. Title" 或 "1. Chapter 1: Title"
+            m = numbered_title_pattern.match(title)
+            if m:
+                sec_num = int(m.group(1))
+                sec_title = m.group(2).strip()
+                if sec_num in seen_numbers:
+                    continue
+                if len(sec_title) < 2:
+                    continue
+                seen_numbers.add(sec_num)
+                sections.append({
+                    "number": sec_num,
+                    "title": sec_title,
+                    "start_page": item["page"],
+                    "end_page": None,
+                })
+                continue
+
+            # 格式 C: "Chapter N: Title"
+            m = chapter_pattern.match(title)
+            if m:
+                sec_num = int(m.group(1))
+                sec_title = m.group(2).strip()
+                if sec_num in seen_numbers:
+                    continue
+                seen_numbers.add(sec_num)
+                sections.append({
+                    "number": sec_num,
+                    "title": sec_title,
+                    "start_page": item["page"],
+                    "end_page": None,
+                })
+
+        # === Pass 2: 格式 A) 纯数字 + 同页紧随标题配对 ===
+        i = 0
+        while i < len(body_outline):
+            item = body_outline[i]
+            title = item["title"].strip()
+
+            if part_pattern.match(title):
+                i += 1
+                continue
+
+            m = number_pattern.match(title)
+            if m:
+                sec_num = int(m.group(1))
+                if sec_num in seen_numbers:
+                    i += 1
+                    continue
+                page = item["page"]
+                full_title_parts = []
+
+                j = i + 1
+                while j < len(body_outline) and body_outline[j]["page"] == page:
+                    next_title = body_outline[j]["title"].strip()
+                    if number_pattern.match(next_title):
+                        break
+                    if 'problem sheet' in next_title.lower():
+                        j += 1
+                        continue
+                    full_title_parts.append(next_title)
+                    j += 1
+
+                if full_title_parts:
+                    full_title = " ".join(full_title_parts)
+                    full_title = re.sub(r'-\s+', '', full_title)
+                    if len(full_title) >= 3:
+                        seen_numbers.add(sec_num)
+                        sections.append({
+                            "number": sec_num,
+                            "title": full_title,
+                            "start_page": page,
+                            "end_page": None,
+                        })
+                i = j
+            else:
+                i += 1
+
+        # 过滤：至少要有实际标题文本
+        sections = [s for s in sections if len(s["title"]) >= 2]
+        return sections
 
     # ================================================================
     # Guide generation
@@ -321,7 +563,7 @@ The FINAL OUTPUT must be a TRUE bilingual document, NOT English with occasional 
 6. **Headings:** Keep the English heading, followed by " / " and Chinese translation. Example: "### Topic 1: Simple Random Walk / 简单随机游走"
 
 7. **Mathematics:** Use standard LaTeX notation. After every formula, include a compact table explaining each symbol in both languages.
-   **CRITICAL: All matrices MUST use LaTeX `\\begin{pmatrix}...\\end{pmatrix}` — NEVER use Unicode box-drawing characters.**
+   **CRITICAL: All matrices MUST use LaTeX `\\begin{{pmatrix}}...\\end{{pmatrix}}` — NEVER use Unicode box-drawing characters.**
 
 Example of GOOD bilingual content:
 ```
