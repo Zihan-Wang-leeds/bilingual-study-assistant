@@ -107,6 +107,17 @@ class CourseRAG:
     # 索引管理
     # ================================================================
 
+    def clear_course(self, course_code: str):
+        """清除某个课程的全部索引块（用于重建前清理）。"""
+        if course_code in self.courses:
+            count = len(self.courses[course_code]["chunks"])
+            del self.courses[course_code]
+            self._rebuild_tfidf()
+            self._save_index()
+            print(f"[{course_code}] 已清除 {count} 个旧块")
+            return count
+        return 0
+
     def add_chunks(self, course_code: str, course_name: str, chunks: list[dict],
                    semantic: bool = False) -> int:
         """将分块后的文档添加到课程知识库。"""

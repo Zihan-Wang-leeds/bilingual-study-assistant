@@ -1,7 +1,8 @@
 """
-索引构建器 - 扫描课程目录，将PDF课件转换为可检索的向量索引
+索引构建器 - 扫描课程目录，将PDF课件 + Markdown教材转换为可检索的向量索引
 """
 import os
+import re
 import sys
 
 # 添加 scripts 目录到路径
@@ -45,6 +46,108 @@ def find_course_pdfs(courses_dir: str) -> dict:
     return courses
 
 
+def find_markdown_guides(course_dir: str) -> list[str]:
+    """
+    查找课程的 Markdown 自学教材文件（guides/ 目录下的 .md 文件）。
+
+    Args:
+        course_dir: 课程文件夹路径（如 课程/MATH2703/）
+
+    Returns:
+        排序后的 .md 文件路径列表
+    """
+    guides_dir = os.path.join(course_dir, "guides")
+    if not os.path.exists(guides_dir):
+        return []
+
+    md_files = []
+    for f in os.listdir(guides_dir):
+        if f.lower().endswith('.md'):
+            md_files.append(os.path.join(guides_dir, f))
+    return sorted(md_files)
+
+
+def chunk_markdown_file(md_path: str) -> list[dict]:
+    """
+    将 Markdown 教材按 ## 二级标题分块。
+
+    策略：
+      - 整文件作为主 chunk，包含所有内容
+      - 按 ## 二级标题切分为子 chunks（适用于大文件）
+      - 如果文件较短（< CHUNK_SIZE），作为单一 chunk
+
+    Args:
+        md_path: .md 文件路径
+
+    Returns:
+        [{"content": str, "metadata": {...}}, ...]
+    """
+    from config import CHUNK_SIZE
+
+    with open(md_path, 'r', encoding='utf-8') as f:
+        text = f.read()
+
+    filename = os.path.basename(md_path)
+    # 从文件名提取章节标题（如 Section_01_Introduction → Introduction）
+    clean_name = filename.replace('.md', '')
+    # 尝试提取中文/英文标题
+    section_title = clean_name
+
+    chunks = []
+
+    # 按 ## 标题分割
+    sections = re.split(r'\n(?=## )', text)
+    # 文件开头（第一个 ## 之前的内容）作为 pre-content
+    pre_content = ""
+    section_parts = []
+
+    for i, section in enumerate(sections):
+        if not section.strip():
+            continue
+        # 第一个 section 可能包含文件开头的介绍
+        if i == 0 and not section.strip().startswith('## '):
+            pre_content = section.strip()
+            continue
+        section_parts.append(section.strip())
+
+    # 如果章节很少（<=2），整个文件作为一个块
+    if len(section_parts) <= 2:
+        chunks.append({
+            "content": text.strip(),
+            "metadata": {
+                "source_file": filename,
+                "section_title": section_title,
+                "subsection": "",
+                "source_type": "markdown_guide",
+            }
+        })
+    else:
+        # 每个 ## section 作为一个块
+        # 但给每个块前面加上 pre_content 作为上下文
+        for i, part in enumerate(section_parts):
+            # 提取子标题
+            heading_match = re.match(r'^## (.+)$', part, re.MULTILINE)
+            subsection = heading_match.group(1).strip() if heading_match else f"Part {i+1}"
+
+            # 太短的块（< 200 chars）合并到下一个
+            if len(part) < 200:
+                if i + 1 < len(section_parts):
+                    section_parts[i+1] = part + "\n\n" + section_parts[i+1]
+                continue
+
+            chunks.append({
+                "content": part,
+                "metadata": {
+                    "source_file": filename,
+                    "section_title": section_title,
+                    "subsection": subsection,
+                    "source_type": "markdown_guide",
+                }
+            })
+
+    return chunks
+
+
 def build_course_index(course_code: str, pdf_paths: list[str],
                        rag: CourseRAG = None, semantic: bool = False) -> int:
     """
@@ -60,6 +163,9 @@ def build_course_index(course_code: str, pdf_paths: list[str],
     print(f"\n{'='*60}")
     print(f"📚 正在索引: {course_code}")
     print(f"{'='*60}")
+
+    # 清除旧索引，避免重复累积
+    rag.clear_course(course_code)
 
     total_chunks = 0
     course_name = course_code  # 默认使用课程代码
@@ -87,6 +193,26 @@ def build_course_index(course_code: str, pdf_paths: list[str],
         # Step 4: 存入索引（TF-IDF + 可选语义）
         count = rag.add_chunks(course_code, course_name, chunks, semantic=semantic)
         total_chunks += count
+
+    # Step 5: 索引 Markdown 教材（guides/ 目录下）
+    if pdf_paths:
+        course_dir = os.path.dirname(pdf_paths[0])
+    else:
+        from config import COURSES_DIR
+        course_dir = os.path.join(COURSES_DIR, course_code)
+
+    md_files = find_markdown_guides(course_dir)
+    if md_files:
+        print(f"\n📝 发现 {len(md_files)} 个 Markdown 教材文件")
+        for md_path in md_files:
+            md_filename = os.path.basename(md_path)
+            md_chunks = chunk_markdown_file(md_path)
+            if md_chunks:
+                count = rag.add_chunks(course_code, course_name, md_chunks, semantic=semantic)
+                total_chunks += count
+                print(f"  ✅ {md_filename}: {len(md_chunks)} 个块")
+    else:
+        print(f"\n📝 未发现 Markdown 教材（可选：guides/*.md）")
 
     print(f"\n✅ [{course_code}] 索引完成！总计 {total_chunks} 个文档块")
     return total_chunks

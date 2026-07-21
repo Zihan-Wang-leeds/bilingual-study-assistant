@@ -127,24 +127,58 @@ def _extract_with_pypdf2(pdf_path: str) -> list[dict]:
     return pages
 
 
+def _render_pdf_to_images(pdf_path: str, dpi: int = 250) -> list:
+    """
+    将 PDF 渲染为 PIL Image 列表。
+    优先使用 pdf2image (poppler)，不可用时回退到 PyMuPDF (fitz)。
+    """
+    # 方法 1: pdf2image + poppler（最佳质量）
+    if HAS_PDF2IMAGE:
+        try:
+            return convert_from_path(pdf_path, dpi=dpi)
+        except Exception as e:
+            print(f"  [INFO] pdf2image 失败 ({e})，回退到 PyMuPDF...")
+
+    # 方法 2: PyMuPDF (fitz) 内置渲染（Windows 无需装 poppler）
+    if HAS_FITZ:
+        try:
+            from PIL import Image
+            import io
+            doc = fitz.open(pdf_path)
+            images = []
+            zoom = dpi / 72  # fitz 默认 72 DPI
+            for i in range(len(doc)):
+                page = doc[i]
+                mat = fitz.Matrix(zoom, zoom)
+                pix = page.get_pixmap(matrix=mat)
+                img = Image.open(io.BytesIO(pix.tobytes("png")))
+                images.append(img)
+            doc.close()
+            return images
+        except Exception as e:
+            print(f"  [INFO] PyMuPDF 渲染失败 ({e})")
+
+    print("[ERROR] 无可用的 PDF→图片渲染引擎。请安装 pdf2image+poppler 或 pymupdf")
+    return []
+
+
 def _extract_with_ocr(pdf_path: str, dpi: int = 250) -> list[dict]:
     """
     使用 OCR (Tesseract) 从扫描版/图片型 PDF 提取文本。
 
-    流程：PDF → 图片 (via pdf2image/poppler) → OCR (via pytesseract)
+    流程：PDF → 图片 → OCR (via pytesseract)
+    渲染引擎：pdf2image/poppler 或 PyMuPDF/fitz（自动选择可用引擎）
     """
-    if not HAS_PDF2IMAGE:
-        print("[ERROR] OCR 需要 pdf2image + poppler。请: brew install poppler && pip install pdf2image")
-        return []
     if not HAS_TESSERACT:
-        print("[ERROR] OCR 需要 pytesseract。请: brew install tesseract && pip install pytesseract")
+        print("[ERROR] OCR 需要 pytesseract + Tesseract 系统安装。")
+        print("  Windows: https://github.com/UB-Mannheim/tesseract/wiki")
+        print("  macOS:   brew install tesseract")
+        print("  Linux:   sudo apt install tesseract-ocr")
         return []
 
     print(f"  OCR mode: converting PDF pages to images (DPI={dpi})...")
-    try:
-        images = convert_from_path(pdf_path, dpi=dpi)
-    except Exception as e:
-        print(f"[ERROR] PDF→图片转换失败: {e}")
+    images = _render_pdf_to_images(pdf_path, dpi=dpi)
+    if not images:
         return []
 
     pages = []
