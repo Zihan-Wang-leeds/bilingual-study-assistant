@@ -10,7 +10,7 @@ import re
 import time
 from datetime import datetime
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paths; paths.setup()
 
 from config import (
     COURSES_DIR,
@@ -176,20 +176,19 @@ class GuideGenerator:
                 ch_marker = re.match(r'^Chapter\s+(\d{1,2})$', line, re.IGNORECASE)
                 if ch_marker:
                     cn = int(ch_marker.group(1))
-                    if cn not in chapter_starts and cn <= 11:
+                    if cn not in chapter_starts:
                         chapter_starts[cn] = page_num
 
         # 4. Build section list from detected starts + TOC titles
-        all_chapters = set(range(1, 12))  # Ch 1-11
-
-        # Fill in missing chapters (9, 10, 11 may not have X.1 markers)
         max_page = len(self.pages)
         sorted_starts = sorted(chapter_starts.items())  # [(num, page), ...]
 
         # Ensure all TOC chapters are represented
         all_chapters = set(chapter_titles.keys()) | set(chapter_starts.keys())
         if not all_chapters:
-            all_chapters = set(range(1, 12))
+            # Fallback: estimate chapter count from page count (~8 pages/chapter typical)
+            num_chapters = max(1, max_page // 8)
+            all_chapters = set(range(1, num_chapters + 1))
 
         for chap_num in sorted(all_chapters):
             if chap_num in chapter_starts:

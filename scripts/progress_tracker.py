@@ -157,7 +157,7 @@ def get_all_progress(courses_dir: str) -> dict:
 
 if __name__ == "__main__":
     import sys
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import paths; paths.setup()
     from config import COURSES_DIR
 
     print("学习进度总览 / Study Progress Overview")

@@ -39,6 +39,17 @@ except ImportError:
 try:
     import pytesseract
     HAS_TESSERACT = True
+    # Windows: auto-detect Tesseract installation
+    # pytesseract 默认 tesseract_cmd='tesseract'（仅 PATH 中有用时生效）
+    # Windows 用户常需手动指定安装路径
+    _candidates = [
+        r'C:\Program Files\Tesseract-OCR\tesseract.exe',
+        r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe',
+    ]
+    for _path in _candidates:
+        if os.path.exists(_path):
+            pytesseract.pytesseract.tesseract_cmd = _path
+            break
 except ImportError:
     HAS_TESSERACT = False
 

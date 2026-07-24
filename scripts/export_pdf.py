@@ -9,7 +9,8 @@ import sys
 import re
 from datetime import datetime
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paths; paths.setup()
+
 from config import COURSES_DIR
 
 OUTPUT_DIR = "guides"

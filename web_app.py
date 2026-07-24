@@ -13,9 +13,15 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 
 # 修复 Windows GBK 终端下 emoji 打印问题
+# 安全替换 stdout/stderr，避免 I/O operation on closed file
 if sys.platform == 'win32':
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    for _attr in ('stdout', 'stderr'):
+        try:
+            _orig = getattr(sys, _attr)
+            if hasattr(_orig, 'buffer') and not _orig.buffer.closed:
+                setattr(sys, _attr, io.TextIOWrapper(_orig.buffer, encoding='utf-8', errors='replace'))
+        except (ValueError, AttributeError, OSError):
+            pass  # 非交互环境（如作为模块导入）可能失败，静默降级
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'scripts'))
 
@@ -216,7 +222,7 @@ def api_guides():
 
 
 def api_flashcards_generate():
-    """生成闪卡"""
+    """生成闪卡 — 优先复用已索引文本，避免重复 OCR"""
     data = request.get_json() or {}
     course_code = data.get('course_code', '').strip().upper()
     if not course_code:
@@ -225,11 +231,31 @@ def api_flashcards_generate():
     if not os.path.exists(pdf_path):
         return {"error": f"课件.pdf not found for {course_code}"}, 404
     try:
-        cards = generate_flashcards(course_code, pdf_path)
+        # 优先复用知识库中已索引的文本（跳过重复 OCR）
+        pre_text = None
+        if course_code in rag.courses:
+            chunks = rag.courses[course_code].get("chunks", [])
+            # 取 PDF 来源的文本（过滤掉 markdown_guide）
+            pdf_chunks = [c for c in chunks
+                          if c.get("metadata", {}).get("source_type") != "markdown_guide"]
+            if pdf_chunks:
+                pre_text = "\n\n".join(c["content"] for c in pdf_chunks)
+                print(f"[Flashcards] 复用已索引文本: {len(pdf_chunks)} 个块, {len(pre_text)} 字符")
+
+        if pre_text:
+            cards = generate_flashcards(course_code, pdf_path, pre_text=pre_text)
+        else:
+            cards = generate_flashcards(course_code, pdf_path)
+
         output_dir = os.path.join(COURSES_DIR, course_code, "guides")
         save_flashcards(course_code, output_dir, cards)
-        return {"success": True, "count": len(cards), "message": f"Generated {len(cards)} flashcards"}
+        return {"success": True, "count": len(cards), "message": f"Generated {len(cards)} flashcards"}, 200
     except Exception as e:
+        try:
+            import traceback
+            traceback.print_exc()
+        except Exception:
+            pass
         return {"error": str(e)}, 500
 
 
@@ -288,16 +314,16 @@ def api_progress_mark():
     tracker = ProgressTracker(course_dir)
     if action == 'section_read' and data.get('number'):
         tracker.mark_section_read(int(data['number']), data.get('title', ''))
-        return {"success": True, "sections_read": tracker.get_sections_read()}
+        return {"success": True, "sections_read": tracker.get_sections_read()}, 200
     elif action == 'problem_solved' and data.get('number'):
         tracker.mark_problem_solved(int(data['number']))
-        return {"success": True, "problems_solved": tracker.data["problems_solved"]}
+        return {"success": True, "problems_solved": tracker.data["problems_solved"]}, 200
     elif action == 'study_session' and data.get('minutes'):
         tracker.add_study_session(int(data['minutes']))
-        return {"success": True, "stats": tracker.get_study_stats()}
+        return {"success": True, "stats": tracker.get_study_stats()}, 200
     elif action == 'quiz_score' and data.get('score') is not None:
         tracker.add_quiz_score(data.get('topic', 'Web Quiz'), int(data['score']), int(data.get('total', 10)))
-        return {"success": True, "quiz_stats": tracker.get_quiz_stats()}
+        return {"success": True, "quiz_stats": tracker.get_quiz_stats()}, 200
     else:
         return {"error": f"Unknown action: {action}"}, 400
 
@@ -321,7 +347,7 @@ def api_export_pdf():
                 if pattern.match(f):
                     md_path = os.path.join(guides_dir, f)
                     output = export_to_pdf(md_path)
-                    return {"success": True, "output": output, "filename": os.path.basename(output)}
+                    return {"success": True, "output": output, "filename": os.path.basename(output)}, 200
             return {"error": f"Section {section} not found"}, 404
         else:
             return {"error": "Specify --section or use --all in CLI"}, 400
@@ -329,16 +355,24 @@ def api_export_pdf():
         return {"error": str(e)}, 500
 
 
+def _json_route(handler):
+    """Wrap a handler that returns dict | (dict, int) for use with add_url_rule."""
+    def wrapper():
+        result = handler()
+        if isinstance(result, tuple):
+            return jsonify(result[0]), result[1]
+        return jsonify(result)
+    return wrapper
+
+
 if app:
     # GET routes
-    app.add_url_rule('/api/stats', 'api_stats', lambda: jsonify(api_stats()))
-    app.add_url_rule('/api/courses', 'api_courses', lambda: jsonify(api_courses()))
-    app.add_url_rule('/api/modes', 'api_modes', lambda: jsonify(api_modes()))
-    app.add_url_rule('/api/guides', 'api_guides', lambda: (
-        lambda r: jsonify(r[0]) if isinstance(r, tuple) else jsonify(r)
-    )(api_guides()))
-    app.add_url_rule('/api/flashcards', 'api_flashcards', lambda: jsonify(api_flashcards_list()))
-    app.add_url_rule('/api/progress', 'api_progress', lambda: jsonify(api_progress()))
+    app.add_url_rule('/api/stats', 'api_stats', _json_route(api_stats))
+    app.add_url_rule('/api/courses', 'api_courses', _json_route(api_courses))
+    app.add_url_rule('/api/modes', 'api_modes', _json_route(api_modes))
+    app.add_url_rule('/api/guides', 'api_guides', _json_route(api_guides))
+    app.add_url_rule('/api/flashcards', 'api_flashcards', _json_route(api_flashcards_list))
+    app.add_url_rule('/api/progress', 'api_progress', _json_route(api_progress))
 
     # POST routes
     @app.route('/api/upload', methods=['POST'])
@@ -395,8 +429,11 @@ if app:
                         yield f"data: {json.dumps({'token': value}, ensure_ascii=False)}\n\n"
                 yield "data: [DONE]\n\n"
             except Exception as e:
-                import traceback
-                traceback.print_exc()
+                try:
+                    import traceback
+                    traceback.print_exc()
+                except Exception:
+                    pass
                 yield f"data: {json.dumps({'token': f'❌ 服务器错误: {str(e)}'}, ensure_ascii=False)}\n\n"
                 yield "data: [DONE]\n\n"
 
@@ -408,6 +445,26 @@ if app:
                 'X-Accel-Buffering': 'no'
             }
         )
+
+    # ================================================================
+    # JSON 错误处理器 — 确保所有错误返回 JSON，而非 HTML
+    # 防止前端 res.json() 因 HTML 响应而抛出 SyntaxError
+    # ================================================================
+    @app.errorhandler(400)
+    @app.errorhandler(404)
+    @app.errorhandler(405)
+    @app.errorhandler(500)
+    def _json_error_handler(error):
+        return jsonify({"error": str(error)}), getattr(error, 'code', 500)
+
+    @app.errorhandler(Exception)
+    def _json_unhandled_handler(error):
+        import traceback
+        try:
+            traceback.print_exc()
+        except Exception:
+            pass
+        return jsonify({"error": f"服务器内部错误: {error}"}), 500
 
 
 class StudyAssistantHandler(BaseHTTPRequestHandler):

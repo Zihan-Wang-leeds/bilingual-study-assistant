@@ -7,7 +7,7 @@ import re
 import time
 from datetime import datetime
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paths; paths.setup()
 
 from config import (
     COURSES_DIR,
@@ -177,7 +177,7 @@ class ProblemSolver:
         if len(problem_text) > max_chars:
             problem_text = problem_text[:max_chars] + "\n\n[Content truncated]"
 
-        prompt = f"""You are a university tutor creating detailed bilingual (Chinese/English) solutions for a Problem Sheet from the course {self.course_code}: Stochastic Processes.
+        prompt = f"""You are a university tutor creating detailed bilingual (Chinese/English) solutions for a Problem Sheet from the course {self.course_code}.
 
 Below is the problem sheet content. Your task: generate COMPLETE, STEP-BY-STEP solutions for EVERY question.
 
@@ -233,7 +233,7 @@ Bilingual summary of the most important idea from this question.
 8. NEVER write English-only steps — each step needs Chinese explanation too"""
 
         response = call_llm_with_prompts(
-            "You are a university mathematics tutor specializing in stochastic processes. You create truly bilingual (Chinese/English) detailed step-by-step solutions — every explanation step has substantial content in BOTH languages, Chinese first then English. You never write English-only steps. You never skip steps and always explain the reasoning.",
+            "You are a university mathematics tutor. You create truly bilingual (Chinese/English) detailed step-by-step solutions — every explanation step has substantial content in BOTH languages, Chinese first then English. You never write English-only steps. You never skip steps and always explain the reasoning.",
             prompt,
             temperature=GENERATION_TEMPERATURE,
             max_tokens=GENERATION_MAX_TOKENS,

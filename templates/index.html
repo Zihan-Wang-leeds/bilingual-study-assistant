@@ -5,18 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>双语学习助手 / Bilingual Study Assistant</title>
 
-    <!-- Markdown 渲染 -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Markdown 渲染（固定版本，避免更新破坏数学公式） -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
     <!-- 数学公式渲染 -->
     <script>
         window.MathJax = {
             tex: {
                 inlineMath: [['\\(', '\\)'], ['$', '$']],
                 displayMath: [['\\[', '\\]'], ['$$', '$$']],
-                processEscapes: true
+                processEscapes: false
             },
             svg: { fontCache: 'global' },
-            startup: { typeset: false }
+            startup: { typeset: false },
+            options: {
+                ignoreHtmlClass: 'no-mathjax',
+                processHtmlClass: 'process-mathjax'
+            }
         };
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
@@ -470,7 +474,10 @@
         }
         .flashcard:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
         .flashcard .card-front { font-weight: 600; font-size: 1rem; margin-bottom: 8px; }
+        .flashcard .card-front p { margin: 0; }
         .flashcard .card-back { display: none; font-size: 0.9rem; color: var(--text-secondary); margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+        .flashcard .card-back p { margin: 0; }
+        .flashcard .card-hint p { margin: 0; }
         .flashcard.flipped .card-front { opacity: 0.5; }
         .flashcard.flipped .card-back { display: block; }
         .flashcard .card-type {
@@ -992,12 +999,13 @@ async function loadFlashcards() {
         }
         grid.innerHTML = data.cards.map(c => `
             <div class="flashcard" onclick="this.classList.toggle('flipped')">
-                <div class="card-front">${escapeHtml(c.title || c.front)}</div>
+                <div class="card-front">${renderAssistantMarkdown(c.title || c.front)}</div>
                 <div class="card-back">${renderAssistantMarkdown(c.back)}</div>
-                <div class="card-hint">🇨🇳 ${escapeHtml(c.cn || '')}</div>
+                <div class="card-hint">🇨🇳 ${renderAssistantMarkdown(c.cn || '')}</div>
                 <div style="font-size:0.7rem;color:var(--text-muted);">点击翻转 / Click to flip</div>
             </div>
         `).join('');
+        typesetMath(grid);
     } catch(e) {
         grid.innerHTML = `<p style="color:var(--danger);">加载失败: ${e.message}</p>`;
     }
@@ -1438,20 +1446,40 @@ function renderAssistantMarkdown(content) {
 }
 
 function wrapInlineRawMath(text) {
-    const protectedPattern = /(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$(?!\s)(?:\\.|[^$\n]){1,120}?(?<!\s)\$|```[\s\S]*?```|`[^`]*`)/g;
+    // Protect already-delimited math + code blocks from being modified
+    const protectedPattern = /(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$(?!\s)(?:\\.|[^$\n]){1,200}?(?<!\s)\$|```[\s\S]*?```|`[^`]*`)/g;
     return text.split(protectedPattern).map(part => {
         if (!part || protectedPattern.test(part)) {
             protectedPattern.lastIndex = 0;
             return part;
         }
 
-        return part
-            .replace(/(^|[\s（(，。；：,;:])((?:[A-Z]|[a-z])_\{?[A-Za-z0-9]+\}?)(?=[\s，。；：,;:）).]|$)/g,
-                '$1\\($2\\)')
-            .replace(/(^|[\s（(，。；：,;:])(\\mathbb\{[A-Z]\})(?=[\s，。；：,;:）).]|$)/g,
-                '$1\\($2\\)')
-            .replace(/(^|[\s（(，。；：,;:])(\\sum_\{[^}]+\}\^\{?[^}\s]+\}?)(?=[\s，。；：,;:）).]|$)/g,
-                '$1\\($2\\)');
+        // 希腊字母 + 下标/上标: \mu_t, \alpha_i, \epsilon_{t}, \varepsilon_n, \phi^{(k)}
+        let wrapped = part.replace(
+            /(^|[\s（(，。；：,;:])(\\[a-zA-Z]+)(_\{(?:[^}]|\\.)+\}|_[A-Za-z0-9]+|\^\{[^}]+\}|\^[A-Za-z0-9]+)(?=[\s，。；：,;:）).,\-]|$)/g,
+            '$1\\($2$3\\)'
+        );
+        // 带帽/装饰符号 可选下标: \hat{X}_n, \bar{Y}_t, \tilde{Z}_i, \widehat{X}
+        wrapped = wrapped.replace(
+            /(^|[\s（(，。；：,;:])(\\[a-zA-Z]+\{[^}]+\})(_\{(?:[^}]|\\.)+\}|_[A-Za-z0-9]+|\^\{[^}]+\})?(?=[\s，。；：,;:）).,\-]|$)/g,
+            '$1\\($2$3\\)'
+        );
+        // 纯 LaTeX 命令序列: \text{...}, \operatorname{...}, \mathbb{R}
+        wrapped = wrapped.replace(
+            /(^|[\s（(，。；：,;:])(\\text\{[^}]*\}|\\operatorname\{[^}]*\}|\\mathbb\{[A-Z]\})(?=[\s，。；：,;:）).,\-]|$)/g,
+            '$1\\($2\\)'
+        );
+        // 拉丁字母 + 复杂下标/上标: X_{t+1}, Y_{i,j}, x^{(k+1)}
+        wrapped = wrapped.replace(
+            /(^|[\s（(，。；：,;:])((?:[A-Z]|[a-z])_\{(?:[^}]|\\.)+\}|(?:[A-Z]|[a-z])\^\{[^}]+\})(?=[\s，。；：,;:）).,\-]|$)/g,
+            '$1\\($2\\)'
+        );
+        // 简单上/下标(fallback): X_n, x_i, a_1, p_0
+        wrapped = wrapped.replace(
+            /(^|[\s（(，。；：,;:])([A-Za-z][A-Za-z]*(?:_[A-Za-z0-9]+|\^[A-Za-z0-9]+))(?=[\s，。；：,;:）).,\-]|$)/g,
+            '$1\\($2\\)'
+        );
+        return wrapped;
     }).join('');
 }
 

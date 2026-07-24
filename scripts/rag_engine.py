@@ -15,7 +15,7 @@ from llm_client import get_client, call_llm, call_llm_with_prompts, call_llm_str
 
 from config import (
     API_KEY, BASE_URL, MODEL_NAME,
-    TOP_K, TEMPERATURE, MAX_TOKENS
+    TOP_K, TEMPERATURE, MAX_TOKENS, MODE_MAX_TOKENS
 )
 
 # 允许从项目根目录导入 prompts 模块
@@ -119,8 +119,12 @@ class CourseRAG:
         return 0
 
     def add_chunks(self, course_code: str, course_name: str, chunks: list[dict],
-                   semantic: bool = False) -> int:
-        """将分块后的文档添加到课程知识库。"""
+                   semantic: bool = False, defer_rebuild: bool = False) -> int:
+        """将分块后的文档添加到课程知识库。
+
+        Args:
+            defer_rebuild: True 时跳过 TF-IDF 重建，由调用者在批量添加完成后手动 rebuild。
+        """
         if course_code not in self.courses:
             self.courses[course_code] = {
                 "name": course_name,
@@ -135,9 +139,9 @@ class CourseRAG:
 
         print(f"[{course_code}] 已添加 {len(chunks)} 个文档块")
 
-        # 重建 TF-IDF 索引
-        self._rebuild_tfidf()
-        self._save_index()
+        if not defer_rebuild:
+            self._rebuild_tfidf()
+            self._save_index()
 
         # 语义索引（如果可用）
         if semantic:
@@ -147,9 +151,66 @@ class CourseRAG:
 
         return len(chunks)
 
+    def finalize_index(self):
+        """重建 TF-IDF 索引并保存（批量添加完成后调用一次）。"""
+        self._rebuild_tfidf()
+        self._save_index()
+
     def list_courses(self) -> list[str]:
         """列出已索引的课程。"""
         return list(self.courses.keys())
+
+    def get_course_overview(self, course_code: str) -> str:
+        """
+        获取课程概览：名称 + 章节列表。
+        优先从 Markdown 教材文件名提取（最干净），否则从 PDF chunk 元数据提取。
+
+        用于注入 AI 上下文，让 AI 知道课程的完整结构，
+        从而正确映射用户说的「第一章」到具体章节名。
+        """
+        if course_code not in self.courses:
+            return ""
+
+        c = self.courses[course_code]
+        name = c.get("name", course_code)
+
+        # 收集 Markdown 教材中的章节标题（更干净）
+        md_sections = []
+        seen_md = set()
+        for chunk in c.get("chunks", []):
+            meta = chunk.get("metadata", {})
+            if meta.get("source_type") != "markdown_guide":
+                continue
+            st = meta.get("section_title", "")
+            if st and st not in seen_md:
+                seen_md.add(st)
+                md_sections.append(st)
+
+        # 如果没有 Markdown 章节，从 PDF 元数据提取
+        if not md_sections:
+            seen = set()
+            for chunk in c.get("chunks", []):
+                meta = chunk.get("metadata", {})
+                st = meta.get("section_title", "")
+                # 过滤噪音：至少 8 个字符，不含过多 OCR 错误
+                if st and st not in seen and len(st) >= 8:
+                    # 过滤明显的 OCR 垃圾（太多单字符/随机字母）
+                    words = st.split()
+                    if len(words) >= 2 and all(len(w) > 1 for w in words[:4]):
+                        seen.add(st)
+                        md_sections.append(st)
+
+        if not md_sections:
+            return f"Course: {course_code} ({name})"
+
+        lines = [f"当前课程 / Current Course: {course_code} — {name}"]
+        lines.append(f"课程章节列表 / Available chapters ({len(md_sections)} total):")
+        for i, sec in enumerate(md_sections, 1):
+            # 清理文件名格式
+            clean = sec.replace('_', ' ')
+            lines.append(f"  {i}. {clean}")
+
+        return "\n".join(lines)
 
     def get_course_stats(self, course_code: str = None) -> dict:
         """获取知识库统计信息。"""
@@ -235,6 +296,48 @@ class CourseRAG:
     # 生成
     # ================================================================
 
+    def _build_context(self, question: str, course_code: str = None,
+                       top_k: int = TOP_K) -> tuple:
+        """构建检索上下文 + 来源列表（ask / ask_stream 共用）。"""
+        relevant_docs = self.search(question, course_code, top_k)
+
+        course_overview = ""
+        if course_code:
+            course_overview = self.get_course_overview(course_code)
+        elif len(self.courses) == 1:
+            course_overview = self.get_course_overview(list(self.courses.keys())[0])
+
+        if relevant_docs:
+            context_parts = []
+            if course_overview:
+                context_parts.append(f"[课程信息 / Course Info]\n{course_overview}")
+            for i, doc in enumerate(relevant_docs):
+                meta = doc["metadata"]
+                src_info = f"[来源{i+1}] "
+                if "course_name" in meta:
+                    src_info += f"课程: {meta['course_name']}, "
+                if "section_title" in meta:
+                    src_info += f"Section {meta.get('section', '?')}: {meta['section_title']}"
+                elif "section" in meta:
+                    src_info += f"Section {meta['section']}"
+                context_parts.append(f"{src_info}\n{doc['content']}")
+            context = "\n\n---\n\n".join(context_parts)
+        else:
+            context = "[未在课件中找到直接相关内容 / No directly relevant content found in course materials]"
+            if course_overview:
+                context = f"[课程信息 / Course Info]\n{course_overview}\n\n{context}"
+
+        sources = []
+        for doc in relevant_docs:
+            meta = doc["metadata"]
+            sources.append({
+                "course": meta.get("course_name", ""),
+                "section": meta.get("section", ""),
+                "section_title": meta.get("section_title", ""),
+                "preview": doc["content"][:200]
+            })
+        return context, sources
+
     def ask(self, question: str, course_code: str = None,
             mode: str = "concept", top_k: int = TOP_K,
             history: list[dict] = None) -> dict:
@@ -249,48 +352,22 @@ class CourseRAG:
 
         返回: {"answer": "...", "sources": [...], "mode": "..."}
         """
-        # 1. 检索
-        relevant_docs = self.search(question, course_code, top_k)
+        # 1. 检索 + 构建上下文
+        context, sources = self._build_context(question, course_code, top_k)
 
-        # 2. 构建上下文（即使检索为空也继续，让 LLM 自行判断）
-        if relevant_docs:
-            context_parts = []
-            for i, doc in enumerate(relevant_docs):
-                meta = doc["metadata"]
-                src_info = f"[来源{i+1}] "
-                if "course_name" in meta:
-                    src_info += f"课程: {meta['course_name']}, "
-                if "section_title" in meta:
-                    src_info += f"Section {meta.get('section', '?')}: {meta['section_title']}"
-                elif "section" in meta:
-                    src_info += f"Section {meta['section']}"
-                context_parts.append(f"{src_info}\n{doc['content']}")
-            context = "\n\n---\n\n".join(context_parts)
-        else:
-            context = "[未在课件中找到直接相关内容 / No directly relevant content found in course materials]"
-
-        # 3. 根据模式选择System Prompt
+        # 2. 构建消息
         system_prompt = get_study_prompt(mode, context)
+        messages = [{"role": "system", "content": system_prompt}]
+        if history:
+            for turn in history[-12:]:
+                messages.append({"role": turn["role"], "content": turn["content"]})
+        messages.append({"role": "user", "content": question})
 
-        # 4. 调用LLM
-        answer = self._call_llm(system_prompt, question, history=history)
+        # 3. 调用LLM
+        max_tok = MODE_MAX_TOKENS.get(mode, MAX_TOKENS)
+        answer = call_llm(messages, temperature=TEMPERATURE, max_tokens=max_tok)
 
-        # 5. 整理来源
-        sources = []
-        for doc in relevant_docs:
-            meta = doc["metadata"]
-            sources.append({
-                "course": meta.get("course_name", ""),
-                "section": meta.get("section", ""),
-                "section_title": meta.get("section_title", ""),
-                "preview": doc["content"][:200]
-            })
-
-        return {
-            "answer": answer,
-            "sources": sources,
-            "mode": mode
-        }
+        return {"answer": normalize_math_answer(answer), "sources": sources, "mode": mode}
 
     def ask_stream(self, question: str, course_code: str = None,
                    mode: str = "concept", top_k: int = TOP_K,
@@ -303,39 +380,11 @@ class CourseRAG:
             ("meta", {"sources": [...], "mode": "..."})  — 元数据
             ("token", str)                                 — 逐个 delta 文本
         """
-        # 1. 检索
-        relevant_docs = self.search(question, course_code, top_k)
-
-        # 2. 构建上下文（即使检索为空也继续，让 LLM 自行判断）
-        if relevant_docs:
-            context_parts = []
-            for i, doc in enumerate(relevant_docs):
-                meta = doc["metadata"]
-                src_info = f"[来源{i+1}] "
-                if "course_name" in meta:
-                    src_info += f"课程: {meta['course_name']}, "
-                if "section_title" in meta:
-                    src_info += f"Section {meta.get('section', '?')}: {meta['section_title']}"
-                elif "section" in meta:
-                    src_info += f"Section {meta['section']}"
-                context_parts.append(f"{src_info}\n{doc['content']}")
-            context = "\n\n---\n\n".join(context_parts)
-        else:
-            context = "[未在课件中找到直接相关内容 / No directly relevant content found in course materials]"
-
-        # 3. 来源 metadata（用 tuple 区分，避免被前端当文本显示）
-        sources = []
-        for doc in relevant_docs:
-            meta = doc["metadata"]
-            sources.append({
-                "course": meta.get("course_name", ""),
-                "section": meta.get("section", ""),
-                "section_title": meta.get("section_title", ""),
-                "preview": doc["content"][:200]
-            })
+        # 1. 检索 + 构建上下文
+        context, sources = self._build_context(question, course_code, top_k)
         yield ("meta", {"sources": sources, "mode": mode})
 
-        # 4. System prompt
+        # 2. 构建消息
         system_prompt = get_study_prompt(mode, context)
         messages = [{"role": "system", "content": system_prompt}]
         if history:
@@ -343,11 +392,12 @@ class CourseRAG:
                 messages.append({"role": turn["role"], "content": turn["content"]})
         messages.append({"role": "user", "content": question})
 
-        # 5. 流式生成
+        # 3. 流式生成
+        max_tok = MODE_MAX_TOKENS.get(mode, MAX_TOKENS)
         for delta in call_llm_stream(
             messages=messages,
             temperature=TEMPERATURE,
-            max_tokens=MAX_TOKENS,
+            max_tokens=max_tok,
         ):
             yield ("token", delta)
 

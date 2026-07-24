@@ -5,8 +5,7 @@ import os
 import re
 import sys
 
-# 添加 scripts 目录到路径
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paths; paths.setup()
 
 from pdf_loader import extract_text_from_pdf, extract_course_info
 from chunker import chunk_pdf
@@ -190,8 +189,9 @@ def build_course_index(course_code: str, pdf_paths: list[str],
         chunks = chunk_pdf(pages)
         print(f"  分块数: {len(chunks)}")
 
-        # Step 4: 存入索引（TF-IDF + 可选语义）
-        count = rag.add_chunks(course_code, course_name, chunks, semantic=semantic)
+        # Step 4: 存入索引（defer rebuild，批量添加完成后再重建一次）
+        count = rag.add_chunks(course_code, course_name, chunks,
+                               semantic=semantic, defer_rebuild=True)
         total_chunks += count
 
     # Step 5: 索引 Markdown 教材（guides/ 目录下）
@@ -208,11 +208,15 @@ def build_course_index(course_code: str, pdf_paths: list[str],
             md_filename = os.path.basename(md_path)
             md_chunks = chunk_markdown_file(md_path)
             if md_chunks:
-                count = rag.add_chunks(course_code, course_name, md_chunks, semantic=semantic)
+                count = rag.add_chunks(course_code, course_name, md_chunks,
+                                       semantic=semantic, defer_rebuild=True)
                 total_chunks += count
                 print(f"  ✅ {md_filename}: {len(md_chunks)} 个块")
     else:
         print(f"\n📝 未发现 Markdown 教材（可选：guides/*.md）")
+
+    # 批量添加完成，一次性重建 TF-IDF 索引
+    rag.finalize_index()
 
     print(f"\n✅ [{course_code}] 索引完成！总计 {total_chunks} 个文档块")
     return total_chunks

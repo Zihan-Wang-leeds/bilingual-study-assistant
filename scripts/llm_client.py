@@ -5,6 +5,7 @@
 """
 import time
 import os
+import httpx
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -30,7 +31,6 @@ def get_client() -> OpenAI:
 
 def _is_retryable(error: Exception) -> bool:
     """判断是否为可重试的错误（网络/超时），不重试认证/参数错误。"""
-    import httpx
     if isinstance(error, httpx.NetworkError):
         return True
     if isinstance(error, httpx.TimeoutException):

@@ -12,7 +12,7 @@ import re
 import io
 from datetime import datetime
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paths; paths.setup()
 
 from config import (
     COURSES_DIR, GENERATION_TEMPERATURE, GENERATION_MAX_TOKENS,
@@ -45,24 +45,35 @@ Every formula must use LaTeX notation ($...$ for inline, $$...$$ for display).""
 
 
 def generate_flashcards(course_code: str, pdf_path: str,
-                        sections: tuple = None) -> list[dict]:
-    """从 PDF 课件生成闪卡列表。"""
-    print(f"\n📇 Generating flashcards for {course_code}...")
+                        sections: tuple = None, pre_text: str = None) -> list[dict]:
+    """从 PDF 课件生成闪卡列表。
+
+    Args:
+        course_code: 课程代码
+        pdf_path: PDF 文件路径
+        sections: 可选的页面范围 (start, end)
+        pre_text: 可选的预提取文本（传入后跳过 PDF 提取，用于 Web 端避免重复 OCR）
+    """
+    print(f"\n[Flashcards] Generating flashcards for {course_code}...")
     print(f"   Source: {pdf_path}")
 
-    pages = extract_text_from_pdf(pdf_path)
-    if not pages:
-        print("ERROR: No pages extracted from PDF")
-        return []
+    if pre_text:
+        print(f"   Using pre-extracted text ({len(pre_text)} chars)")
+        full_text = pre_text
+    else:
+        pages = extract_text_from_pdf(pdf_path)
+        if not pages:
+            print("ERROR: No pages extracted from PDF")
+            return []
 
-    # 筛选页面范围
-    if sections:
-        start, end = sections
-        pages = [p for p in pages if start <= p["page"] <= end]
-        print(f"   Pages {start}-{end} ({len(pages)} pages)")
+        # 筛选页面范围
+        if sections:
+            start, end = sections
+            pages = [p for p in pages if start <= p["page"] <= end]
+            print(f"   Pages {start}-{end} ({len(pages)} pages)")
 
-    # 合并文本
-    full_text = "\n\n".join(f"[Page {p['page']}]\n{p['text']}" for p in pages)
+        # 合并文本
+        full_text = "\n\n".join(f"[Page {p['page']}]\n{p['text']}" for p in pages)
 
     # 过长则截断（保留开头和结尾）
     max_chars = 15000
@@ -135,7 +146,7 @@ def save_flashcards(course_code: str, output_dir: str,
             f.write(f"*Type: {card.get('type', '')} | Source: {card.get('source', '')}*\n\n")
             f.write("---\n\n")
 
-    print(f"   📝 Markdown: {md_path}")
+    print(f"   [Markdown] {md_path}")
 
     # Anki CSV
     csv_path = os.path.join(output_dir, "Flashcards.csv")
@@ -152,9 +163,9 @@ def save_flashcards(course_code: str, output_dir: str,
                 f"{course_code}",
             ])
 
-    print(f"   📊 Anki CSV: {csv_path}")
-    print(f"\n💡 导入 Anki: File → Import → 选择 {csv_path}")
-    print(f"   Import Anki: File → Import → Select {csv_path}")
+    print(f"   [CSV] {csv_path}")
+    print(f"\n[Tip] Import into Anki: File -> Import -> Select {csv_path}")
+    print(f"   Import Anki: File -> Import -> Select {csv_path}")
 
 
 def main():
